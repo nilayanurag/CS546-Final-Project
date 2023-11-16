@@ -1,7 +1,17 @@
 import {ObjectId} from 'mongodb';
 
+export function checkStringHelper(strVal, varName) {
+    if (!varName) varName="Value"
+    if (!strVal) throw `Error: You must supply a ${varName}!`;
+    if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
+    strVal = strVal.trim();
+    if (strVal.length === 0)
+    throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+    return strVal;
+}
+
 export function checkString(strVal, varName,lowerbound,upperbound) {
-    strVal=checkStringBasic(strVal,varName)
+    strVal=checkStringHelper(strVal,varName)
     if(!lowerbound) {return strVal}
     else if (strVal.length<lowerbound) {throw `Error: ${strVal} must atleast ${lowerbound} in size!`}
     if (!upperbound){return strVal}
