@@ -13,7 +13,7 @@ const getCollectionFn = (collection) => {
   };
 };
 
-// Note: You will need to change the code below to have the collection required by the assignment!
+// We are adding all collection here
 export const users = getCollectionFn('users');
 export const reviews = getCollectionFn('reviews');
 export const categories = getCollectionFn('categories');
