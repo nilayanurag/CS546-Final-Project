@@ -1,16 +1,5 @@
 import {ObjectId} from 'mongodb';
 
-
-export function checkStringBasic(strVal, varName) {
-    if (!varName) varName="Value"
-    if (!strVal) throw `Error: You must supply a ${varName}!`;
-    if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
-    strVal = strVal.trim();
-    if (strVal.length === 0)
-      throw `Error: ${varName} cannot be an empty string or string with just spaces`;
-    return strVal;
-  }
-
 export function checkString(strVal, varName,lowerbound,upperbound) {
     strVal=checkStringBasic(strVal,varName)
     if(!lowerbound) {return strVal}
