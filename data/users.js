@@ -1,5 +1,5 @@
-import * as helper from "../helpers/validation.js"
-import {users} from "../config/mongoCollections.js"
+import * as helper from "../helpers/validation.js";
+import { users } from "../config/mongoCollections.js";
 
 /*
 Refernce Schema:
@@ -33,44 +33,79 @@ users:{
 }
 */
 
-export const createUser =async(
+export const createUser = async (
+  firstName,
+  lastName,
+  sex,
+  age,
+  contactEmail,
+  password,
+  following,
+  followers,
+  tags,
+  location
+) => {
+  // Validate input using helper functions
+  firstName = helper.checkString(firstName, "g", 1, 50);
+  lastName = helper.checkString(lastName, "h", 1, 50);
+  sex = helper.checkString(sex);
+
+  // Additional validations...
+
+  // Hash the password using bcrypt
+  const saltRounds = 1; // Change back to 16 later on
+  const hash = await bcrypt.hash(password, saltRounds);
+
+  // Create a new user object
+  const newUser = {
     firstName,
     lastName,
     sex,
     age,
     contactEmail,
-    password,
-    following,
-    followers,
-    tags,
-    location
-)=>{
-    /*this is a basic template I have use from hw just to get it started* /
+    password: hash,
+    following: [],
+    followers: [],
+    tags: [],
+    location,
+    reviews: [],
+    comments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  // Insert the new user into the users collection
+  const userCollection = await users();
+  const insertInfo = await userCollection.insertOne(newUser);
+
+  if (insertInfo.insertedCount === 0) {
+    throw "Error: Could not create user.";
+  }
+
+  return newUser;
+
+  /*this is a basic template I have use from hw just to get it started* /
     firstName=helper.checkString(firstName,1,50)
     lastName=helper.checkString(lastName,1,50)
     sex=helper.checkString(sex)
     */
-    
 
+  // Create a new user and return its Id
+};
 
-    // Create a new user and return its Id
-}
+export const getUser = async (userId) => {};
 
-export const getUser = async(userId)=>{
-
-}
-
-export const updateUser =async(
-    userId,
-    firstName,
-    lastName,
-    sex,
-    age,
-    contactEmail,
-    password,
-    location
-)=>{
-    /*
+export const updateUser = async (
+  userId,
+  firstName,
+  lastName,
+  sex,
+  age,
+  contactEmail,
+  password,
+  location
+) => {
+  /*
     create empty array like
     following,
     followers,
@@ -79,44 +114,32 @@ export const updateUser =async(
     comments
     put a "created" timesteamp
     */
-      
-}
+};
 
-export const updateLastTimeStamp= async(userId)=>{
-    /*
+export const updateLastTimeStamp = async (userId) => {
+  /*
     Call this in every function to update the date
      */
-}
+};
 
-export const deleteUser= async(userId)=>{
-}
+export const deleteUser = async (userId) => {};
 
-export const getFollowing=async(userId)=>{
-}
+export const getFollowing = async (userId) => {};
 
-export const getFollowers=async(userId)=>{
-}
+export const getFollowers = async (userId) => {};
 
-export const getTags=async(userId)=>{
-}
+export const getTags = async (userId) => {};
 
-export const addFollowing=async(userId,followingId)=>{
-}
+export const addFollowing = async (userId, followingId) => {};
 
-export const addFollower=async(userId,followerId)=>{
-}
+export const addFollower = async (userId, followerId) => {};
 
-export const addTags=async(userId,tags)=>{
-}
+export const addTags = async (userId, tags) => {};
 
-export const addReview=async(userId,reviewId)=>{
-}
+export const addReview = async (userId, reviewId) => {};
 
-export const deleteReview=async(userId,reviewId)=>{
-}
+export const deleteReview = async (userId, reviewId) => {};
 
-export const addComment=async(userId,commentId)=>{
-}
+export const addComment = async (userId, commentId) => {};
 
-export const deleteComment=async(userId,commentId)=>{
-}
+export const deleteComment = async (userId, commentId) => {};
