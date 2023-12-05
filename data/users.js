@@ -50,8 +50,6 @@ export const createUser =async(
     lastName=helper.checkString(lastName,1,50)
     sex=helper.checkString(sex)
     */
-    
-
 
     // Create a new user and return its Id
 }
