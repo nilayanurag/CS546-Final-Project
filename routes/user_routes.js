@@ -1,21 +1,5 @@
 import express from "express";
-import {
-  createUser,
-  getUser,
-  updateUser,
-  getTags,
-  getFollowers,
-  getFollowing,
-  updateLastTimeStamp,
-  deleteUser,
-  addFollowing,
-  addFollower,
-  addTags,
-  addReview,
-  deleteReview,
-  addComment,
-  deleteComment,
-} from "../data/users.js";
+import * as userData from "../data/users.js";
 import * as helper from "../helpers/validation.js";
 
 const usersRouter = express.Router();
