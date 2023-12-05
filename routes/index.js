@@ -1,4 +1,4 @@
-import usersRouter from "../routes/user_routes.js";
+import usersRouter from "../routes/userRoutes.js";
 
 const constructorMethod = (app) => {
   app.use("/", usersRouter);
