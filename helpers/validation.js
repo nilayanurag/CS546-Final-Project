@@ -182,4 +182,28 @@ export function checkAddress(addressObject) {
     return addressObject
 }
 
+export function checkArray(arr, varName) {
+    if (!varName) varName="Value"
+    if (!arr) throw `Error: You must supply a ${varName}!`;
+    if (!Array.isArray(arr)) throw `Error: ${varName} must be an array!`;
+
+    return arr;
+}
+
+export function checkArrayOfObjectIds(arr, varName) {
+    arr=checkArray(arr,varName)
+    for (let i=0;i<arr.length;i++){
+        arr[i]=checkObjectId(arr[i])
+    }
+    return arr
+}
+
+export function checkArrayOfStrings(arr, varName) {
+    arr=checkArray(arr,varName)
+    for (let i=0;i<arr.length;i++){
+        arr[i]=checkString(arr[i])
+    }
+    return arr
+}
+
 
