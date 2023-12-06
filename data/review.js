@@ -1,5 +1,7 @@
-import * as helper from "../helpers/validation.js"
-import {reviews} from "../config/mongoCollections.js"
+import * as helper from "../helpers/validation.js";
+import { reviews } from "../config/mongoCollections.js";
+import fs from 'fs';
+import {Binary, ObjectId} from "mongodb";
 
 /*
 reviews:{
@@ -20,41 +22,63 @@ reviews:{
 },
  */
 
-export const createReview =async()=>{
-    /*createdAt*/
-}
+export const createReview = async (
+  businessId,
+  userId,
+  categoryId,
+  ratingPoints,
+  reviewText,
+  imagePath
+) => {
+  try {
+    businessId = helper.checkObjectId(businessId);
+    userId = helper.checkObjectId(userId);
+    categoryId = helper.checkObjectId(categoryId);
+    reviewText = helper.checkString(reviewText, "Review Text", 1, 500);
 
-export const deleteReview = async()=>{
+    // validate image if there then insert else null
+    let imageBinary
+    if (imagePath && imagePath.trim() !== ''){
+        const imageBuffer = fs.readFileSync(imagePath);
+        imageBinary = new Binary(imageBuffer); 
+    }else{
+        imageBinary = null
+    }
+       
+    const reviewCollection = await reviews();
+    const newReview = await reviewCollection.insertOne({
+      businessId: businessId,
+      userId: userId,
+      categoryId: categoryId,
+      rating: ratingPoints,
+      reviewText: reviewText,
+      images: imageBinary,
+      comments: [],
+      thumsUp: [],
+      thumsDown: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return { insertedReview: newReview.insertedId ? true : false };
+  } catch (error) {}
+};
 
-} 
+export const deleteReview = async (reviewId) => {};
 
-export const updateReview =async()=>{
+export const updateReview = async (reviewId, ratingPoints,
+    reviewText,
+    imagePath) => {};
 
-}
+export const getReview = async () => {};
 
+export const thumbsUp = async () => {};
 
-export const getReview =async()=>{
+export const removeThumbsUp = async () => {};
 
-}
+export const thumbsDown = async () => {};
 
-export const thumbsUp =async()=>{
+export const removeThumbsDown = async () => {};
 
-}
-
-export const removeThumbsUp =async()=>{
-
-}
-
-export const thumbsDown =async()=>{
-
-}
-
-export const removeThumbsDown =async()=>{
-
-}
-
-
-export const updatedReviewTimeStamp =async()=>{
-    /**call after every operation */
-}
-
+export const updatedReviewTimeStamp = async () => {
+  /**call after every operation */
+};

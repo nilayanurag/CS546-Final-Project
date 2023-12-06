@@ -3,6 +3,7 @@ import * as userData from "../data/users.js";
 
 try {
     const created=await userData.createUser(
+        "nilayanurag",
         "Nilay",
         "Anurag",
         "male",
@@ -26,6 +27,7 @@ try {
 
 try {
     const created=await userData.createUser(
+        "peter123",
         "Peter",
         "Parker",
         "male",

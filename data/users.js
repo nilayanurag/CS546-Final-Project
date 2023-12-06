@@ -1,7 +1,7 @@
-import * as helper from "../helpers/validation.js"
-import {users} from "../config/mongoCollections.js"
+import * as helper from "../helpers/validation.js";
+import { users } from "../config/mongoCollections.js";
 import bcrypt from "bcrypt";
-import * as EmailValidator from 'email-validator';
+import { ObjectId } from "mongodb";
 const saltRounds = 10;
 
 /*
@@ -36,141 +36,356 @@ users:{
 }
 */
 
-export const createUser =async(
-    firstName,
-    lastName,
-    sex,
-    age,
-    contactEmail,
-    password,
-    location
-)=>{
-    /*this is a basic template I have use from hw just to get it started* /
+export const createUser = async (
+  username,
+  firstName,
+  lastName,
+  sex,
+  age,
+  contactEmail,
+  password,
+  location
+) => {
+  /*this is a basic template I have use from hw just to get it started* /
     firstName=helper.checkString(firstName,1,50)
     lastName=helper.checkString(lastName,1,50)
     sex=helper.checkString(sex)
     */
 
-    // Create a new user and return its Id
-    
-    const userCollection= await users();
-    
-    firstName=helper.checkString(firstName,"firstName",1,25)
-    lastName=helper.checkString(lastName,"lastName",1,25)
-    sex=helper.checkSex(sex)
-    contactEmail=await helper.checkIfEmailPresent(contactEmail)
-    age=helper.checkAge(age,12,105)
-    password=helper.checkPass(password)
-    let followers=[]
-    let following=[]
-    let tags=[]
-    location=helper.checkAddress(location)
+  // Create a new user and return its Id
 
-    const hash = await bcrypt.hash(password, saltRounds);
+  const userCollection = await users();
 
-    
-    let dataPacket={
-        firstName,
-        sex,
-        contactEmail,
-        password:hash,
-        following,
-        followers,
-        tags,
-        location
-    }
+  username = helper.checkString(username, "username", 1, 25);
+  firstName = helper.checkString(firstName, "firstName", 1, 25);
+  lastName = helper.checkString(lastName, "lastName", 1, 25);
+  sex = helper.checkSex(sex);
+  contactEmail = await helper.checkIfEmailPresent(contactEmail);
+  age = helper.checkAge(age, 12, 105);
+  password = helper.checkPass(password);
+  let followers = [];
+  let following = [];
+  let tags = [];
+  location = helper.checkAddress(location);
 
-    const inserted = await userCollection.insertOne(dataPacket);
-    if (inserted.insertedId){
-    return {insertedUser:true}
-    }else{
-    throw "Could not insert user"
-    }
-}
+  const hash = await bcrypt.hash(password, saltRounds);
 
-export const loginUser = async (contactEmail, password) => {
-    contactEmail=await helper.checkValidEmail(contactEmail)
-    password=helper.checkPass(password)
-  
-    const userCollection= await users();
-    const found= await userCollection.findOne({contactEmail:contactEmail})
-    if (found==null){
-      throw "Either the email address or password is invalid"
-    }
-    let compareToPassword=false
-    try {
-      compareToPassword = await bcrypt.compare(password, found.password);
-    } catch (e) {
-      //no op
-    }
-    if (compareToPassword){
-      return {firstName:found.firstName,lastName:found.lastName,contactEmail:found.contactEmail}
-    }else{
-      throw "Either the email address or password is invalid"
-    }
-  };
-
-export const getUser = async(userId)=>{
-
-}
-
-export const updateUser =async(
-    userId,
+  let dataPacket = {
+    username,
     firstName,
     lastName,
     sex,
     age,
     contactEmail,
-    password,
-    location
-)=>{
-    /*
-    create empty array like
+    password: hash,
     following,
     followers,
     tags,
-    reviews
-    comments
-    put a "created" timesteamp
-    */
-      
-}
+    location,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-export const updateLastTimeStamp= async(userId)=>{
-    /*
-    Call this in every function to update the date
-     */
-}
+  const inserted = await userCollection.insertOne(dataPacket);
+  if (inserted.insertedId) {
+    return { insertedUser: true };
+  } else {
+    throw "Could not insert user";
+  }
+};
 
-export const deleteUser= async(userId)=>{
-}
+export const loginUser = async (contactEmail, password) => {
+  contactEmail = await helper.checkValidEmail(contactEmail);
+  password = helper.checkPass(password);
 
-export const getFollowing=async(userId)=>{
-}
+  const userCollection = await users();
+  const found = await userCollection.findOne({ contactEmail: contactEmail });
+  if (found == null) {
+    throw "Either the email address or password is invalid";
+  }
+  let compareToPassword = false;
+  try {
+    compareToPassword = await bcrypt.compare(password, found.password);
+  } catch (e) {
+    //no op
+  }
+  if (compareToPassword) {
+    return {
+      firstName: found.firstName,
+      lastName: found.lastName,
+      contactEmail: found.contactEmail,
+    };
+  } else {
+    throw "Either the email address or password is invalid";
+  }
+};
 
-export const getFollowers=async(userId)=>{
-}
+export const getUser = async (userId) => {
+  try {
+    userId = helper.checkObjectId(userId);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
 
-export const getTags=async(userId)=>{
-}
+export const updateUser = async (
+  userId,
+  username,
+  firstName,
+  lastName,
+  sex,
+  age,
+  contactEmail,
+  password,
+  location
+) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    username = helper.checkString(username, "username", 1, 25);
+    firstName = helper.checkString(firstName, "firstName", 1, 25);
+    lastName = helper.checkString(lastName, "lastName", 1, 25);
+    sex = helper.checkSex(sex);
+    contactEmail = await helper.checkIfEmailPresent(contactEmail);
+    age = helper.checkAge(age, 12, 105);
+    password = helper.checkPass(password);
+    location = helper.checkAddress(location);
 
-export const addFollowing=async(userId,followingId)=>{
-}
+    const hash = await bcrypt.hash(password, saltRounds);
 
-export const addFollower=async(userId,followerId)=>{
-}
+    const userCollection = await users();
 
-export const addTags=async(userId,tags)=>{
-}
+    let userData = await userCollection
+        .find(
+          { _id: userId },
+          { projection: { following: 1, followers: 1, tags: 1 } }
+        )
+        .toArray();
 
-export const addReview=async(userId,reviewId)=>{
-}
+    if (!userData) throw "User not found";
+    let dataPacket = {
+      username,
+      firstName,
+      lastName,
+      sex,
+      age,
+      contactEmail,
+      password: hash,
+      following: userData.following,
+      followers: userData.followers,
+      tags: userData.tags,
+      location,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-export const deleteReview=async(userId,reviewId)=>{
-}
+    const updatedUser = await userCollection.findOneAndUpdate(
+      { _id: userId },
+      { $set: dataPacket },
+      { returnDocument: "after" }
+    );
+    
+    if (!updatedUser || updatedUser === undefined) {
+      throw "could not update event successfully";
+    }
+    return updateUser;
+  } catch (error) {}
+};
 
-export const addComment=async(userId,commentId)=>{
-}
+// export const updateLastTimeStamp = async (userId) => {
+//   /*
+//     Call this in every function to update the date
+//      */
+// };
 
-export const deleteComment=async(userId,commentId)=>{
-}
+export const deleteUser = async (userId) => {
+  try{
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const deleteInfo = await userCollection.deleteOne({ _id: userId });
+    if (deleteInfo.deletedCount === 0) throw `Could not delete user with id of ${userId}`;
+    return true;
+  }catch(error){
+    throw error;
+  }
+};
+
+export const getUserById = async (userId) => {
+  try {
+    userId = helper.checkObjectId(userId);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//--------------- NO NEED FOR THIS (THE ABOVE FUNCTION IS ENOUGH) -----------------------
+
+// export const getFollowing = async (userId) => {
+//   try {
+//     userId = helper.checkObjectId(userId);
+//     const userCollection = await users();
+//     const user = await userCollection.findOne({ _id: userId });
+//     if (!user) throw "User not found";
+//     return user.following;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+// export const getFollowers = async (userId) => {
+//   try {
+//     userId = helper.checkObjectId(userId);
+//     const userCollection = await users();
+//     const user = await userCollection.findOne({ _id: userId });
+//     if (!user) throw "User not found";
+//     return user.followers;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+// export const getTags = async (userId) => {
+//   try {
+//     userId = helper.checkObjectId(userId);
+//     const userCollection = await users();
+//     const user = await userCollection.findOne({ _id: userId });
+//     if (!user) throw "User not found";
+//     return user.tags;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+
+
+export const addFollowing = async (userId, followingId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    followingId = new ObjectId(helper.checkObjectId(followingId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { following: followingId }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addFollower = async (userId, followerId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    followerId = new ObjectId(helper.checkObjectId(followerId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { followers: followerId }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addTags = async (userId, tags) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    tags = helper.checkString(tags);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { tags: tags }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addReview = async (userId, reviewId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { reviews: reviewId }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+  } catch (error) {
+    throw error;
+  }
+
+};
+
+export const deleteReview = async (userId, reviewId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $pull: { reviews: reviewId }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addComment = async (userId, commentId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    commentId = new ObjectId(helper.checkObjectId(commentId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { comments: commentId }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteComment = async (userId, commentId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    commentId = new ObjectId(helper.checkObjectId(commentId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne({ _id: userId }, { $pull: { comments: commentId }, $set: { updatedAt: new Date() } });
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    return true;
+
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserByName = async (firstName) => {
+  try {
+    firstName = helper.checkString(firstName, "firstName", 1, 50);
+    const userCollection = await users();
+    // name: { $regex: `^${prefix}`, $options: 'i' }  To search for prefix only
+    const user = await userCollection
+      .find({ firstName: { $regex: firstName, $options: "i" } })
+      .toArray();
+    // if (!business) throw "Business not found";
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
