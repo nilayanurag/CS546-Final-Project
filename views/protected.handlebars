@@ -3,9 +3,9 @@
 If the user is logged in , and 'GET /protected' endpoint is called, you will render this view based on the specs.
 
 --}}
-<p>Welcome {{firstName}} {{lastName}} , the time is now: {{currentTime}}. Your role in the system is: {{role}}.</p>
-{{#if isAdmin}}
+<p>Welcome {{firstName}} {{lastName}} , the time is now: {{currentTime}}. Your role in the system is Nothing.</p>
+{{!-- {{#if isAdmin}}
     <a href="/admin">Admin Page</a>
-{{/if}}
+{{/if}} --}}
 <a href="/logout">Logout</a>
 

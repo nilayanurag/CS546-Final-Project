@@ -79,8 +79,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let contactEmailVal=await helper.routeValidationHelper(helper.checkValidEmail,userInfo.contactEmailInput)
-    let passwordVal=await helper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
+    let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,userInfo.contactEmailInput)
+    let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
     let dataToRender={
       contactEmailDef:contactEmailVal[0],
       contactEmailErr:contactEmailVal[1],
@@ -88,12 +88,12 @@ usersRouter
     }
 
     try {
-      let loginInfo=await loginUser(contactEmailVal[0],passwordVal[0])
+      let loginInfo=await userData.loginUser(contactEmailVal[0],passwordVal[0])
       if (loginInfo.firstName){
         req.session.user= {firstName: loginInfo.firstName,
            lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
-          redirect("/admin")
+          res.redirect("admin")
        
       }else{
         res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
@@ -102,6 +102,18 @@ usersRouter
       dataToRender.loginError="emailId/Password is Incorrect"
       res.status(400).render("login",dataToRender)
     }
+  });
+
+  usersRouter
+.route('/admin').get(async (req, res) => {
+    //code here for GET
+    let dataToRender={
+      firstName:req.session.user.firstName,
+      lastName:req.session.user.lastName,
+      currentTime:new Date().toLocaleTimeString(),
+      role:req.session.user.role
+    }
+    res.render("admin",dataToRender)
   });
 
 export default usersRouter;

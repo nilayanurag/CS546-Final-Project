@@ -88,6 +88,28 @@ export const createUser =async(
     }
 }
 
+export const loginUser = async (contactEmail, password) => {
+    contactEmail=await helper.checkValidEmail(contactEmail)
+    password=helper.checkPass(password)
+  
+    const userCollection= await users();
+    const found= await userCollection.findOne({contactEmail:contactEmail})
+    if (found==null){
+      throw "Either the email address or password is invalid"
+    }
+    let compareToPassword=false
+    try {
+      compareToPassword = await bcrypt.compare(password, found.password);
+    } catch (e) {
+      //no op
+    }
+    if (compareToPassword){
+      return {firstName:found.firstName,lastName:found.lastName,contactEmail:found.contactEmail}
+    }else{
+      throw "Either the email address or password is invalid"
+    }
+  };
+
 export const getUser = async(userId)=>{
 
 }

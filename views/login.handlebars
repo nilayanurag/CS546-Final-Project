@@ -7,12 +7,12 @@ TODO place holder
 <main>
     <form id ="login-form" action="/login" method="post">
     
-        <label for="emailAddressInput">Email Address</label>
-        <input type="email" id="emailAddressInput" name="emailAddressInput" required>
+        <label for="contactEmailInput">Email Address</label>
+        <input type="email" id="contactEmailInput" name="contactEmailInput" required>
 
-        {{#if emailIdErr}}
-            <div id="emailIdError" class="errorMessage">
-                {{emailIdErr}}
+        {{#if contactEmailErr}}
+            <div id="contactEmailError" class="errorMessage">
+                {{contactEmailErr}}
             </div>
         {{/if}}
 
