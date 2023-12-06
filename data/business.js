@@ -91,7 +91,7 @@ export const addReview = async(reviewId, businessId)=>{
         const businessCollection = await businesses();
         const business = await businessCollection.findOne({ _id: businessId});
         if (!business) throw "Business not found";
-        const updateInfo = await businessCollection.updateOne({ _id: businessId }, { $addToSet: { reviews: reviewId } });
+        const updateInfo = await businessCollection.updateOne({ _id: businessId }, { $addToSet: { reviews: reviewId }, $set: { updatedAt: new Date() } });
         if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
         return true;
     } catch (error) {
@@ -118,7 +118,7 @@ export const deleteReview = async(reviewId, businessId)=>{
         const businessCollection = await businesses();
         const business = await businessCollection.findOne({ _id: businessId });
         if (!business) throw "Business not found";
-        const updateInfo = await businessCollection.updateOne({ _id: businessId }, { $pull: { reviews: reviewId } });
+        const updateInfo = await businessCollection.updateOne({ _id: businessId }, { $pull: { reviews: reviewId }, $set: { updatedAt: new Date() } });
         if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
         return true;
 
@@ -139,8 +139,5 @@ export const updateGlobalRating = async (businessId) => {
     // } catch (error) {
     //     throw error;
     // }
-}
-
-export const updateTimeStamp = async()=>{
 }
 
