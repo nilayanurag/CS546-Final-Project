@@ -1,0 +1,95 @@
+/*Temp Style*/
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+header {
+    background: linear-gradient(to right, #007bff, #ff1493); 
+    top: 0;
+    color: white; 
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    width: 100%;
+    
+}
+
+footer {
+    background: linear-gradient(to right, #008080, #ffa500);
+    color: white; 
+    text-align: center;
+    padding: 10px 0; 
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+
+main {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Labels and Inputs */
+label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Error Message Styling */
+.errorMessage {
+    color: red;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+}
+
+/* Button Styling */
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Link Styling */
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}

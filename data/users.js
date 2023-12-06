@@ -1,5 +1,8 @@
 import * as helper from "../helpers/validation.js"
 import {users} from "../config/mongoCollections.js"
+import bcrypt from "bcrypt";
+import * as EmailValidator from 'email-validator';
+const saltRounds = 10;
 
 /*
 Refernce Schema:
@@ -40,9 +43,6 @@ export const createUser =async(
     age,
     contactEmail,
     password,
-    following,
-    followers,
-    tags,
     location
 )=>{
     /*this is a basic template I have use from hw just to get it started* /
@@ -52,6 +52,40 @@ export const createUser =async(
     */
 
     // Create a new user and return its Id
+    
+    const userCollection= await users();
+    
+    firstName=helper.checkString(firstName,"firstName",1,25)
+    lastName=helper.checkString(lastName,"lastName",1,25)
+    sex=helper.checkSex(sex)
+    contactEmail=await helper.checkIfEmailPresent(contactEmail)
+    age=helper.checkAge(age,12,105)
+    password=helper.checkPass(password)
+    let followers=[]
+    let following=[]
+    let tags=[]
+    location=helper.checkAddress(location)
+
+    const hash = await bcrypt.hash(password, saltRounds);
+
+    
+    let dataPacket={
+        firstName,
+        sex,
+        contactEmail,
+        password:hash,
+        following,
+        followers,
+        tags,
+        location
+    }
+
+    const inserted = await userCollection.insertOne(dataPacket);
+    if (inserted.insertedId){
+    return {insertedUser:true}
+    }else{
+    throw "Could not insert user"
+    }
 }
 
 export const getUser = async(userId)=>{

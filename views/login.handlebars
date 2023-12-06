@@ -1,0 +1,40 @@
+{{!--
+
+login form handlebar template have to modify to login still
+TODO place holder
+
+--}}
+<main>
+    <form id ="login-form" action="/login" method="post">
+    
+        <label for="emailAddressInput">Email Address</label>
+        <input type="email" id="emailAddressInput" name="emailAddressInput" required>
+
+        {{#if emailIdErr}}
+            <div id="emailIdError" class="errorMessage">
+                {{emailIdErr}}
+            </div>
+        {{/if}}
+
+        <label for="passwordInput">Password</label>
+        <input type="password" id="passwordInput" name="passwordInput" required>
+
+        {{#if passwordErr}}
+            <div id="passwordError" class="errorMessage">
+                {{passwordErr}}
+            </div>
+        {{/if}}
+        
+        {{#if loginError}}
+            <div id="bothError" class="errorMessage">
+                {{loginError}}
+            </div>
+        {{/if}}
+
+        <button type="submit">Login</button>
+
+
+    </form>
+
+    <p id="registerLink"><a href="/register">Click here to register!</a></p>
+</main>
