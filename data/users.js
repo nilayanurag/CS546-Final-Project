@@ -36,6 +36,7 @@ users:{
 }
 */
 
+// Route has been linked to this function
 export const createUser = async (
   username,
   firstName,
@@ -86,6 +87,7 @@ export const createUser = async (
   }
 };
 
+// Route has been linked to this function
 export const loginUser = async (contactEmail, password) => {
   contactEmail = await helper.checkValidEmail(contactEmail);
   password = helper.checkPass(password);
@@ -112,6 +114,7 @@ export const loginUser = async (contactEmail, password) => {
   }
 };
 
+// Route has been linked to this function
 export const getUserById = async (userId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -124,6 +127,7 @@ export const getUserById = async (userId) => {
   }
 };
 
+// Route has been linked to this function
 export const updateUser = async (
   userId,
   username,
@@ -190,6 +194,7 @@ export const updateUser = async (
 };
 
 // MOST IMP: If you are deleting a user, make sure to FIRST delete all the reviews, comments, and tags associated with it
+// Route has been linked to this function
 export const deleteUser = async (userId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -243,6 +248,7 @@ export const deleteUser = async (userId) => {
 //   }
 // };
 
+//Route has been linked to this function
 export const addFollowing = async (userId, followingId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -267,8 +273,9 @@ export const addFollowing = async (userId, followingId) => {
     throw error;
   }
 };
-
-export const deleteFollowing = async (userId, followingId) => {
+a
+//Route has been linked to this function
+export const removeFollowing = async (userId, followingId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
     followingId = new ObjectId(helper.checkObjectId(followingId));
@@ -293,6 +300,9 @@ export const deleteFollowing = async (userId, followingId) => {
   }
 }
 
+
+//TODO why are we not using the above function instead of creating unncessary bloat
+//Route has been linked to this function
 export const addFollower = async (userId, followerId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -314,7 +324,8 @@ export const addFollower = async (userId, followerId) => {
   }
 };
 
-export const deleteFollower = async (userId, followerId) => {
+//route has been linked to this function
+export const removeFollower = async (userId, followerId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
     followerId = new ObjectId(helper.checkObjectId(followerId));
@@ -335,6 +346,7 @@ export const deleteFollower = async (userId, followerId) => {
   }
 }
 
+// Route has been linked to this function
 export const addTags = async (userId, tags) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -354,6 +366,7 @@ export const addTags = async (userId, tags) => {
   }
 };
 
+//Route has been linked to this function
 export const deleteTags = async (userId, tags) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -373,6 +386,7 @@ export const deleteTags = async (userId, tags) => {
   }
 }
 
+// Route has been linked to this function
 export const addReview = async (userId, reviewId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -395,6 +409,7 @@ export const addReview = async (userId, reviewId) => {
   }
 };
 
+//route has been linked to this function
 export const deleteReview = async (userId, reviewId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -416,6 +431,7 @@ export const deleteReview = async (userId, reviewId) => {
   }
 };
 
+// Route has been linked to this function
 export const addComment = async (userId, commentId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -438,6 +454,7 @@ export const addComment = async (userId, commentId) => {
   }
 };
 
+//Route has been linked to this function
 export const deleteComment = async (userId, commentId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -459,6 +476,7 @@ export const deleteComment = async (userId, commentId) => {
   }
 };
 
+// Route has been linked to this function
 export const getUserByUsername = async (username) => {
   try {
     username = helper.checkString(username, "username", 1, 50);
@@ -472,6 +490,7 @@ export const getUserByUsername = async (username) => {
   }
 };
 
+// Route has been linked to this function
 export const getAllUsers = async () => {
   try {
     const userCollection = await users();
