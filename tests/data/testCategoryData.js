@@ -8,13 +8,15 @@ try {
     // Testing getCategoryByName
     let category = await categoryFunctions.getCategoryByName("Restaurant");
     if(category){
-        console.log("getCategoryByName passed");
+        console.log("Test 1: getCategoryByName passed");
+        console.log(category);
     }
 
     // Testing getCategoryById
     let categoryId = await categoryFunctions.getCategoryById(category._id.toString());
     if(categoryId){
-        console.log("getCategoryById passed");
+        console.log("Test 2: getCategoryById passed");
+        console.log(categoryId);
     }
 } catch (error) {
     console.log(error);
@@ -24,7 +26,8 @@ try {
 try {
     let category = await categoryFunctions.getAllCategory();
     if(category){
-        console.log("getAllCategory passed");
+        console.log("Test 3: getAllCategory passed");
+        console.log(category);
     }
 } catch (error) {
     console.log(error);

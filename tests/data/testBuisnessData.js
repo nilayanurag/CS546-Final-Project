@@ -1,4 +1,5 @@
 import * as businessFunctions from "../../data/business.js";
+import * as reviewsFunctions from "../../data/review.js";
 
 // Valid Input Testing
 
@@ -7,7 +8,7 @@ try {
     let business = await businessFunctions.getAllBusinessWithPrefix("napo");
     if(business){
         console.log(business);
-        console.log("getBusinessById passed");
+        console.log("Test 1: getBusinessById passed");
     }
 }
 catch (error) {
@@ -18,12 +19,14 @@ catch (error) {
 try {
     let business = await businessFunctions.getBusinessByName("Napoli's Pizzeria");
     let businessId = business._id.toString();
-    let addReview = await businessFunctions.addReview("6570c556cb2c09ab6e9610e9", businessId)
-    console.log("add Review in buisness",addReview);
+    let reviews = await reviewsFunctions.getAllReviews();
+    let reviewId = reviews[0]._id.toString();
+    let addReview = await businessFunctions.addReview(reviewId, businessId)
+    console.log("Test 1: add Review in buisness:",addReview);
     let getReview = await businessFunctions.getAllReview(businessId)
-    console.log("get Reviews in buisness",getReview);
-    let deleteReview = await businessFunctions.deleteReview("6570c556cb2c09ab6e9610e9", businessId)
-    console.log("delete Review in buisness",deleteReview);    
+    console.log("Test 2: get Reviews in buisness:",getReview);
+    let deleteReview = await businessFunctions.deleteReview(reviewId, businessId)
+    console.log("Test 3: delete Review in buisness:",deleteReview);    
 } catch (error) {
     console.log(error);
 }
@@ -33,7 +36,7 @@ try {
     let business = await businessFunctions.getBusinessByName("Honest");
     let businessId = business._id.toString();
     let deleteBusiness = await businessFunctions.deleteBusiness(businessId)
-    console.log("delete Business",deleteBusiness);
+    console.log("Test 4: delete Business",deleteBusiness);
     
 } catch (error) {
     console.log(error);
