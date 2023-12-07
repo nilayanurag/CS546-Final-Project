@@ -273,7 +273,7 @@ export const addFollowing = async (userId, followingId) => {
     throw error;
   }
 };
-a
+
 //Route has been linked to this function
 export const removeFollowing = async (userId, followingId) => {
   try {

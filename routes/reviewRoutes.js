@@ -24,7 +24,6 @@ reviewRouter
         reviewTextDef:reviewTextVal[0],
         reviewTextErr:reviewTextVal[1]
     }
-
     if (reviewTextVal[1]){
         errorCode=400;
         return res.status(errorCode).render("createReview",dataToRender);

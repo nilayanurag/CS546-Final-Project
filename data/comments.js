@@ -12,6 +12,7 @@ comment{
       updatedAt: 2022-02-26T16:37:48.244Z
 }*/
 
+//Route: POST /comments/createComment
 export const createComment = async (reviewId, userId, commentDescription) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -47,6 +48,8 @@ export const createComment = async (reviewId, userId, commentDescription) => {
 
 // MOST ImP: You are deleting any comment, make sure to FIRST remove the comment from the review document
 // and user document
+
+//Route: GET /comments/deleteComment/:id
 export const deleteComment = async (commentId) => {
   try {
     commentId = new ObjectId(helper.checkObjectId(commentId));
@@ -54,12 +57,15 @@ export const deleteComment = async (commentId) => {
     const comment = await commentCollection.findOne({ _id: commentId });
     if (!comment) throw "Comment not found";
     const deleteComment = await commentCollection.deleteOne({ _id: commentId });
-    return { deletedComment: deleteComment.deletedCount ? true : false };
+    if (deleteComment.deletedCount === 0) throw `Could not delete comment with id of ${commentId}`;
+        return true;
   } catch (error) {
     throw error;
   }
 };
 
+
+//Route: GET /comments/getComment/:id
 export const getCommentById = async (commentId) => {
   try {
     commentId = new ObjectId(helper.checkObjectId(commentId));
@@ -72,6 +78,7 @@ export const getCommentById = async (commentId) => {
   }
 };
 
+//Route: POST /comments/updateComment
 export const updateComment = async (
   commentId,
   reviewId,

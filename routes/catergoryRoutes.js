@@ -3,7 +3,7 @@ import * as categoryData from "../data/category.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
 
-const categoryRouter = express.Router();
+const categoryRouter = express.Router()
 
 categoryRouter
 .route("/categories/getAll")

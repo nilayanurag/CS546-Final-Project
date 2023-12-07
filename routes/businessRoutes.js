@@ -6,45 +6,6 @@ import * as routeHelper from "../helpers/routeHelper.js";
 const businessRouter = express.Router();
 
 
-reviewRouter
-.route("/review/createReview")
-.get(async (req, res) => {
-    res.render("createReview");
-})
-.post(async (req, res) => {
-    let reviewInfo = req.body;
-    let businessIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,reviewInfo.businessId);
-    let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,reviewInfo.userId);
-    let ratingPointsVal= await routeHelper.routeValidationHelper(helper.checkRating,reviewInfo.ratingPoints,1,5);
-    let categoryIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,reviewInfo.categoryId);
-    let reviewTextVal= await routeHelper.routeValidationHelper(helper.checkString,reviewInfo.reviewText, "Review Text", 1, 500);
-    let imagePathVal= reviewInfo.imagePath
-    let errorCode=undefined;
-
-    let dataToRender={
-        reviewTextDef:reviewTextVal[0],
-        reviewTextErr:reviewTextVal[1]
-    }
-
-    if (reviewTextVal[1]){
-        errorCode=400;
-        res.status(errorCode).render("createReview",dataToRender);
-    }
-
-    try{
-        let review = await reviewData.createReview(businessIdVal[0],userIdVal[0],categoryIdVal[0],ratingPointsVal[0],reviewTextVal[0],imagePathVal);
-        if (review){
-            res.redirect("/review/getReview/"+review._id);
-        }else{
-            errorCode=500;
-            res.status(errorCode).render("createReview",dataToRender);
-        }
-    }catch(error){
-        errorCode=500;
-        res.status(errorCode).render("createReview",dataToRender);  
-    }
-});
-
 businessRouter
 .route("/business/createBusiness")
 .get(async (req, res) => {
@@ -83,3 +44,81 @@ businessRouter
         return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
     }
 });
+
+businessRouter
+.route("/business/getBusiness/:pre")
+.get(async (req, res) => {
+    let businessIdPrefix = req.params.pre;
+    let errorCode=undefined;
+    let prefix=await routeHelper.routeValidationHelper(helper.checkString,businessIdPrefix, "Prefix", 1, 50);
+    if (prefix[1]){
+        errorCode=400;
+        return res.status(errorCode).json({errorMessage: "Bad Request"});  
+    }
+    try {
+        let business = await businessData.getAllBusinessWithPrefix(prefix[0]);
+        if (business){
+            return res.json(business);
+        }else{
+            errorCode=404;
+            return res.status(errorCode).json({errorMessage: "Not Found"});  
+        }
+    } catch (error) {
+        errorCode=500;
+        return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+        
+    }
+});
+
+businessRouter
+.route("/business/getBusinessByName/:name")
+.get(async (req, res) => {
+    let businessName = req.params.name;
+    let errorCode=undefined;
+    let name=await routeHelper.routeValidationHelper(helper.checkString,businessName, "Business Name", 3, 50);
+    if (name[1]){
+        errorCode=400;
+        return res.status(errorCode).json({errorMessage: "Bad Request"});  
+    }
+    try {
+        let business = await businessData.getBusinessByName(name[0]);
+        if (business){
+            return res.json(business);
+        }else{
+            errorCode=404;
+            return res.status(errorCode).json({errorMessage: "Not Found"});  
+        }
+    } catch (error) {
+        errorCode=500;
+        return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+        
+    }
+});
+
+businessRouter
+.route("/business/deleteBusiness/:id")
+.get(async (req, res) => {
+    let businessId = req.params.id;
+    let errorCode=undefined;
+    businessId=routeHelper.routeValidationHelper(helper.checkObjectId,businessId);
+    if (businessId[1]){
+        errorCode=400;
+        return res.status(errorCode).json({errorMessage: "Bad Request"});  
+    }
+    try {
+        let deleted = await businessData.deleteBusiness(businessId[0]);
+        if (deleted){
+            return res.json(deleted);
+        }else{
+            errorCode=404;
+            return res.status(errorCode).json({errorMessage: "Business Not Found"});  
+        }
+    } catch (error) {
+        errorCode=500;
+        return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+    }
+    
+});
+
+
+export default businessRouter;
