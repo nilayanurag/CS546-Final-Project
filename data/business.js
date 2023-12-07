@@ -48,8 +48,7 @@ export const getAllBusinessWithPrefix = async(prefix) =>{
         prefix = helper.checkString(prefix, "prefix", 1, 50);
         const businessCollection = await businesses();
         // name: { $regex: `^${prefix}`, $options: 'i' }  To search for prefix only
-        const business = await businessCollection.find({name: { $regex: prefix, $options: 'i' }}).toArray();
-        // if (!business) throw "Business not found";
+        const business = await businessCollection.find({name: { $regex: prefix, $options: 'i' }}).toArray(); // This to search for prefix anywhere in the string
         return business;
         
     } catch (error) {

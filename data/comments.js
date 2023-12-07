@@ -1,5 +1,5 @@
-import * as helper from "../helpers/validation.js"
-import {comments} from "../config/mongoCollections.js"
+import * as helper from "../helpers/validation.js";
+import { comments } from "../config/mongoCollections.js";
 
 /*
 comment{
@@ -11,20 +11,87 @@ comment{
       updatedAt: 2022-02-26T16:37:48.244Z
 }*/
 
+export const createComment = async (reviewId, userId, commentDescription) => {
+  try {
+    reviewId = helper.checkObjectId(reviewId);
+    userId = helper.checkObjectId(userId);
+    commentDescription = helper.checkString(
+      commentDescription,
+      "Comment Description",
+      1,
+      500
+    );
+    const commentCollection = await comments();
+    const newComment = await commentCollection.insertOne({
+      reviewId: reviewId,
+      userId: userId,
+      commentDescription: commentDescription,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return { insertedComment: newComment.insertedId ? true : false };
+  } catch (error) {
+    throw error;
+  }
+};
 
-export const createComment = async()=>{
-}
+// MOST ImP: You are deleting any comment, make sure to FIRST remove the comment from the review document
+// and user document
+export const deleteComment = async (commentid) => {
+  try {
+    commentid = helper.checkObjectId(commentid);
+    const commentCollection = await comments();
+    const deleteComment = await commentCollection.deleteOne({ _id: commentid });
+    return { deletedComment: deleteComment.deletedCount ? true : false };
+  } catch (error) {
+    throw error;
+  }
+};
 
-export const deleteComment = async()=>{
-}
+export const getCommentById = async (commentId) => {
+  try {
+    commentId = helper.checkObjectId(commentId);
+    const commentCollection = await comments();
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    return comment;
+  } catch (error) {
+    throw error;
+  }
+};
 
-export const getCommentById = async()=>{
-}
-
-export const updateComment = async()=>{
-}
-
-
-export const updateTimeStamp = async()=>{
-}
-
+export const updateComment = async (
+  commentId,
+  reviewId,
+  userId,
+  commentDescription
+) => {
+  try {
+    commentId = helper.checkObjectId(commentId);
+    reviewId = helper.checkObjectId(reviewId);
+    userId = helper.checkObjectId(userId);
+    commentDescription = helper.checkString(
+      commentDescription,
+      "Comment Description",
+      1,
+      500
+    );
+    const commentCollection = await comments();
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    const updateComment = await commentCollection.updateOne(
+      { _id: commentId },
+      {
+        $set: {
+          reviewId: reviewId,
+          userId: userId,
+          commentDescription: commentDescription,
+          updatedAt: new Date(),
+        },
+      }
+    );
+    return { updatedComment: updateComment.modifiedCount ? true : false };
+  } catch {
+    throw error;
+  }
+};

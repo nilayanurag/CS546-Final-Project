@@ -46,14 +46,7 @@ export const createUser = async (
   password,
   location
 ) => {
-  /*this is a basic template I have use from hw just to get it started* /
-    firstName=helper.checkString(firstName,1,50)
-    lastName=helper.checkString(lastName,1,50)
-    sex=helper.checkString(sex)
-    */
-
-  // Create a new user and return its Id
-
+  
   const userCollection = await users();
 
   username = helper.checkString(username, "username", 1, 25);
@@ -195,12 +188,7 @@ export const updateUser = async (
   } catch (error) {}
 };
 
-// export const updateLastTimeStamp = async (userId) => {
-//   /*
-//     Call this in every function to update the date
-//      */
-// };
-
+// MOST IMP: If you are deleting a user, make sure to FIRST delete all the reviews, comments, and tags associated with it
 export const deleteUser = async (userId) => {
   try{
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -327,6 +315,7 @@ export const addReview = async (userId, reviewId) => {
   }
 
 };
+
 
 export const deleteReview = async (userId, reviewId) => {
   try {
