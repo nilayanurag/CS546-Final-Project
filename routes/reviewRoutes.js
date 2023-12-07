@@ -8,7 +8,7 @@ const reviewRouter = express.Router();
 reviewRouter
 .route("/review/createReview")
 .get(async (req, res) => {
-    res.render("createReview");
+    return res.render("createReview");
 })
 .post(async (req, res) => {
     let reviewInfo = req.body;
@@ -27,20 +27,20 @@ reviewRouter
 
     if (reviewTextVal[1]){
         errorCode=400;
-        res.status(errorCode).render("createReview",dataToRender);
+        return res.status(errorCode).render("createReview",dataToRender);
     }
 
     try{
         let review = await reviewData.createReview(businessIdVal[0],userIdVal[0],categoryIdVal[0],ratingPointsVal[0],reviewTextVal[0],imagePathVal);
         if (review){
-            res.redirect("/review/getReview/"+review._id);
+          return res.redirect("/review/getReview/"+review._id);
         }else{
             errorCode=500;
-            res.status(errorCode).render("createReview",dataToRender);
+            return res.status(errorCode).render("createReview",dataToRender);
         }
     }catch(error){
         errorCode=500;
-        res.status(errorCode).render("createReview",dataToRender);  
+        return res.status(errorCode).render("createReview",dataToRender);  
     }
 });
 
@@ -51,19 +51,19 @@ reviewRouter
     let errorCode=undefined;
     if (reviewIdVal[1]){
         errorCode=400;
-        res.status(errorCode).json({errorMessage:"Invalid ObjectId"});
+        return res.status(errorCode).json({errorMessage:"Invalid ObjectId"});
     }
     try{
         let deleted = await reviewData.deleteReview(reviewIdVal[0]);
         if (deleted){
-            res.json({deleted});
+          return res.json({deleted});
         }else{
             errorCode=404;
-            res.status(errorCode).json({errorMessage:"Review not found"});
+            return res.status(errorCode).json({errorMessage:"Review not found"});
         }
     }catch(error){
         errorCode=500;
-        res.status(errorCode).json({errorMessage:"Internal Server Error"});
+        return res.status(errorCode).json({errorMessage:"Internal Server Error"});
     }
 })
 
@@ -85,7 +85,7 @@ reviewRouter
 
     if (reviewTextVal[1]){
         errorCode=400;
-        res.status(errorCode).render("updateReview",dataToRender);
+        return res.status(errorCode).render("updateReview",dataToRender);
     }
 
     try{
@@ -96,14 +96,14 @@ reviewRouter
             imagePathVal
         );
         if (updatedReview){
-            res.redirect("/review/getReview/"+review._id);
+          return res.redirect("/review/getReview/"+review._id);
         }else{
             errorCode=404;
-            res.status(errorCode).json({errorMessage:"Review not found"})   ;
+            return res.status(errorCode).json({errorMessage:"Review not found"})   ;
         }
     }catch(error){
         errorCode=500;
-        res.status(errorCode).json({errorMessage:"Internal Server Error"}); 
+        return res.status(errorCode).json({errorMessage:"Internal Server Error"}); 
     }
 })
 
@@ -115,19 +115,19 @@ reviewRouter
     let errorCode=undefined;
     if (reviewIdVal[1]){
         errorCode=400;
-        res.status(errorCode).json({errorMessage:"Invalid ObjectId"});
+        return res.status(errorCode).json({errorMessage:"Invalid ObjectId"});
     }
     try{
         let reviewInfo = await reviewData.getReview(reviewIdVal[0]);
         if (reviewInfo){
-            res.render("review", { review: review });
+          return res.render("review", { review: review });
         }else{
             errorCode=404;
-            res.status(errorCode).json({errorMessage:"Review not found"});
+            return res.status(errorCode).json({errorMessage:"Review not found"});
         }
     }catch(error){
         errorCode=500;
-        res.status(errorCode).json({errorMessage:"Internal Server Error"});
+        return res.status(errorCode).json({errorMessage:"Internal Server Error"});
     }
 });
 
@@ -137,14 +137,14 @@ reviewRouter
     try{
         let reviewList = await reviewData.getAllReviews();
         if (reviewList){
-            res.json(reviewList);
+          return res.json(reviewList);
         }else{
             errorCode=404;
-            res.status(errorCode).json({errorMessage:"Reviews not found"});
+            return res.status(errorCode).json({errorMessage:"Reviews not found"});
         }
     }catch(error){
         errorCode=500;
-        res.status(errorCode).json({errorMessage:"Internal Server Error"});
+        return res.status(errorCode).json({errorMessage:"Internal Server Error"});
     }
 });
 
@@ -163,18 +163,18 @@ reviewRouter
     
     if (reviewId[1]||userId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let addedThumbUp=await reviewData.addThumbsUp(reviewId[0],userId[0])
       if (addedThumbUp.modifiedCount){
-        res.json({addedThumbUp})
+        return res.json({addedThumbUp})
       }else{
-        res.status(404).json({errorMessage:"Cannot find review"})
+        return res.status(404).json({errorMessage:"Cannot find review"})
       }
     }catch (error) {
-      res.status(500).json({errorMessage:"Cannot add thumb up"})
+      return res.status(500).json({errorMessage:"Cannot add thumb up"})
     }
   })
 
@@ -194,18 +194,18 @@ reviewRouter
     
     if (reviewId[1]||userId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let removedThumbUp=await reviewData.removeThumbsUp(reviewId[0],userId[0])
       if (removedThumbUp.modifiedCount){
-        res.json({removedThumbUp})
+        return res.json({removedThumbUp})
       }else{
-        res.status(404).json({errorMessage:"Cannot find review"})
+        return res.status(404).json({errorMessage:"Cannot find review"})
       }
     }catch (error) {
-      res.status(500).json({errorMessage:"Cannot remove thumb up"})
+      return res.status(500).json({errorMessage:"Cannot remove thumb up"})
     }
   })
 
@@ -224,18 +224,18 @@ reviewRouter
     
     if (reviewId[1]||userId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let addedThumbDown=await reviewData.addThumbsDown(reviewId[0],userId[0])
       if (addedThumbDown.modifiedCount){
-        res.json({addedThumbDown})
+        return res.json({addedThumbDown})
       }else{
-        res.status(404).json({errorMessage:"Cannot find review"})
+        return res.status(404).json({errorMessage:"Cannot find review"})
       }
     }catch (error) {
-      res.status(500).json({errorMessage:"Cannot add thumb down"})
+      return res.status(500).json({errorMessage:"Cannot add thumb down"})
     }
   })
 
@@ -256,18 +256,18 @@ reviewRouter
     
     if (reviewId[1]||userId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let removedThumbDown=await reviewData.removeThumbsDown(reviewId[0],userId[0])
       if (removedThumbDown.modifiedCount){
-        res.json({removedThumbDown})
+        return res.json({removedThumbDown})
       }else{
-        res.status(404).json({errorMessage:"Cannot find review"})
+        return res.status(404).json({errorMessage:"Cannot find review"})
       }
     }catch (error) {
-      res.status(500).json({errorMessage:"Cannot remove thumb down"})
+      return res.status(500).json({errorMessage:"Cannot remove thumb down"})
     }
   })
 
@@ -287,18 +287,18 @@ reviewRouter
     
     if (reviewId[1]||commentText[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let addedComment=await reviewData.addComment(reviewId[0],commentText[0])
       if (addedComment.modifiedCount){
-        res.json({addedComment})
+        return res.json({addedComment})
       }else{
-        res.status(404).json({errorMessage:"Cannot find review"})
+        return res.status(404).json({errorMessage:"Cannot find review"})
       }
     }catch (error) {
-      res.status(500).json({errorMessage:"Internal Server Error"})
+      return res.status(500).json({errorMessage:"Internal Server Error"})
     }
     })
 
@@ -318,18 +318,18 @@ reviewRouter
         
         if (reviewId[1]||commentId[1]){
             errorCode=400
-            res.status(400).json({errorMessage:"Invalid ObjectId"})
+            return res.status(400).json({errorMessage:"Invalid ObjectId"})
         }
     
         try {
             let removedComment=await reviewData.removeComment(reviewId[0],commentId[0])
             if (removedComment.modifiedCount){
-            res.json({removedComment})
+              return res.json({removedComment})
             }else{
-            res.status(404).json({errorMessage:"Cannot find review"})
+              return res.status(404).json({errorMessage:"Cannot find review"})
             }
         }catch (error) {
-            res.status(500).json({errorMessage:"Internal Server Error"})
+          return res.status(500).json({errorMessage:"Internal Server Error"})
         }
         })
 

@@ -49,19 +49,19 @@ usersRouter
     if (firstNameVal[1]||lastNameVal[1]||sexVal[1]||ageVal[1]||contactEmailVal[1]
       ||passwordVal[1]||confirmedPasswordVal[1]||locationVal[1]){
       errorCode=400
-      res.status(400).render("register",dataToRender)
+      return res.status(400).render("register",dataToRender)
     }
 
     try {
       let registeredInfo=await userData.createUser(firstNameVal[0],lastNameVal[0],sexVal[0],
         ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
       if (registeredInfo.insertedUser){
-        res.render("login")
+        return res.render("login")
       }else{
-        res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
+        return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
       }
     } catch (error) {
-      res.status(400).render("register",dataToRender)
+      return res.status(400).render("register",dataToRender)
     }
 
   });
@@ -69,7 +69,7 @@ usersRouter
 usersRouter
   .route("/login")
   .get(async (req, res) => {
-    res.render("login")
+    return res.render("login")
   })
   .post(async (req, res) => {
     let userInfo=req.body;
@@ -93,14 +93,14 @@ usersRouter
         req.session.user= {firstName: loginInfo.firstName,
            lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
-          res.redirect("admin")
+           return res.redirect("admin")
        
       }else{
-        res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
+        return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
       }
     } catch (error) {
       dataToRender.loginError="emailId/Password is Incorrect"
-      res.status(400).render("login",dataToRender)
+      return res.status(400).render("login",dataToRender)
     }
   });
 
@@ -108,13 +108,13 @@ usersRouter
   .route('/getUser/:id').get(async (req, res) => {
       let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,req.params.id)
       if (userId[1])
-        {res.status(400)
+        {return res.status(400)
           .json({errorMessage:"Invalid ObjectId"})} 
       try {
         let getUserInfo=await userData.getUserById(userId[0])
-        res.json(getUserInfo)
+        return res.json(getUserInfo)
       } catch (error) {
-        res.status(400)
+        return res.status(400)
         .json({errorMessage:"User Not Found"})
       }
     });
@@ -123,13 +123,13 @@ usersRouter
   .route('/deleteUser/:id').get(async (req, res) => {
       let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,req.params.id)
       if (userId[1])
-        {res.status(400)
+        {return res.status(400)
           .json({errorMessage:"Invalid ObjectId"})} 
       try {
         let deleted=await userData.deleteUser(userId[0])
-        res.json({deleted})
+        return res.json({deleted})
       } catch (error) {
-        res.status(400)
+        return res.status(400)
         .json({errorMessage:"User Not Found"})
       }
     });
@@ -139,7 +139,7 @@ usersRouter
       try {
         let userId=helper.checkObjectId(req.session.user.userId)
       } catch (error) {
-        res.status(400)
+        return res.status(400)
         .render("error",{errorMessage:"User Not Found"})
       }
       let getUserInfo;
@@ -147,7 +147,7 @@ usersRouter
         getUserInfo=await userData.getUserById(userId)
       }
       catch (error) {
-        res.status(400)
+        return res.status(400)
         .render("error",{errorMessage:"User Not Found"})
       }
       let dataToRender={ 
@@ -159,7 +159,7 @@ usersRouter
         contactEmail:getUserInfo.contactEmail,
         location:getUserInfo.location
       }
-      res.render("updateUser",dataToRender)
+      return res.render("updateUser",dataToRender)
   
     })
     .post(async (req, res) => {
@@ -204,19 +204,19 @@ usersRouter
       if (username[1]||firstNameVal[1]||lastNameVal[1]||sexVal[1]||ageVal[1]||contactEmailVal[1]
         ||passwordVal[1]||confirmedPasswordVal[1]||locationVal[1]){
         errorCode=400
-        res.status(400).render("updateUser",dataToRender)
+        return res.status(400).render("updateUser",dataToRender)
       }
 
       try {
         let updatedInfo=await userData.updateUser(userId[0],username[0],firstNameVal[0],lastNameVal[0],sexVal[0],
           ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
         if (updatedInfo.modifiedCount){
-          res.render("updateUser",dataToRender)
+          return res.render("updateUser",dataToRender)
         }else{
-          res.status(500).render("error",{errorMessage:"Internal Server Error"})
+          return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        res.status(400).render("updateUser",dataToRender)
+        return res.status(400).render("updateUser",dataToRender)
       } 
     }
   );
@@ -225,7 +225,7 @@ usersRouter
   .route("/getAllUsers")
   .get(async (req, res) => {
     let getAllUsersInfo=await userData.getAllUsers()
-    res.json(getAllUsersInfo)
+    return res.json(getAllUsersInfo)
   })
 
   usersRouter
@@ -233,14 +233,14 @@ usersRouter
   .get(async (req, res) => {
     let username=await routeHelper.routeValidationHelper(helper.checkString,req.params.username,"username",1,25)
     if (username[1]){
-      res.status(400)
+      return res.status(400)
       .json({errorMessage:"Invalid Username"})
     }else{
       try {
         let getUserInfo=await userData.getUserByUserName(username[0])
-        res.json(getUserInfo)
+        return res.json(getUserInfo)
       } catch (error) {
-        res.status(400)
+        return res.status(400)
         .json({errorMessage:"User Not Found"})
       }
     }
@@ -261,18 +261,18 @@ usersRouter
     
     if (userId[1]||followingId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let addedFollowing=await userData.addFollowing(userId[0],followingId[0])
       if (addedFollowing.modifiedCount){
-        res.json({addedFollowing})
+        return res.json({addedFollowing})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot add following"})
+      return res.status(400).json({errorMessage:"Cannot add following"})
     }
   })
 
@@ -291,18 +291,18 @@ usersRouter
     
     if (userId[1]||followingId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let removeFollowing=await userData.removeFollowing(userId[0],followingId[0])
       if (removeFollowing.modifiedCount){
-        res.json({removeFollowing})
+        return res.json({removeFollowing})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot remove following"})
+      return res.status(400).json({errorMessage:"Cannot remove following"})
     }
   })
   usersRouter
@@ -321,18 +321,18 @@ usersRouter
 
     if (userId[1]||followerId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
     
     try {
       let addedFollower=await userData.addFollower(userId[0],followerId[0])
       if (addedFollower.modifiedCount){
-        res.json({addedFollower})
+        return res.json({addedFollower})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot add follower"})
+      return res.status(400).json({errorMessage:"Cannot add follower"})
     }
   }
   )
@@ -352,18 +352,18 @@ usersRouter
     
     if (userId[1]||followerId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let removeFollower=await userData.removeFollower(userId[0],followerId[0])
       if (removeFollower.modifiedCount){
-        res.json({removeFollower})
+        return res.json({removeFollower})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot remove follower"})
+      return res.status(400).json({errorMessage:"Cannot remove follower"})
     }
   }
   )
@@ -383,18 +383,18 @@ usersRouter
     
     if (userId[1]||tag[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let addedTag=await userData.addTags(userId[0],tag[0])
       if (addedTag.modifiedCount){
-        res.json({addedTag})
+        return res.json({addedTag})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot add tag"})
+      return res.status(400).json({errorMessage:"Cannot add tag"})
     }
   })
 
@@ -413,7 +413,7 @@ usersRouter
     
     if (userId[1]||tag[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
@@ -421,10 +421,10 @@ usersRouter
       if (removeTag.modifiedCount){
         res.json({removeTag})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot remove tag"})
+      return res.status(400).json({errorMessage:"Cannot remove tag"})
     }
   })
 
@@ -443,18 +443,18 @@ usersRouter
     
     if (userId[1]||reviewId[1]){
       errorCode=400
-      res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid ObjectId"})
     }
 
     try {
       let addedReview=await userData.addReview(userId[0],reviewId[0])
       if (addedReview.modifiedCount){
-        res.json({addedReview})
+        return res.json({addedReview})
       }else{
-        res.status(500).json({errorMessage:"Internal Server Error"})
+        return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      res.status(400).json({errorMessage:"Cannot add review"})
+      return res.status(400).json({errorMessage:"Cannot add review"})
     }
   })
 
@@ -472,18 +472,18 @@ usersRouter
       
       if (userId[1]||reviewId[1]){
         errorCode=400
-        res.status(400).json({errorMessage:"Invalid ObjectId"})
+        return res.status(400).json({errorMessage:"Invalid ObjectId"})
       }
   
       try {
         let removeReview=await userData.removeReview(userId[0],reviewId[0])
         if (removeReview.modifiedCount){
-          res.json({removeReview})
+          return res.json({removeReview})
         }else{
-          res.status(500).json({errorMessage:"Internal Server Error"})
+          return res.status(500).json({errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        res.status(400).json({errorMessage:"Cannot remove review"})
+        return res.status(400).json({errorMessage:"Cannot remove review"})
       }
     })
 
@@ -501,18 +501,18 @@ usersRouter
       
       if (userId[1]||commentId[1]){
         errorCode=400
-        res.status(400).json({errorMessage:"Invalid ObjectId"})
+        return res.status(400).json({errorMessage:"Invalid ObjectId"})
       }
   
       try {
         let addedComment=await userData.addComment(userId[0],commentId[0])
         if (addedComment.modifiedCount){
-          res.json({addedComment})
+          return res.json({addedComment})
         }else{
-          res.status(500).json({errorMessage:"Internal Server Error"})
+          return res.status(500).json({errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        res.status(400).json({errorMessage:"Cannot add comment"})
+        return res.status(400).json({errorMessage:"Cannot add comment"})
       }
     })
 
@@ -530,18 +530,18 @@ usersRouter
       
       if (userId[1]||commentId[1]){
         errorCode=400
-        res.status(400).json({errorMessage:"Invalid ObjectId"})
+        return res.status(400).json({errorMessage:"Invalid ObjectId"})
       }
   
       try {
         let removeComment=await userData.deleteComment(userId[0],commentId[0])
         if (removeComment.modifiedCount){
-          res.json({removeComment})
+          return res.json({removeComment})
         }else{
-          res.status(500).json({errorMessage:"Internal Server Error"})
+          return res.status(500).json({errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        res.status(400).json({errorMessage:"Cannot delete comment"})
+        return res.status(400).json({errorMessage:"Cannot delete comment"})
       }
     })
 
