@@ -94,7 +94,7 @@ usersRouter
       let loginInfo=await userData.loginUser(contactEmailVal[0],passwordVal[0])
       if (loginInfo.firstName){
         req.session.user= {firstName: loginInfo.firstName,
-           lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress,userId:userData.getUserByEmailAddress(loginInfo.emailAddress)._id}
+           lastName: loginInfo.lastName, emailAddress: loginInfo.contactEmail,userId:await userData.getUserByEmailAddress(loginInfo.contactEmail)._id}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
            return res.redirect("admin")
        
