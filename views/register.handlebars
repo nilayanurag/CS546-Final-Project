@@ -24,6 +24,15 @@ registration handelbars
             </div>
         {{/if}}
 
+        <label for="usernameInput">Username</label>
+        <input type="text" id="usernameInput" name="usernameInput" value="{{usernameDef}}" required>
+
+        {{#if usernameErr}}
+            <div id="usernameError" class="errorMessage">
+                {{usernameErr}}
+            </div>
+        {{/if}}
+
         <label for="ageInput">Age</label>
         <input type="number" id="ageInput" name="ageInput" value="{{ageDef}}" required>
 

@@ -20,6 +20,7 @@ usersRouter
     }
     let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
     let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
+    let usernameVal = await routeHelper.routeValidationHelper(helper.checkString,userInfo.usernameInput,"username",1,25)
     let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,userInfo.sexInput,"sex")
     let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkIfEmailPresent,userInfo.contactEmailInput)
     let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,userInfo.ageInput,12,105)
@@ -34,6 +35,8 @@ usersRouter
       firstNameErr:firstNameVal[1],
       lastNameDef:lastNameVal[0],
       lastNameErr:lastNameVal[1],
+      usernameDef:usernameVal[0],
+      usernameErr:usernameVal[1],
       sexDef:sexVal[0],
       sexErr:sexVal[1],
       ageDef:ageVal[0],
@@ -46,14 +49,14 @@ usersRouter
       locationErr:locationVal[1],
     }
 
-    if (firstNameVal[1]||lastNameVal[1]||sexVal[1]||ageVal[1]||contactEmailVal[1]
+    if (firstNameVal[1]||lastNameVal[1]||usernameVal[1]||sexVal[1]||ageVal[1]||contactEmailVal[1]
       ||passwordVal[1]||confirmedPasswordVal[1]||locationVal[1]){
       errorCode=400
       return res.status(400).render("register",dataToRender)
     }
 
     try {
-      let registeredInfo=await userData.createUser(firstNameVal[0],lastNameVal[0],sexVal[0],
+      let registeredInfo=await userData.createUser(usernameVal[0],firstNameVal[0],lastNameVal[0],sexVal[0],
         ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
       if (registeredInfo.insertedUser){
         return res.render("login")
