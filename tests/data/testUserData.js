@@ -68,7 +68,7 @@ try {
 }
 
 try {
-  const user = await userFunctions.deleteFollowing(
+  const user = await userFunctions.removeFollowing(
     user1,
     user2
   );
@@ -78,7 +78,7 @@ try {
 }
 
 try {
-  const user = await userFunctions.deleteFollower(
+  const user = await userFunctions.removeFollower(
     user1,
     user2
   );
