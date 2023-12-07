@@ -490,6 +490,17 @@ export const getUserByUsername = async (username) => {
   }
 };
 
+export const getUserByEmailAddress = async (contactEmail) => {
+  try {
+    contactEmail = helper.checkValidEmail(contactEmail);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ contactEmail: contactEmail });
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Route has been linked to this function
 export const getAllUsers = async () => {
   try {
