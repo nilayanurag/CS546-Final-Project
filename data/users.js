@@ -1,5 +1,5 @@
 import * as helper from "../helpers/validation.js";
-import { users } from "../config/mongoCollections.js";
+import { users, reviews, comments } from "../config/mongoCollections.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
@@ -46,7 +46,6 @@ export const createUser = async (
   password,
   location
 ) => {
-  
   const userCollection = await users();
 
   username = helper.checkString(username, "username", 1, 25);
@@ -113,9 +112,9 @@ export const loginUser = async (contactEmail, password) => {
   }
 };
 
-export const getUser = async (userId) => {
+export const getUserById = async (userId) => {
   try {
-    userId = helper.checkObjectId(userId);
+    userId = new ObjectId(helper.checkObjectId(userId));
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
@@ -142,35 +141,37 @@ export const updateUser = async (
     firstName = helper.checkString(firstName, "firstName", 1, 25);
     lastName = helper.checkString(lastName, "lastName", 1, 25);
     sex = helper.checkSex(sex);
-    contactEmail = await helper.checkIfEmailPresent(contactEmail);
+    contactEmail = helper.checkValidEmail(contactEmail);
     age = helper.checkAge(age, 12, 105);
     password = helper.checkPass(password);
     location = helper.checkAddress(location);
-
     const hash = await bcrypt.hash(password, saltRounds);
 
     const userCollection = await users();
 
     let userData = await userCollection
-        .find(
-          { _id: userId },
-          { projection: { following: 1, followers: 1, tags: 1 } }
-        )
-        .toArray();
+      .find(
+        { _id: userId },
+        { projection: { following: 1, followers: 1, tags: 1 } }
+      )
+      .toArray();
+    if (userData.following === undefined) userData.following = [];
+    if (userData.followers === undefined) userData.followers = [];
+    if (userData.tags === undefined) userData.tags = [];
 
     if (!userData) throw "User not found";
     let dataPacket = {
-      username,
-      firstName,
-      lastName,
-      sex,
-      age,
-      contactEmail,
+      username: username,
+      firstName: firstName,
+      lastName: lastName,
+      sex: sex,
+      age: age,
+      contactEmail: contactEmail,
       password: hash,
       following: userData.following,
       followers: userData.followers,
       tags: userData.tags,
-      location,
+      location: location,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -180,7 +181,7 @@ export const updateUser = async (
       { $set: dataPacket },
       { returnDocument: "after" }
     );
-    
+
     if (!updatedUser || updatedUser === undefined) {
       throw "could not update event successfully";
     }
@@ -190,26 +191,15 @@ export const updateUser = async (
 
 // MOST IMP: If you are deleting a user, make sure to FIRST delete all the reviews, comments, and tags associated with it
 export const deleteUser = async (userId) => {
-  try{
+  try {
     userId = new ObjectId(helper.checkObjectId(userId));
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
     const deleteInfo = await userCollection.deleteOne({ _id: userId });
-    if (deleteInfo.deletedCount === 0) throw `Could not delete user with id of ${userId}`;
+    if (deleteInfo.deletedCount === 0)
+      throw `Could not delete user with id of ${userId}`;
     return true;
-  }catch(error){
-    throw error;
-  }
-};
-
-export const getUserById = async (userId) => {
-  try {
-    userId = helper.checkObjectId(userId);
-    const userCollection = await users();
-    const user = await userCollection.findOne({ _id: userId });
-    if (!user) throw "User not found";
-    return user;
   } catch (error) {
     throw error;
   }
@@ -253,22 +243,55 @@ export const getUserById = async (userId) => {
 //   }
 // };
 
-
-
 export const addFollowing = async (userId, followingId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
     followingId = new ObjectId(helper.checkObjectId(followingId));
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
-    if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { following: followingId }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    if (!user) {
+      throw "User not found";
+    }
+    const followingUser = await userCollection.findOne({ _id: followingId });
+    if (!followingUser) {
+      throw "User not found";
+    }
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $addToSet: { following: followingId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
   } catch (error) {
     throw error;
   }
 };
+
+export const deleteFollowing = async (userId, followingId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    followingId = new ObjectId(helper.checkObjectId(followingId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) {
+      throw "User not found";
+    }
+    const followingUser = await userCollection.findOne({ _id: followingId });
+    if (!followingUser) {
+      throw "User not found";
+    }
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $pull: { following: followingId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const addFollower = async (userId, followerId) => {
   try {
@@ -277,13 +300,40 @@ export const addFollower = async (userId, followerId) => {
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { followers: followerId }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    const followerUser = await userCollection.findOne({ _id: followerId });
+    if (!followerUser) throw "User not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $addToSet: { followers: followerId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
   } catch (error) {
     throw error;
   }
 };
+
+export const deleteFollower = async (userId, followerId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    followerId = new ObjectId(helper.checkObjectId(followerId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const followerUser = await userCollection.findOne({ _id: followerId });
+    if (!followerUser) throw "User not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $pull: { followers: followerId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const addTags = async (userId, tags) => {
   try {
@@ -292,13 +342,36 @@ export const addTags = async (userId, tags) => {
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { tags: tags }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $addToSet: { tags: tags }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
   } catch (error) {
     throw error;
   }
 };
+
+export const deleteTags = async (userId, tags) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    tags = helper.checkString(tags);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $pull: { tags: tags }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const addReview = async (userId, reviewId) => {
   try {
@@ -307,15 +380,20 @@ export const addReview = async (userId, reviewId) => {
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { reviews: reviewId }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $addToSet: { reviews: reviewId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
   } catch (error) {
     throw error;
   }
-
 };
-
 
 export const deleteReview = async (userId, reviewId) => {
   try {
@@ -324,10 +402,15 @@ export const deleteReview = async (userId, reviewId) => {
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $pull: { reviews: reviewId }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $pull: { reviews: reviewId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
-
   } catch (error) {
     throw error;
   }
@@ -340,8 +423,15 @@ export const addComment = async (userId, commentId) => {
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $addToSet: { comments: commentId }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    const commentCollection = await comments();
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $addToSet: { comments: commentId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
   } catch (error) {
     throw error;
@@ -355,24 +445,37 @@ export const deleteComment = async (userId, commentId) => {
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: userId });
     if (!user) throw "User not found";
-    const updateInfo = await userCollection.updateOne({ _id: userId }, { $pull: { comments: commentId }, $set: { updatedAt: new Date() } });
-    if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    const updateInfo = await userCollection.updateOne(
+      { _id: userId },
+      { $pull: { comments: commentId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
     return true;
-
   } catch (error) {
     throw error;
   }
 };
 
-export const getUserByName = async (firstName) => {
+export const getUserByUsername = async (username) => {
   try {
-    firstName = helper.checkString(firstName, "firstName", 1, 50);
+    username = helper.checkString(username, "username", 1, 50);
     const userCollection = await users();
-    // name: { $regex: `^${prefix}`, $options: 'i' }  To search for prefix only
     const user = await userCollection
-      .find({ firstName: { $regex: firstName, $options: "i" } })
+      .find({ username: { $regex: username, $options: "i" } })
       .toArray();
-    // if (!business) throw "Business not found";
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const userCollection = await users();
+    const user = await userCollection.find({}).toArray();
     return user;
   } catch (error) {
     throw error;

@@ -1,5 +1,6 @@
 import * as helper from "../helpers/validation.js";
-import { comments } from "../config/mongoCollections.js";
+import { comments, reviews, users } from "../config/mongoCollections.js";
+import { ObjectId } from "mongodb";
 
 /*
 comment{
@@ -13,8 +14,17 @@ comment{
 
 export const createComment = async (reviewId, userId, commentDescription) => {
   try {
-    reviewId = helper.checkObjectId(reviewId);
-    userId = helper.checkObjectId(userId);
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+
     commentDescription = helper.checkString(
       commentDescription,
       "Comment Description",
@@ -37,11 +47,13 @@ export const createComment = async (reviewId, userId, commentDescription) => {
 
 // MOST ImP: You are deleting any comment, make sure to FIRST remove the comment from the review document
 // and user document
-export const deleteComment = async (commentid) => {
+export const deleteComment = async (commentId) => {
   try {
-    commentid = helper.checkObjectId(commentid);
+    commentId = new ObjectId(helper.checkObjectId(commentId));
     const commentCollection = await comments();
-    const deleteComment = await commentCollection.deleteOne({ _id: commentid });
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    const deleteComment = await commentCollection.deleteOne({ _id: commentId });
     return { deletedComment: deleteComment.deletedCount ? true : false };
   } catch (error) {
     throw error;
@@ -50,7 +62,7 @@ export const deleteComment = async (commentid) => {
 
 export const getCommentById = async (commentId) => {
   try {
-    commentId = helper.checkObjectId(commentId);
+    commentId = new ObjectId(helper.checkObjectId(commentId));
     const commentCollection = await comments();
     const comment = await commentCollection.findOne({ _id: commentId });
     if (!comment) throw "Comment not found";
@@ -67,15 +79,22 @@ export const updateComment = async (
   commentDescription
 ) => {
   try {
-    commentId = helper.checkObjectId(commentId);
-    reviewId = helper.checkObjectId(reviewId);
-    userId = helper.checkObjectId(userId);
+    commentId = new ObjectId(helper.checkObjectId(commentId));
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    userId = new ObjectId(helper.checkObjectId(userId));
     commentDescription = helper.checkString(
       commentDescription,
       "Comment Description",
       1,
       500
     );
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
     const commentCollection = await comments();
     const comment = await commentCollection.findOne({ _id: commentId });
     if (!comment) throw "Comment not found";
@@ -95,3 +114,19 @@ export const updateComment = async (
     throw error;
   }
 };
+
+export const getCommentsByReviewId  = async (reviewId) => {
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    const reviewCollection = await reviews();
+    const commentCollection = await comments();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const allComments = await commentCollection
+      .find({ reviewId: reviewId })
+      .toArray();
+    return allComments;
+  } catch (error) {
+    throw error;
+  }
+}

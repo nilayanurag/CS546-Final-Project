@@ -1,5 +1,5 @@
 import * as helper from "../helpers/validation.js"
-import {businesses} from "../config/mongoCollections.js"
+import {businesses, reviews, categories} from "../config/mongoCollections.js"
 import { ObjectId } from "mongodb";
 
 /*
@@ -24,8 +24,12 @@ business:{
 export const createBusiness = async(name, categoryId, addressObject)=>{
     try {
         name = helper.checkString(name, "Buisness name", 3, 50);
-        categoryId = helper.checkObjectId(categoryId);
+        categoryId = new ObjectId(helper.checkObjectId(categoryId));
         addressObject = helper.checkAddress(addressObject);
+
+        const categoryCollection = await categories();
+        const category =  await categoryCollection.findOne({ _id: categoryId });
+        if (!category) throw "Category not found";
 
         const businessCollection = await businesses();
         const newBusiness = await businessCollection.insertOne({
@@ -63,7 +67,6 @@ export const getBusinessByName = async(name)=>{
         const business = await businessCollection.findOne({ name: name });
         if (!business) throw "Business not found";
         return business;
-        
     } catch (error) {
         throw error;
     }
@@ -90,6 +93,9 @@ export const addReview = async(reviewId, businessId)=>{
         const businessCollection = await businesses();
         const business = await businessCollection.findOne({ _id: businessId});
         if (!business) throw "Business not found";
+        const reviewCollection = await reviews();
+        const review = await reviewCollection.findOne({ _id: reviewId });
+        if (!review) throw "Review not found";
         const updateInfo = await businessCollection.updateOne({ _id: businessId }, { $addToSet: { reviews: reviewId }, $set: { updatedAt: new Date() } });
         if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
         return true;
@@ -117,6 +123,9 @@ export const deleteReview = async(reviewId, businessId)=>{
         const businessCollection = await businesses();
         const business = await businessCollection.findOne({ _id: businessId });
         if (!business) throw "Business not found";
+        const reviewCollection = await reviews();
+        const review = await reviewCollection.findOne({ _id: reviewId });
+        if (!review) throw "Review not found";
         const updateInfo = await businessCollection.updateOne({ _id: businessId }, { $pull: { reviews: reviewId }, $set: { updatedAt: new Date() } });
         if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
         return true;

@@ -1,5 +1,11 @@
 import * as helper from "../helpers/validation.js";
-import { reviews } from "../config/mongoCollections.js";
+import {
+  reviews,
+  users,
+  businesses,
+  categories,
+  comments,
+} from "../config/mongoCollections.js";
 import fs from "fs";
 import { Binary, ObjectId } from "mongodb";
 
@@ -31,11 +37,23 @@ export const createReview = async (
   imagePath
 ) => {
   try {
-    businessId = helper.checkObjectId(businessId);
-    userId = helper.checkObjectId(userId);
+    businessId = new ObjectId(helper.checkObjectId(businessId));
+    userId = new ObjectId(helper.checkObjectId(userId));
     ratingPoints = helper.checkRating(ratingPoints, 1, 5);
-    categoryId = helper.checkObjectId(categoryId);
+    categoryId = new ObjectId(helper.checkObjectId(categoryId));
     reviewText = helper.checkString(reviewText, "Review Text", 1, 500);
+
+    const businessCollection = await businesses();
+    const business = await businessCollection.findOne({ _id: businessId });
+    if (!business) throw "Business not found";
+
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+
+    const categoryCollection = await categories();
+    const category = await categoryCollection.findOne({ _id: categoryId });
+    if (!category) throw "Category not found";
 
     // validate image if there then insert else null
     let imageBinary;
@@ -99,7 +117,8 @@ export const updateReview = async (
       imageBinary = null;
     }
     const reviewCollection = await reviews();
-
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
     const updatedReview = await reviewCollection.updateOne(
       { _id: reviewId },
       {
@@ -109,7 +128,6 @@ export const updateReview = async (
           images: imageBinary,
           updatedAt: new Date(),
         },
-        
       },
       { returnDocument: "after" }
     );
@@ -121,81 +139,158 @@ export const updateReview = async (
   }
 };
 
-export const getReview = async (reviewId) => {
-    try {
-        reviewId = new ObjectId(helper.checkObjectId(reviewId));
-        const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: reviewId });
-        if (!review) throw "Review not found";
-        return review;
-    } catch (error) {
-        throw error;
-    }
-
+export const getReviewById = async (reviewId) => {
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    return review;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const addThumbsUp = async (reviewId, userId) => {
-    try {
-        reviewId = new ObjectId(helper.checkObjectId(reviewId));
-        userId = new ObjectId(helper.checkObjectId(userId));
-        const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: reviewId });
-        if (!review) throw "Review not found";
-        const updateInfo = await reviewCollection.updateOne({ _id: reviewId }, { $addToSet: { thumsUp: userId }, $set: { updatedAt: new Date() } });
-        if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
-        return true;
-    } catch (error) {
-        throw error;
-    }
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    await removeThumbsDown(reviewId.toString(), userId.toString());
+    const updateInfo = await reviewCollection.updateOne(
+      { _id: reviewId },
+      { $addToSet: { thumsUp: userId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
 };
-
 
 export const removeThumbsUp = async (reviewId, userId) => {
-    try {
-
-        reviewId = new ObjectId(helper.checkObjectId(reviewId));
-        userId = new ObjectId(helper.checkObjectId(userId));
-        const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: reviewId });
-        if (!review) throw "Review not found";
-        const updateInfo = await reviewCollection.updateOne({ _id: reviewId }, { $pull: { thumsUp: userId }, $set: { updatedAt: new Date() } });
-        if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
-        return true;
-        
-    } catch (error) {
-        throw error;
-    }
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await reviewCollection.updateOne(
+      { _id: reviewId },
+      { $pull: { thumsUp: userId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
 };
 
-export const addThumbsDown = async (userId, reviewId) => {
-    try {
-        reviewId = new ObjectId(helper.checkObjectId(reviewId));
-        userId = new ObjectId(helper.checkObjectId(userId));
-        const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: reviewId });
-        if (!review) throw "Review not found";
-        const updateInfo = await reviewCollection.updateOne({ _id: reviewId }, { $addToSet: { thumsDown: userId }, $set: { updatedAt: new Date() } });
-        if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
-        return true;
-    } catch (error) {
-        throw error;
-    }
+export const addThumbsDown = async (reviewId, userId) => {
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    await removeThumbsUp(reviewId.toString(), userId.toString());
+    const updateInfo = await reviewCollection.updateOne(
+      { _id: reviewId },
+      { $addToSet: { thumsDown: userId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const removeThumbsDown = async (reviewId, userId) => {
-    try {
-        reviewId = new ObjectId(helper.checkObjectId(reviewId));
-        userId = new ObjectId(helper.checkObjectId(userId));
-        const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: reviewId });
-        if (!review) throw "Review not found";
-        const updateInfo = await reviewCollection.updateOne({ _id: reviewId }, { $pull: { thumsDown: userId }, $set: { updatedAt: new Date() } });
-        if (!updateInfo.matchedCount && !updateInfo.modifiedCount) throw 'Update failed';
-        return true;
-        
-    } catch (error) {
-        throw  error;
-    }
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+    const updateInfo = await reviewCollection.updateOne(
+      { _id: reviewId },
+      { $pull: { thumsDown: userId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
 };
 
+export const addComment = async (reviewId, commentId) => {
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    commentId = new ObjectId(helper.checkObjectId(commentId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const commentCollection = await comments();
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    const updateInfo = await reviewCollection.updateOne(
+      { _id: reviewId },
+      { $addToSet: { comments: commentId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
 
+export const removeComment = async (reviewId, commentId) => {
+  try {
+    reviewId = new ObjectId(helper.checkObjectId(reviewId));
+    commentId = new ObjectId(helper.checkObjectId(commentId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: reviewId });
+    if (!review) throw "Review not found";
+    const commentCollection = await comments();
+    const comment = await commentCollection.findOne({ _id: commentId });
+    if (!comment) throw "Comment not found";
+    const updateInfo = await reviewCollection.updateOne(
+      { _id: reviewId },
+      { $pull: { comments: commentId }, $set: { updatedAt: new Date() } }
+    );
+    if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
+      throw "Update failed";
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllReviews = async () => {
+  try {
+    const reviewCollection = await reviews();
+    const allReviews = await reviewCollection.find({}).toArray();
+    return allReviews;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,5 +1,6 @@
 import * as helper from "../helpers/validation.js";
 import { categories } from "../config/mongoCollections.js";
+import { ObjectId } from "mongodb";
 
 
 export const createCategory = async (name, tags) => {
@@ -23,7 +24,7 @@ export const createCategory = async (name, tags) => {
 
 export const getCategoryById = async (categoryId) => {
     try {
-        categoryId = helper.checkObjectId(categoryId);
+        categoryId = new ObjectId(helper.checkObjectId(categoryId));
         const categoryCollection = await categories();
         const category = await categoryCollection.findOne({ _id: categoryId });
         if (!category) throw "Category not found";

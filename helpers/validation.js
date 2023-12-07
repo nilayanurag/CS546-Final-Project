@@ -76,9 +76,10 @@ export function checkNaturalNumber(numVal) {
     return numVal
 }
 
-export function checkRating(rating, upperbound, lowerbound) {
+export function checkRating(rating, lowerbound, upperbound) {
     rating = checkWholeNumber(rating)
     if(rating<lowerbound || rating>upperbound) throw "Rating out of bound"
+    console.log("rating", rating)
     return rating
 }
 
