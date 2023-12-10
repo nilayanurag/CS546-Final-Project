@@ -1,0 +1,17 @@
+<!-- Review Page -->
+<div id="reviewPage">
+    <h2>{{businessName}}: {{review.rating}}</h2>
+    <p>Posted by: {{username}}</p>
+    <div id="reviewDescription">
+        <p>{{review.reviewText}}</p>
+
+        {{#each commentData}}
+        <li> {{this.commentDescription}} </li>
+
+        {{else}}
+        <p>No recent comments.</p>
+        {{/each}}
+
+
+    </div>
+</div>

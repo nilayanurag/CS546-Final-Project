@@ -4,7 +4,12 @@
     <ul>
         {{#each reviews}}
         <li>
-            <h4>{{this.businessName}}</h4>
+            <a href="/review/getReview/{{this._id}}">
+            
+            <h4>
+                {{this.businessName}}
+            </h4>
+            </a>
             <h3>{{this.username}}</h3>
             <p>{{this.description}}</p>
             {{#if this.image}}

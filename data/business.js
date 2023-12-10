@@ -143,6 +143,19 @@ export const deleteReview = async(reviewId, businessId)=>{
     }
 }
 
+// Route: GET /business/getBusinessById/:id
+export const getBusinessById = async(businessId)=>{
+    try {
+        businessId = new ObjectId(helper.checkObjectId(businessId));
+        const businessCollection = await businesses();
+        const business = await businessCollection.findOne({ _id: businessId });
+        if (!business) throw "Business not found";
+        return business;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // To be completed later
 export const updateGlobalRating = async (businessId) => {
     // try {

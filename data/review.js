@@ -56,13 +56,14 @@ export const createReview = async (
     if (!category) throw "Category not found";
 
     // validate image if there then insert else null
-    let imageBinary;
-    if (imagePath && imagePath.trim() !== "") {
-      const imageBuffer = fs.readFileSync(imagePath);
-      imageBinary = new Binary(imageBuffer);
-    } else {
-      imageBinary = null;
-    }
+    // let imageBinary;
+    // console.log(imagePath);
+    // if (imagePath && imagePath.trim() !== "") {
+    //   const imageBuffer = fs.readFileSync(imagePath);
+    //   imageBinary = new Binary(imageBuffer);
+    // } else {
+    //   imageBinary = null;
+    // }
 
     const reviewCollection = await reviews();
     const newReview = await reviewCollection.insertOne({
@@ -71,7 +72,7 @@ export const createReview = async (
       categoryId: categoryId,
       rating: ratingPoints,
       reviewText: reviewText,
-      images: imageBinary,
+      images: imagePath ? imagePath : null,
       comments: [],
       thumsUp: [],
       thumsDown: [],
@@ -304,3 +305,4 @@ export const getAllReviews = async () => {
     throw error;
   }
 };
+
