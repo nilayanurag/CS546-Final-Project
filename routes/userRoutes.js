@@ -92,11 +92,11 @@ usersRouter
 
     try {
       let loginInfo=await userData.loginUser(contactEmailVal[0],passwordVal[0])
-      if (loginInfo.firstName){
-        req.session.user= {firstName: loginInfo.firstName,
-           lastName: loginInfo.lastName, emailAddress: loginInfo.contactEmail,userId:await userData.getUserByEmailAddress(loginInfo.contactEmail)._id}
+      if (loginInfo.firstName){//TODO: Hey dont return password here
+        let userDetail=await userData.getUserByEmailAddress(loginInfo.contactEmail)
+        req.session.user= {firstName: loginInfo.firstName, contactEmail: loginInfo.contactEmail,userId:userDetail._id}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
-           return res.redirect("admin")
+           return res.redirect("/")
        
       }else{
         return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
@@ -139,8 +139,9 @@ usersRouter
     usersRouter
     .route('/updateUser')
     .get(async (req, res) => {
+      let userId;
       try {
-        let userId=helper.checkObjectId(req.session.user.userId)
+        userId=helper.checkObjectId(req.session.user.userId)
       } catch (error) {
         return res.status(400)
         .render("error",{errorMessage:"User Not Found"})
@@ -154,13 +155,13 @@ usersRouter
         .render("error",{errorMessage:"User Not Found"})
       }
       let dataToRender={ 
-        username:getUserInfo.username,
-        firstName:getUserInfo.firstName,
-        lastName:getUserInfo.lastName,
-        sex:getUserInfo.sex,
-        age:getUserInfo.age,
-        contactEmail:getUserInfo.contactEmail,
-        location:getUserInfo.location
+        usernameDef:getUserInfo.username,
+        firstNameDef:getUserInfo.firstName,
+        lastNameDef:getUserInfo.lastName,
+        sexDef:getUserInfo.sex,
+        ageDef:getUserInfo.age,
+        contactEmailDef:getUserInfo.contactEmail,
+        locationDef:getUserInfo.location
       }
       return res.render("updateUser",dataToRender)
   
@@ -178,7 +179,7 @@ usersRouter
       let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
       let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
       let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,userInfo.sexInput,"sex")
-      let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkIfEmailPresent,userInfo.contactEmailInput)
+      let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,userInfo.contactEmailInput)
       let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,userInfo.ageInput,12,105)
       let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
       let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,userInfo.passwordInput,userInfo.confirmPasswordInput)
@@ -214,7 +215,7 @@ usersRouter
         let updatedInfo=await userData.updateUser(userId[0],username[0],firstNameVal[0],lastNameVal[0],sexVal[0],
           ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
         if (updatedInfo.modifiedCount){
-          return res.render("updateUser",dataToRender)
+          return res.redirect("/")
         }else{
           return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
@@ -231,23 +232,23 @@ usersRouter
     return res.json(getAllUsersInfo)
   })
 
-  usersRouter
-  .route("/getByUserName/:username")
-  .get(async (req, res) => {
-    let username=await routeHelper.routeValidationHelper(helper.checkString,req.params.username,"username",1,25)
-    if (username[1]){
-      return res.status(400)
-      .json({errorMessage:"Invalid Username"})
-    }else{
-      try {
-        let getUserInfo=await userData.getUserByUserName(username[0])
-        return res.json(getUserInfo)
-      } catch (error) {
-        return res.status(400)
-        .json({errorMessage:"User Not Found"})
-      }
-    }
-  })
+  // usersRouter
+  // .route("/getByUserName/:username")
+  // .get(async (req, res) => {
+  //   let username=await routeHelper.routeValidationHelper(helper.checkString,req.params.username,"username",1,25)
+  //   if (username[1]){
+  //     return res.status(400)
+  //     .json({errorMessage:"Invalid Username"})
+  //   }else{
+  //     try {
+  //       let getUserInfo=await userData.getUserByUsername(username[0])[0]
+  //       return res.json(getUserInfo)
+  //     } catch (error) {
+  //       return res.status(400)
+  //       .json({errorMessage:"User Not Found"})
+  //     }
+  //   }
+  // })
 
   usersRouter
   .route("/addFollowing").post(async (req, res) => {
@@ -547,10 +548,82 @@ usersRouter
         return res.status(400).json({errorMessage:"Cannot delete comment"})
       }
     })
+    usersRouter
+    .route("/getUsersByPrefix")
+    .get(async (req, res) => {
+        let userNamePrefix = req.query.prefix;
+        let errorCode=undefined;
+        let prefix=await routeHelper.routeValidationHelper(helper.checkString,userNamePrefix, "Prefix", 1, 50);
+        if (prefix[1]){
+            errorCode=400;
+            return res.status(errorCode).json({errorMessage: "Bad Request"});  
+        }
+        try {
+            let userList = await userData.getAllUserWithPrefix(prefix[0]);
+            if (userList.length>0){
+                return res.json(userList);
+            }else{
+                errorCode=404;
+                return res.status(errorCode).json({errorMessage: "Not Found"});  
+            }
+        } catch (error) {
+            errorCode=500;
+            return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+            
+        }
+    });
 
+    usersRouter
+    .route("/getUserDetails/:username")
+    .get(async (req, res) => {
+      let userName = req.params.username;
+      let errorCode=undefined;
+      let username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
+      if (username[1]){
+          errorCode=400;
+          return res.status(errorCode).json({errorMessage: "Bad Request"});  
+      }
+      try {
+          let user = await userData.getUserByUsername(username[0])[0];
+          if (user){
+              return res.json(user);
+          }else{
+              errorCode=404;
+              return res.status(errorCode).json({errorMessage: "Not Found"});  
+          }
+      } catch (error) {
+          errorCode=500;
+          return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+          
+      }
+  }
+  );
 
-
-
+  usersRouter
+    .route("/renderUserDetails/:username")
+    .get(async (req, res) => {
+      let username = req.params.username;
+      let errorCode=undefined;
+      username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
+      if (username[1]){
+          errorCode=400;
+          return res.status(errorCode).json({errorMessage: "Bad Request"});  
+      }
+      try {
+          let user = await userData.getUserByUsername(username[0]);
+          if (user[0]){
+              return res.render("partials/userDetail",{user:user[0]});
+          }else{
+              errorCode=404;
+              return res.status(errorCode).json({errorMessage: "Not Found"});  
+          }
+      } catch (error) {
+          errorCode=500;
+          return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+          
+      }
+  }
+  );
 
 
 

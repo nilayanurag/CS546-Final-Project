@@ -8,6 +8,7 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+
 }
 header {
     background: linear-gradient(to right, #007bff, #ff1493); 
@@ -93,3 +94,50 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
+.handlebars-container {
+    display: grid;
+    grid-template-columns: 30% 40% 30%; /* 3 columns */
+    gap: 10px; /* Space between grid items */
+    padding-top: 60px; /* Adjust as needed to avoid overlapping with the header */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+#user-profile-handle-bar,
+#feed-handle-bar,
+#following-list-handle-bar {
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#user-profile-handle-bar {
+    grid-column: 1;
+}
+
+#feed-handle-bar {
+    grid-column: 2;
+}
+
+#following-list-handle-bar {
+    grid-column: 3;
+}
+.search-dropdown {
+    display: none; /* Initially hidden */
+    position: absolute; /* Positioned relative to the search container */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%; /* Same width as the input field */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    background-color: white;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f0f0f0;
+  }

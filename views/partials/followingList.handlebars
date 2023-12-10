@@ -1,0 +1,15 @@
+<div id="following-list-handle-bar" class="class-handlebars">
+  <h3>Following</h3>
+  <div class="search-container">
+    <input type="text" id="user-search" placeholder="Search users...">
+     <div id="search-dropdown" class="search-dropdown"></div>
+  </div>
+  <button id="search-user">Search</button>
+  <button id="update-following">Update Following</button>
+    <div class="following-list">
+        <ul>
+        {{#each data.items}}
+            <li>{{this}}</li>
+        {{/each}}
+        </ul>
+  </div>

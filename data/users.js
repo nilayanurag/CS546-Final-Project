@@ -511,3 +511,17 @@ export const getAllUsers = async () => {
     throw error;
   }
 };
+
+//Route linked to this function
+export const getAllUserWithPrefix = async(prefix) =>{
+  try {
+      prefix = helper.checkString(prefix, "prefix", 1, 50);
+      const userCollection = await users();
+      // name: { $regex: `^${prefix}`, $options: 'i' }  To search for prefix only
+      const userList = await userCollection.find({username: { $regex: prefix, $options: 'i' }}).toArray(); // This to search for prefix anywhere in the string
+      return userList;
+      
+  } catch (error) {
+      throw error;
+  }
+}

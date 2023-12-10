@@ -1,0 +1,12 @@
+<div id="user-profile-handle-bar" class="class-handlebars">
+  <h1>User Profile</h1>
+  <div class="user-info">
+    <p>Name: {{data.user.firstName}}</p>
+  </div>
+  <form action="/login" method="get">
+  <button type="submit" id="login-screen">Login</button>
+   </form>
+  <form action="/updateUser" method="get">
+  <button  type="submit" id="edit-profile">Edit Profile</button>
+   </form>
+</div>
