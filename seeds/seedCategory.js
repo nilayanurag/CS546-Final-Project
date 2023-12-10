@@ -78,7 +78,7 @@ export const seedAllCategory = async () => {
     } catch (error) {
       throw error;
     }
-
+  
     try {
       const category6 = await categoryFunctions.createCategory("Grocery", [
           "Pulses",
@@ -92,5 +92,4 @@ export const seedAllCategory = async () => {
     } catch (error) {
       throw error;
     }
-  
 }

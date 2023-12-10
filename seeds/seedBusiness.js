@@ -187,5 +187,6 @@ export const seedAllBuisness = async () => {
     } catch (error) {
         throw error;
     }
+
 }
 
