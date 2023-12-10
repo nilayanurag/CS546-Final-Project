@@ -1,5 +1,6 @@
 import * as helper from "../helpers/validation.js";
-import { users, reviews, comments } from "../config/mongoCollections.js";
+import { users, reviews, comments, businesses } from "../config/mongoCollections.js";
+import * as reviewFunctions from "./review.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
@@ -525,3 +526,72 @@ export const getAllUserWithPrefix = async(prefix) =>{
       throw error;
   }
 }
+
+export const getHomePageDetails = async (userId) => {
+  userId = helper.checkObjectId(userId);
+  const businessCollection = await businesses();
+  const reviewCollection = await reviews();
+  let followingUserIds = await getUserById(userId);
+  const username = followingUserIds.username;
+
+  followingUserIds = followingUserIds.following;
+  if (followingUserIds.length === 0) {
+    return {
+      reviewsByFollowing: [],
+      followingUsername: [],
+    };
+  }
+
+  let followingUsername = [];
+  for (let i = 0; i < followingUserIds.length; i++) {
+    const followingUser = await getUserById(followingUserIds[i].toString());
+    followingUserIds[i] = new ObjectId(followingUserIds[i]);
+    const userData = {
+      name: followingUser.username,
+      userId: followingUserIds[i].toString(),
+    };
+    followingUsername.push(userData);
+  }
+  let reviewsByFollowing = await reviewCollection
+    .find(
+      { userId: { $in: followingUserIds } },
+      {
+        projection: {
+          _id: 1,
+          userId: 1,
+          businessId: 1,
+          rating: 1,
+          reviewText: 1,
+        },
+      }
+    )
+    .toArray();
+
+  for (let i = 0; i < reviewsByFollowing.length; i++) {
+    const business = await businessCollection.findOne({
+      _id: reviewsByFollowing[i].businessId,
+    });
+    reviewsByFollowing[i].businessName = business.name;
+  }
+
+  reviewsByFollowing = reviewsByFollowing.map((review) => {
+    const user = followingUsername.find(
+      (user) => user.userId === review.userId.toString()
+    );
+    return {
+      _id: review._id.toString(),
+      userId: review.userId.toString(),
+      businessId: review.businessId.toString(),
+      businessName: review.businessName,
+      rating: review.rating,
+      description: review.reviewText,
+      username: user.username,
+    };
+  });
+
+  return {
+    reviewsByFollowing: reviewsByFollowing,
+    followingUsername: followingUsername,
+    username: username,
+  };
+};

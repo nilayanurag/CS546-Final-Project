@@ -96,7 +96,7 @@ usersRouter
         let userDetail=await userData.getUserByEmailAddress(loginInfo.contactEmail)
         req.session.user= {firstName: loginInfo.firstName, contactEmail: loginInfo.contactEmail,userId:userDetail._id}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
-           return res.redirect("/")
+           return res.redirect("home")
        
       }else{
         return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
@@ -638,6 +638,27 @@ usersRouter
       role:req.session.user.role
     }
     res.render("admin",dataToRender)
+  });
+
+  usersRouter.route("/home").get(async (req, res) => {
+    // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+    // if (userId[1]){
+    //   errorCode=400
+    //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+    // }
+    try {
+      
+      let getUserHomeDetails = await userData.getHomePageDetails(req.session.user.userId);
+      res.render("home", {
+        layout: "main",
+        followingUsers: getUserHomeDetails.followingUsername,
+        reviews: getUserHomeDetails.reviewsByFollowing,
+        username: getUserHomeDetails.username,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
   });
 
 export default usersRouter;

@@ -7,9 +7,17 @@
   <button id="search-user">Search</button>
   <button id="update-following">Update Following</button>
     <div class="following-list">
-        <ul>
+        {{!-- <ul>
         {{#each data.items}}
             <li>{{this}}</li>
         {{/each}}
-        </ul>
+        </ul> --}}
+
+         <ul>
+        {{#each followingUsers}}
+        <li>{{this.name}}</li>
+        {{else}}
+        <p>No users followed.</p>
+        {{/each}}
+    </ul>
   </div>

@@ -78,6 +78,19 @@ export const seedAllCategory = async () => {
     } catch (error) {
       throw error;
     }
-  
 
+    try {
+      const category6 = await categoryFunctions.createCategory("Grocery", [
+          "Pulses",
+          "Frozen",
+          "Snacks",
+          ]);
+      if(category6.insertedCategory){
+          console.log("Category 6 created")
+      }
+      
+    } catch (error) {
+      throw error;
+    }
+  
 }
