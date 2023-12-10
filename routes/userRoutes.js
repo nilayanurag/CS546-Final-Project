@@ -94,9 +94,10 @@ usersRouter
       let loginInfo=await userData.loginUser(contactEmailVal[0],passwordVal[0])
       if (loginInfo.firstName){
         req.session.user= {firstName: loginInfo.firstName,
-           lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress}
+           lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress, userId: loginInfo.userId}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
-           return res.redirect("admin")
+           console.log("passed login")
+           return res.redirect("home")
        
       }else{
         return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
@@ -548,23 +549,43 @@ usersRouter
       }
     })
 
-
-
-
-
-
-
-
-  usersRouter
-.route('/admin').get(async (req, res) => {
-    //code here for GET
-    let dataToRender={
-      firstName:req.session.user.firstName,
-      lastName:req.session.user.lastName,
-      currentTime:new Date().toLocaleTimeString(),
-      role:req.session.user.role
-    }
-    res.render("admin",dataToRender)
-  });
+    const dummyFollowingUsers = [
+      { name: "Alice" },
+      { name: "Bob" },
+      { name: "Charlie" },
+    ];
+    
+    const dummyReviews = [
+      {
+        businessName: "Cafe Delight",
+        description: "Great coffee and pastries.",
+        image: "./public/images/testImage.png",
+      },
+      {
+        businessName: "Tech Gadgets",
+        description: "Found the latest tech gadgets here.",
+        image: "",
+      },
+    ];
+    
+    usersRouter.route("/home").get(async (req, res) => {
+      // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+      // if (userId[1]){
+      //   errorCode=400
+      //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+      // }
+      try {
+        
+        let getUserHomeDetails = await userData.getHomePageDetails(req.session.user.userId);
+        res.render("home", {
+          layout: "main",
+          followingUsers: getUserHomeDetails.followingUsername,
+          reviews: getUserHomeDetails.reviewsByFollowing,
+        });
+      } catch (error) {
+        console.log(error);
+        res.status(500).send("Server Error");
+      }
+    });
 
 export default usersRouter;

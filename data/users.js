@@ -1,8 +1,14 @@
 import * as helper from "../helpers/validation.js";
-import { users, reviews, comments } from "../config/mongoCollections.js";
+import {
+  users,
+  reviews,
+  comments,
+  businesses,
+} from "../config/mongoCollections.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
+import * as reviewFunctions from "./review.js";
 
 /*
 Refernce Schema:
@@ -105,6 +111,7 @@ export const loginUser = async (contactEmail, password) => {
   }
   if (compareToPassword) {
     return {
+      userId: found._id.toString(),
       firstName: found.firstName,
       lastName: found.lastName,
       contactEmail: found.contactEmail,
@@ -298,8 +305,7 @@ export const removeFollowing = async (userId, followingId) => {
   } catch (error) {
     throw error;
   }
-}
-
+};
 
 //TODO why are we not using the above function instead of creating unncessary bloat
 //Route has been linked to this function
@@ -344,7 +350,7 @@ export const removeFollower = async (userId, followerId) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 // Route has been linked to this function
 export const addTags = async (userId, tags) => {
@@ -384,7 +390,7 @@ export const deleteTags = async (userId, tags) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 // Route has been linked to this function
 export const addReview = async (userId, reviewId) => {
@@ -499,4 +505,73 @@ export const getAllUsers = async () => {
   } catch (error) {
     throw error;
   }
+};
+
+export const getHomePageDetails = async (userId) => {
+  userId = helper.checkObjectId(userId);
+  const userCollection = await users();
+  const businessCollection = await businesses();
+  const reviewCollection = await reviews();
+  let followingUserIds = await getUserById(userId);
+
+  followingUserIds = followingUserIds.following;
+  if (followingUserIds.length === 0) {
+    return {
+      reviewsByFollowing: [],
+      followingUsername: [],
+    };
+  }
+
+  let followingUsername = [];
+  for (let i = 0; i < followingUserIds.length; i++) {
+    const followingUser = await getUserById(followingUserIds[i].toString());
+    followingUserIds[i] = new ObjectId(followingUserIds[i]);
+    const userData = {
+      name: followingUser.username,
+      userId: followingUserIds[i].toString(),
+    };
+    followingUsername.push(userData);
+  }
+  console.log(followingUsername);
+  let reviewsByFollowing = await reviewCollection
+    .find(
+      { userId: { $in: followingUserIds } },
+      {
+        projection: {
+          _id: 1,
+          userId: 1,
+          businessId: 1,
+          rating: 1,
+          reviewText: 1,
+        },
+      }
+    )
+    .toArray();
+
+  for (let i = 0; i < reviewsByFollowing.length; i++) {
+    const business = await businessCollection.findOne({
+      _id: reviewsByFollowing[i].businessId,
+    });
+    reviewsByFollowing[i].businessName = business.name;
+  }
+
+  reviewsByFollowing = reviewsByFollowing.map((review) => {
+    const user = followingUsername.find(
+      (user) => user.userId === review.userId.toString()
+    );
+    return {
+      _id: review._id.toString(),
+      userId: review.userId.toString(),
+      businessId: review.businessId.toString(),
+      businessName: review.businessName,
+      rating: review.rating,
+      description: review.reviewText,
+      username: user.username,
+    };
+  });
+
+  return {
+    reviewsByFollowing: reviewsByFollowing,
+    followingUsername: followingUsername,
+  };
 };

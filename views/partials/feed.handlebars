@@ -1,0 +1,18 @@
+<!-- User Feed -->
+<div id="userFeed">
+    <h3>Recent Reviews</h3>
+    <ul>
+        {{#each reviews}}
+        <li>
+            <h4>{{this.businessName}}</h4>
+            <h3>{{this.username}}</h3>
+            <p>{{this.description}}</p>
+            {{#if this.image}}
+            <img src="{{this.image}}" alt="Review Image">
+            {{/if}}
+        </li>
+        {{else}}
+        <p>No recent reviews.</p>
+        {{/each}}
+    </ul>
+</div>

@@ -1,0 +1,12 @@
+<!-- Following List -->
+<div id="followingList">
+    <h3>Following</h3>
+    <input type="text" placeholder="Search users..." id="userSearchBar">
+    <ul>
+        {{#each followingUsers}}
+        <li>{{this.name}}</li>
+        {{else}}
+        <p>No users followed.</p>
+        {{/each}}
+    </ul>
+</div>

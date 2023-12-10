@@ -93,3 +93,17 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
+
+#contentContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+#userFeed {
+    /* Assuming you want the feed to take more space */
+    flex: 3;
+}
+
+#followingList {
+    flex: 1;
+}
