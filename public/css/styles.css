@@ -6,7 +6,7 @@ body {
     background: #f4f4f4;
     display: flex;
     flex-direction: column;
-    align-items: center;
+   
     min-height: 100vh;
 
 }
@@ -23,12 +23,14 @@ header {
 
 footer {
     background: linear-gradient(to right, #008080, #ffa500);
-    color: white; 
-    text-align: center;
-    padding: 10px 0; 
-    position: fixed;
     bottom: 0;
-    width: 100%;
+    color: white;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    width:100%;
+  
+  
 }
 
 
@@ -37,6 +39,13 @@ main {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width:300px;
+    margin-top: 100px;
+}
+.register{
+    margin-bottom: 70px;
+    width: 400px;
+    margin-top: 10px;
 }
 
 form {
@@ -56,11 +65,13 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 select {
-    width: 100%;
+    width: 90%;
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    margin-left: 10px;
+
 }
 
 /* Error Message Styling */
@@ -101,34 +112,42 @@ p a:hover {
     padding-top: 60px; /* Adjust as needed to avoid overlapping with the header */
     width: 100%; /* Full width */
     box-sizing: border-box; /* Include padding in width calculation */
+
+
 }
 
 #user-profile-handle-bar,
 #feed-handle-bar,
 #following-list-handle-bar {
-    border: 2px solid #007bff;
+
     border-radius: 8px;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 #user-profile-handle-bar {
     grid-column: 1;
+
 }
 
 #feed-handle-bar {
     grid-column: 2;
+    margin-left: 150px;
 }
 
 #following-list-handle-bar {
     grid-column: 3;
+    margin-top: -170px;
+    margin-right:100px;
+    margin-left: 50px;
 }
 .search-dropdown {
     display: none; /* Initially hidden */
     position: absolute; /* Positioned relative to the search container */
     border: 1px solid #ddd;
     border-radius: 4px;
-    width: 100%; /* Same width as the input field */
+    width: 80%; /* Same width as the input field */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   }
   
@@ -141,3 +160,32 @@ p a:hover {
   .dropdown-item:hover {
     background-color: #f0f0f0;
   }
+  .user-profile{
+    margin-left: 900px;
+    width: 300px;
+    height:auto;
+    margin-right: 50px;
+    justify-content: center;
+
+  }
+  #login-screen{
+    margin-top: -70px;
+    margin-left: 200px;  
+
+  }
+  #edit-profile{
+    margin-top: -30px;
+    margin-left: 170px;
+
+  }
+  #user-search{
+    width: 90%;
+  }
+  .following-list{
+   width:700px;
+
+ 
+  }
+a{
+    margin-left: 500px;
+}
