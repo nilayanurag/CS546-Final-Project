@@ -6,7 +6,7 @@ body {
     background: #f4f4f4;
     display: flex;
     flex-direction: column;
-   
+  align-items: center;
     min-height: 100vh;
 
 }
@@ -24,11 +24,13 @@ header {
 footer {
     background: linear-gradient(to right, #008080, #ffa500);
     bottom: 0;
+    left: 0;
     color: white;
     text-align: center;
     padding: 10px 20px;
     position: fixed;
     width:100%;
+  
   
   
 }
@@ -60,7 +62,10 @@ label {
     margin-bottom: 5px;
     font-weight: bold;
 }
-
+.feed{
+    text-align: center;
+    
+}
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -124,23 +129,30 @@ p a:hover {
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+
 }
 
 #user-profile-handle-bar {
     grid-column: 1;
+    float: right;
 
 }
 
 #feed-handle-bar {
     grid-column: 2;
-    margin-left: 150px;
+  width: 500px;
+  margin-left: -200px;
+  margin-top: -100px;
 }
 
 #following-list-handle-bar {
     grid-column: 3;
-    margin-top: -170px;
+    margin-top: -160px;
     margin-right:100px;
-    margin-left: 50px;
+    float: left;
+    margin-left: -575px;
+    padding: 20px 20px;
+    width: 300px;
 }
 .search-dropdown {
     display: none; /* Initially hidden */
@@ -182,10 +194,22 @@ p a:hover {
     width: 90%;
   }
   .following-list{
-   width:700px;
+   width:150px;
 
  
   }
 a{
-    margin-left: 500px;
+  color: white;
+text-decoration: underline #007bff ;
+}
+ a:hover{
+    text-decoration: underline #0056b3;
+}
+.refreshbutton:hover{
+    text-decoration: underline #0056b3;
+}
+.refreshbutton{
+    text-align: center;
+    align-self: flex-end;
+    
 }
