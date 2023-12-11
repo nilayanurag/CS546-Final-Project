@@ -81,6 +81,8 @@ export const createUser = async (
     followers,
     tags,
     location,
+    reviews: [],
+    comments: [],
     createdAt: new Date(),
     updatedAt: new Date(),
   };

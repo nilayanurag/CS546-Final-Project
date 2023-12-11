@@ -1,17 +1,16 @@
 import express from "express";
-import * as commentData from "../data/comment.js";
+import * as commentData from "../data/comments.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
 
 const commentRouter = express.Router();
-
 
 commentRouter
 .route("/comments/createComment")
 .post(async (req, res) => {
     let commentInfo = req.body;
     let reviewIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.reviewId);
-    let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.userId);
+    let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,req.session.user.userId);
     let commentDescriptionVal= await routeHelper.routeValidationHelper(helper.checkString,commentInfo.commentDescription, "Comment Description", 1, 500);
     let errorCode=undefined;
 
@@ -33,7 +32,7 @@ commentRouter
     try{
         let comment = await commentData.createComment(reviewIdVal[0],userIdVal[0],commentDescriptionVal[0]);
         if (comment){
-            return res.redirect("/comments/getComment/"+comment._id);
+            return res.redirect("/review/getReview/"+reviewIdVal[0]);
         }else{
             errorCode=404;
             return res.status(errorCode).json({errorMessage: "Comment not created"});
@@ -48,17 +47,19 @@ commentRouter
 
 commentRouter
 .route("/comments/deleteComment/:id")
-.get(async (req, res) => {
+.post(async (req, res) => {
     let commentIdVal= routeHelper.routeValidationHelper(helper.checkObjectId, req.params.id);
     if (commentIdVal[1]) {
         return res.status(400).json({ errorMessage: "Not a valid Object" });
         
     }
     try {
-        let deleted = await commentData.deleteComment(commentIdVal[0]);
+        
+        let deleted = await commentData.deleteComment(req.params.id);
+        
         if (deleted)
         {
-            res.json(deleted)
+            return res.redirect("/review/getReview/"+req.body.reviewId);
         }else{
             return res.status(404).json({ errorMessage: "Comment not found" });
         }

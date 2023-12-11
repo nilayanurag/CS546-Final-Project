@@ -170,11 +170,16 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
       reviewInfo.businessId.toString()
     );
     let commentInfo = await commentData.getCommentsByReviewId(reviewInfo._id.toString());
-    console.log(commentInfo);
+    for(let i=0;i<commentInfo.length;i++){
+      if(commentInfo[i].userId===req.session.user.userId){
+        commentInfo[i].canDelete=true;
+      }
+    }
     if (reviewInfo) {
       return res.render("review", {
         review: reviewInfo,
         username: userinfo.username,
+        loggedInUser: req.session.user.userId,
         businessName: businessinfo.name,
         commentData: commentInfo,
       });
