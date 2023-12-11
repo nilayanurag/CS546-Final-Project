@@ -12,8 +12,10 @@
     <div class="feed">
         {{> feed }}
     </div>
-    
-    
-
+    <div class=" search-bar">
+     <label class="business-search-bar"for ="search">Search:</label>
+        <input id="search" type="text" name="searchTerm" placeholder="Search for business..." value="{{search_term_value}}">
+        <button type="submit">Search</button>
+</div>
 <button class="refershbutton">
     <a href="#" id="refresh-link">Refresh Content</a></button>

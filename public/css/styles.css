@@ -43,23 +43,41 @@ main {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width:300px;
     margin-top: 100px;
+    margin-left: 200px;
+
 }
 .register{
     margin-bottom: 70px;
     width: 400px;
     margin-top: 10px;
 }
+#registerLink{
+    margin-left: 200px;
+}
+.business-search-bar{
+    font-family: "Poppins";
+    font-size: 14px;
+ 
 
+  
+    padding: 3px 12px 3px 12px;
 
+    outline-width: 0px;
+
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}
+.search-bar{
+    margin-left: 725px;
+    width: 200px;
+}
 form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
    
 }
-#login-form{
-    margin-left: 300px;
-}
+
 /* Labels and Inputs */
 label {
     margin-top: 10px;
@@ -212,6 +230,7 @@ p a:hover {
 a{
   color: white;
 text-decoration: underline #007bff ;
+
 }
  a:hover{
     text-decoration: underline #0056b3;
