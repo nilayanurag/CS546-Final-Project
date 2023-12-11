@@ -1,12 +1,12 @@
 /*Temp Style*/
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
+    margin: auto;
     padding: 0;
     background: #f4f4f4;
-    display: flex;
+
     flex-direction: column;
-  align-items: center;
+ 
     min-height: 100vh;
 
 }
@@ -50,12 +50,16 @@ main {
     margin-top: 10px;
 }
 
+
 form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+   
 }
-
+#login-form{
+    margin-left: 300px;
+}
 /* Labels and Inputs */
 label {
     margin-top: 10px;
@@ -129,30 +133,37 @@ p a:hover {
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    text-align: center;
 
 }
 
 #user-profile-handle-bar {
     grid-column: 1;
-    float: right;
+  
 
 }
 
 #feed-handle-bar {
     grid-column: 2;
-  width: 500px;
-  margin-left: -200px;
-  margin-top: -100px;
+  width: 430px;
+  margin-left: 250px;
+  margin-top: 100px;
+ text-align: center;
+
+
+  
 }
+
 
 #following-list-handle-bar {
     grid-column: 3;
-    margin-top: -160px;
+    margin-top: -50px;
     margin-right:100px;
     float: left;
-    margin-left: -575px;
+    margin-left: 0px;
     padding: 20px 20px;
-    width: 300px;
+    width: 200px;
+    
 }
 .search-dropdown {
     display: none; /* Initially hidden */
@@ -173,21 +184,21 @@ p a:hover {
     background-color: #f0f0f0;
   }
   .user-profile{
-    margin-left: 900px;
-    width: 300px;
+   float:right;
+    width: 200px;
     height:auto;
-    margin-right: 50px;
-    justify-content: center;
+ padding-right: 20px;
+    /* margin-left: 750px; */
 
   }
   #login-screen{
-    margin-top: -70px;
-    margin-left: 200px;  
+    margin-top:0px;
+    margin-left: 0px;  
 
   }
   #edit-profile{
-    margin-top: -30px;
-    margin-left: 170px;
+    margin-top: -35px;
+    margin-left: 80px;
 
   }
   #user-search{
