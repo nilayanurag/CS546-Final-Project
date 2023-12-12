@@ -1,4 +1,4 @@
-<div id="feed-handle-bar" class="class-handlebars">
+{{!-- <div id="feed-handle-bar" class="class-handlebars">
   <h3>Feed</h3>
     <div class="feed-list">
         {{!-- <ul>
@@ -6,7 +6,7 @@
             <li>{{this}}</li>
         {{/each}}
         </ul> --}}
-        <ul>
+        {{!-- <ul>
         {{#each reviews}}
         <li>
             <a href="/review/getReview/{{this._id}}">
@@ -26,3 +26,10 @@
         {{/each}}
     </ul>
   </div>
+ --}} 
+
+<script id="feed-partial" type="text/x-handlebars-template">
+      {{#each reviews}}
+        {{> review this }}
+      {{/each}}
+    </script>

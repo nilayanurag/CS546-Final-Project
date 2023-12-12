@@ -1,4 +1,4 @@
-<div id="following-list-handle-bar" class="class-handlebars">
+{{!-- <div id="following-list-handle-bar" class="class-handlebars">
   <h3>Following</h3>
   <div class="search-container">
     <input type="text" id="user-search" placeholder="Search users...">
@@ -7,11 +7,6 @@
   <button id="search-user">Search</button>
   <button id="update-following">Update Following</button>
     <div class="following-list">
-        {{!-- <ul>
-        {{#each data.items}}
-            <li>{{this}}</li>
-        {{/each}}
-        </ul> --}}
 
          <ul>
         {{#each followingUsers}}
@@ -20,4 +15,23 @@
         <p>No users followed.</p>
         {{/each}}
     </ul>
-  </div>
+  </div> --}}
+
+<div class="following-list">
+    <h5>Following</h5>
+
+
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="userSearchInput" placeholder="Search people..." aria-label="Search people" aria-describedby="button-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="goButton">Go</button>
+        </div>
+        <div class="search-suggestions dropdown-menu" aria-labelledby="userSearchInput" id="search-Dropdown"></div>
+    </div>
+
+    <!-- List -->
+    <ul class="list-group">
+        <!-- list element will be appended here -->
+    </ul>
+</div>

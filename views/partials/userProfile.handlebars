@@ -1,7 +1,31 @@
-<div id="user-profile-handle-bar" class="class-handlebars">
+<div class="user-profile">
+    <div class="d-flex align-items-center">
+        <!-- Placeholder for User Image -->
+        <div class="user-image-placeholder mr-3">
+            
+            <!-- <i class="fa fa-user" aria-hidden="true"></i> --> <!-- Example if using Font Awesome -->
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info">
+            <div>{{user.firstName}} {{user.lastName}}</div>
+            <div>Following: {{user.following}} | Followers: {{user.followers}}</div>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mt-3">
+        <button class="btn btn-primary btn-sm mr-2">Edit User Info</button>
+        <button class="btn btn-secondary btn-sm">Log Off</button>
+    </div>
+</div>
+
+
+{{!-- <div id="user-profile-handle-bar" class="class-handlebars">
   <h1>User Profile</h1>
   <div class="user-info">
     <p>Name: {{username}}</p>
+    
   </div>
   <form action="/login" method="get">
   <button type="submit" id="login-screen">Login</button>
@@ -9,4 +33,4 @@
   <form action="/updateUser" method="get">
   <button  type="submit" id="edit-profile">Edit Profile</button>
    </form>
-</div>
+</div> --}}

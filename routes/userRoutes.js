@@ -250,65 +250,65 @@ usersRouter
   //   }
   // })
 
-  usersRouter
-  .route("/addFollowing").post(async (req, res) => {
-    let taskInfo=req.body;
-    if (!taskInfo || Object.keys(taskInfo).length === 0) {
-      return res
-        .status(400)
-        .json({error: 'There are no fields in the request body'});
-    }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
+  // usersRouter
+  // .route("/addFollowing").post(async (req, res) => {
+  //   let taskInfo=req.body;
+  //   if (!taskInfo || Object.keys(taskInfo).length === 0) {
+  //     return res
+  //       .status(400)
+  //       .json({error: 'There are no fields in the request body'});
+  //   }
+  //   let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+  //   let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
 
-    let errorCode=undefined
+  //   let errorCode=undefined
     
-    if (userId[1]||followingId[1]){
-      errorCode=400
-      return res.status(400).json({errorMessage:"Invalid ObjectId"})
-    }
+  //   if (userId[1]||followingId[1]){
+  //     errorCode=400
+  //     return res.status(400).json({errorMessage:"Invalid ObjectId"})
+  //   }
 
-    try {
-      let addedFollowing=await userData.addFollowing(userId[0],followingId[0])
-      if (addedFollowing.modifiedCount){
-        return res.json({addedFollowing})
-      }else{
-        return res.status(500).json({errorMessage:"Internal Server Error"})
-      }
-    }catch (error) {
-      return res.status(400).json({errorMessage:"Cannot add following"})
-    }
-  })
+  //   try {
+  //     let addedFollowing=await userData.addFollowing(userId[0],followingId[0])
+  //     if (addedFollowing.modifiedCount){
+  //       return res.json({addedFollowing})
+  //     }else{
+  //       return res.status(500).json({errorMessage:"Internal Server Error"})
+  //     }
+  //   }catch (error) {
+  //     return res.status(400).json({errorMessage:"Cannot add following"})
+  //   }
+  // })
 
-  usersRouter
-  .route("/removeFollowing").post(async (req, res) => {
-    let taskInfo=req.body;
-    if (!taskInfo || Object.keys(taskInfo).length === 0) {
-      return res
-        .status(400)
-        .json({error: 'There are no fields in the request body'});
-    }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
+  // usersRouter
+  // .route("/removeFollowing").post(async (req, res) => {
+  //   let taskInfo=req.body;
+  //   if (!taskInfo || Object.keys(taskInfo).length === 0) {
+  //     return res
+  //       .status(400)
+  //       .json({error: 'There are no fields in the request body'});
+  //   }
+  //   let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+  //   let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
 
-    let errorCode=undefined
+  //   let errorCode=undefined
     
-    if (userId[1]||followingId[1]){
-      errorCode=400
-      return res.status(400).json({errorMessage:"Invalid ObjectId"})
-    }
+  //   if (userId[1]||followingId[1]){
+  //     errorCode=400
+  //     return res.status(400).json({errorMessage:"Invalid ObjectId"})
+  //   }
 
-    try {
-      let removeFollowing=await userData.removeFollowing(userId[0],followingId[0])
-      if (removeFollowing.modifiedCount){
-        return res.json({removeFollowing})
-      }else{
-        return res.status(500).json({errorMessage:"Internal Server Error"})
-      }
-    }catch (error) {
-      return res.status(400).json({errorMessage:"Cannot remove following"})
-    }
-  })
+  //   try {
+  //     let removeFollowing=await userData.removeFollowing(userId[0],followingId[0])
+  //     if (removeFollowing.modifiedCount){
+  //       return res.json({removeFollowing})
+  //     }else{
+  //       return res.status(500).json({errorMessage:"Internal Server Error"})
+  //     }
+  //   }catch (error) {
+  //     return res.status(400).json({errorMessage:"Cannot remove following"})
+  //   }
+  // })
   usersRouter
   .route("/addFollower").post(async (req, res) => {
 
@@ -330,7 +330,8 @@ usersRouter
     
     try {
       let addedFollower=await userData.addFollower(userId[0],followerId[0])
-      if (addedFollower.modifiedCount){
+      let addedFollowing=await userData.addFollowing(followerId[0],userId[0])
+      if (addedFollower.modifiedCount && addedFollowing.modifiedCount){
         return res.json({addedFollower})
       }else{
         return res.status(500).json({errorMessage:"Internal Server Error"})
@@ -612,7 +613,7 @@ usersRouter
       try {
           let user = await userData.getUserByUsername(username[0]);
           if (user[0]){
-              return res.render("partials/userDetail",{user:user[0]});
+              return res.render("partials/userDetail",{user:user[0],adminUser:req.session.user});
           }else{
               errorCode=404;
               return res.status(errorCode).json({errorMessage: "Not Found"});  
