@@ -4,7 +4,7 @@ login form handlebar template have to modify to login still
 TODO place holder
 
 --}}
-<main>
+{{!-- <main>
     <form id ="login-form" action="/login" method="post">
     
         <label for="contactEmailInput">Email Address</label>
@@ -38,4 +38,39 @@ TODO place holder
 
    
 </main>
- <p id="registerLink"><a href="/register">Click here to register!</a></p>
+ <p id="registerLink"><a href="/register">Click here to register!</a></p> --}}
+ <main>
+    <div class="container">
+        <form id="login-form" action="/login" method="post" class="p-4 border rounded">
+
+            <div class="form-group">
+                <label for="contactEmailInput">Email Address</label>
+                <input type="email" class="form-control" id="contactEmailInput" name="contactEmailInput" placeholder="Enter email-Id" required>
+                {{#if contactEmailErr}}
+                    <div class="text-danger">{{contactEmailErr}}</div>
+                {{/if}}
+            </div>
+
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <input type="password" class="form-control" id="passwordInput" name="passwordInput" placeholder="Enter password">
+                {{#if passwordErr}}
+                    <div class="text-danger">{{passwordErr}}</div>
+                {{/if}}
+            </div>
+
+            {{#if loginError}}
+                <div class="text-danger">{{loginError}}</div>
+            {{/if}}
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+
+        </form>
+
+        <p id="registerLink" class="text-center">
+            <a href="/register">Click here to register!</a>
+        </p>
+    </div>
+</main>

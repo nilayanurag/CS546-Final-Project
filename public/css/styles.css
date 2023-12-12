@@ -1,3 +1,18 @@
+
+header {
+    background: blueviolet;
+    background-color: blueviolet;
+    color:cadetblue;
+    
+}
+footer {
+    
+    background: blueviolet;
+    bottom: 0;
+    margin-top: 50px;
+    position: fixed;
+    width:100%;
+}
 .userProfile {
     text-align: right;
 }
@@ -65,4 +80,12 @@
 /* Show suggestions when there are items */
 #userSearchInput:not(:empty) ~ .search-suggestions {
     display: block;
+}
+
+.userProfileFull .user-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    /* Other styling as needed */
 }

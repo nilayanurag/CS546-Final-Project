@@ -96,6 +96,7 @@ usersRouter
         let userDetail=await userData.getUserByEmailAddress(loginInfo.contactEmail)
         req.session.user= {firstName: loginInfo.firstName, contactEmail: loginInfo.contactEmail,userId:userDetail._id}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
+           res.cookie('username',userDetail.username,{maxAge: 3600000})
            return res.redirect("home")
        
       }else{
@@ -577,17 +578,17 @@ usersRouter
     usersRouter
     .route("/getUserDetails/:username")
     .get(async (req, res) => {
-      let userName = req.params.username;
+      let username = req.params.username;
       let errorCode=undefined;
-      let username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
+      username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
       if (username[1]){
           errorCode=400;
           return res.status(errorCode).json({errorMessage: "Bad Request"});  
       }
       try {
-          let user = await userData.getUserByUsername(username[0])[0];
-          if (user){
-              return res.json(user);
+          let user = await userData.getUserByUsername(username[0]);
+          if (user[0]){
+              return res.json(user[0]);
           }else{
               errorCode=404;
               return res.status(errorCode).json({errorMessage: "Not Found"});  
@@ -660,6 +661,13 @@ usersRouter
       console.log(error);
       res.status(500).send("Server Error");
     }
+  });
+
+  usersRouter.route('/logout').get(async (req, res) => {
+    req.session.destroy(); 
+    res.clearCookie("AuthState");
+    res.render("login");
+  
   });
 
 export default usersRouter;

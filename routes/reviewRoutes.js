@@ -131,7 +131,7 @@ reviewRouter
 });
 
 reviewRouter
-.route("/review/getAllReviews")
+.route("/getAllReviews")
 .get(async (req, res) => {
     try{
         let reviewList = await reviewData.getAllReviews();
