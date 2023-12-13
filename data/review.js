@@ -79,6 +79,16 @@ export const createReview = async (
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    if(newReview.insertedId){
+      await businessCollection.updateOne(
+        { _id: businessId },
+        { $addToSet: { reviews: newReview.insertedId } }
+      );
+      await userCollection.updateOne(
+        { _id: userId },
+        { $addToSet: { reviews: newReview.insertedId } }
+      );
+    }
     return { insertedReview: newReview.insertedId ? true : false };
   } catch (error) {}
 };
