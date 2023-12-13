@@ -3,15 +3,20 @@ import * as reviewData from "../data/review.js";
 import * as userData from "../data/users.js";
 import * as businessData from "../data/business.js";
 import * as commentData from "../data/comments.js";
+import * as categoryData from "../data/category.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
+import multer from 'multer';
+
+const upload = multer({ dest: 'uploads/' });
 
 const reviewRouter = express.Router();
 
 reviewRouter
   .route("/review/createReview")
   .get(async (req, res) => {
-    return res.render("createReview");
+    const categories = await categoryData.getAllCategory();
+    return res.render("createReview",{categories:categories});
   })
   .post(async (req, res) => {
     let reviewInfo = req.body;
@@ -21,8 +26,9 @@ reviewRouter
     );
     let userIdVal = await routeHelper.routeValidationHelper(
       helper.checkObjectId,
-      reviewInfo.userId
+      req.session.user.userId
     );
+    reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints);
     let ratingPointsVal = await routeHelper.routeValidationHelper(
       helper.checkRating,
       reviewInfo.ratingPoints,
@@ -62,12 +68,13 @@ reviewRouter
         imagePathVal
       );
       if (review) {
-        return res.redirect("/review/getReview/" + review._id);
+        return res.redirect("/home");
       } else {
         errorCode = 500;
         return res.status(errorCode).render("createReview", dataToRender);
       }
     } catch (error) {
+      console.log(error);
       errorCode = 500;
       return res.status(errorCode).render("createReview", dataToRender);
     }

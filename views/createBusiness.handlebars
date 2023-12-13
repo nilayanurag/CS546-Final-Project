@@ -1,0 +1,33 @@
+<a href="/home" class="back-to-home-link">Home</a>
+<main>
+    <form action="/business/createBusiness" method="POST" name="businessForm" id="businessForm" class="wide-form">
+        <!-- Categories Dropdown -->
+        <p> Select Category: </p>
+
+
+        <select name="categoryId" id="categorySelect" value="{{this._id}}">
+            {{#each categories}}
+            <option value="{{this._id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+
+        <!-- Name of the Business -->
+        <p> Business Name: </p>
+        <input type="text" name="businessName" id="businessName" required>
+
+        <!-- Location Details -->
+        <p> Location: </p>
+        <input type="text" name="firstAddressLine" placeholder="First Address Line" id="firstAddressLine" required>
+        <input type="text" name="lastAddressLine" placeholder="Last Address Line" id="lastAddressLine">
+        <input type="text" name="country" placeholder="Country" id="country" required>
+        <input type="text" name="city" placeholder="City" id="city" required>
+        <input type="text" name="state" placeholder="State" id="state" required>
+        <input type="text" name="zip" placeholder="Zip Code" id="zip" required>
+
+        <!-- Submit Button -->
+        <button type="submit">Create Business</button>
+        <p id="error-message" class="error">Input can't be empty or just spaces</p>
+        <p class="error-message hidden"></p>
+    </form>
+</main>
+<script src="/public/js/reviewValidation.js"></script>

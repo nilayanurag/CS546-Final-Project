@@ -156,6 +156,19 @@ export const getBusinessById = async(businessId)=>{
     }
 }
 
+export const getBusinessesByCategory = async(categoryId)=>{
+    try {
+        categoryId = new ObjectId(helper.checkObjectId(categoryId));
+        const businessCollection = await businesses();
+        const business = await businessCollection.find({ categoryId: categoryId }).toArray();
+        if (!business) throw "Business not found";
+        return business;
+        
+    } catch (error) {
+        throw error;
+    }
+}
+
 // To be completed later
 export const updateGlobalRating = async (businessId) => {
     // try {

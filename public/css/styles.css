@@ -42,6 +42,7 @@ form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
 }
 
 /* Labels and Inputs */
@@ -63,10 +64,23 @@ select {
 }
 
 /* Error Message Styling */
-.errorMessage {
+/* .errorMessage {
     color: red;
     font-size: 0.8rem;
     margin-bottom: 10px;
+} */
+
+.error-message {
+    color: red;
+    text-align: center;
+    display: none; /* Hidden by default */
+}
+
+.error {
+    color: red;
+    margin: 10px 0;
+    font-weight: bold;
+    display: none;
 }
 
 /* Button Styling */
@@ -106,4 +120,40 @@ p a:hover {
 
 #followingList {
     flex: 1;
+}
+
+#addReviewContainer {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+}
+
+.addReviewButton {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.addReviewButton:hover {
+    background-color: #0056b3;
+}
+
+.back-to-home-link {
+    display: block;
+    margin-top: 20px;
+    margin-right: 30cm;
+    text-decoration: none;
+    /*color: #000; Adjust the color as needed */
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.wide-form {
+    width: 300px; /* or any width you prefer */
+    /* max-width: 1000px; */
+    /* margin: auto;   */
 }

@@ -534,7 +534,6 @@ export const getHomePageDetails = async (userId) => {
     };
     followingUsername.push(userData);
   }
-  console.log(followingUsername);
   let reviewsByFollowing = await reviewCollection
     .find(
       { userId: { $in: followingUserIds } },
