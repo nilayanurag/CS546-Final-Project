@@ -316,3 +316,14 @@ export const getAllReviews = async () => {
   }
 };
 
+export const getReviewsByUserId = async (userId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const allReviews = await reviewCollection.find({ userId: userId }).toArray();
+    return allReviews;
+  } catch (error) {
+    throw error;
+  }
+};
+

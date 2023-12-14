@@ -6,9 +6,9 @@ import * as commentData from "../data/comments.js";
 import * as categoryData from "../data/category.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
-import multer from 'multer';
+import multer from "multer";
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: "uploads/" });
 
 const reviewRouter = express.Router();
 
@@ -16,7 +16,7 @@ reviewRouter
   .route("/review/createReview")
   .get(async (req, res) => {
     const categories = await categoryData.getAllCategory();
-    return res.render("createReview",{categories:categories});
+    return res.render("createReview", { categories: categories });
   })
   .post(async (req, res) => {
     let reviewInfo = req.body;
@@ -68,7 +68,7 @@ reviewRouter
         imagePathVal
       );
       if (review) {
-        return res.redirect("/home");
+        return res.redirect("/review/getMyReview");
       } else {
         errorCode = 500;
         return res.status(errorCode).render("createReview", dataToRender);
@@ -176,10 +176,12 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
     let businessinfo = await businessData.getBusinessById(
       reviewInfo.businessId.toString()
     );
-    let commentInfo = await commentData.getCommentsByReviewId(reviewInfo._id.toString());
-    for(let i=0;i<commentInfo.length;i++){
-      if(commentInfo[i].userId===req.session.user.userId){
-        commentInfo[i].canDelete=true;
+    let commentInfo = await commentData.getCommentsByReviewId(
+      reviewInfo._id.toString()
+    );
+    for (let i = 0; i < commentInfo.length; i++) {
+      if (commentInfo[i].userId === req.session.user.userId) {
+        commentInfo[i].canDelete = true;
       }
     }
     if (reviewInfo) {
@@ -200,6 +202,52 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
     return res
       .status(errorCode)
       .json({ errorMessage: "Internal Server Error" });
+  }
+});
+
+reviewRouter.route("/review/getMyReview").get(async (req, res) => {
+  try {
+    /*
+    reviews{
+      businessName: businessName,
+      description,
+      image,
+      commentData: [
+        {commentDescription,
+        username}
+      ]
+    }
+    */
+    let reviews = [];
+    let reviewInfo = await reviewData.getReviewsByUserId(
+      req.session.user.userId
+    );
+
+    for(let i = 0; i < reviewInfo.length; i++){
+      let businessinfo = await businessData.getBusinessById(
+        reviewInfo[i].businessId.toString()
+      );
+      const review = {};
+      review.businessName = businessinfo.name;
+      review.description = reviewInfo[i].reviewText;
+      review.image = reviewInfo[i].images;
+      review.rating = reviewInfo[i].rating;
+      review.commentData = [];
+      for (let j = 0; j < reviewInfo[i].comments.length; j++) {
+        let commentInfo = await commentData.getCommentsByReviewId(
+          reviewInfo.comments[j].toString()
+        );
+        let info = {}
+        info.commentDescription = commentInfo.commentDescription;
+        let userinfo = await userData.getUserById(commentInfo.userId.toString());
+        info.username = userinfo.username;
+        review.commentData.push(info);
+      }
+      reviews.push(review);
+    }
+    return res.render("myReview", { reviews: reviews });
+  } catch (error) {
+    return res.status(404).json({ errorMessage: "Cannot find review" });
   }
 });
 

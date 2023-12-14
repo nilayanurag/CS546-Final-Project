@@ -1,11 +1,22 @@
 <!-- Back to Home Link -->
-<a href="/home" class="back-to-home-link">Home</a>  
+{{!-- <a href="/home" class="back-to-home-link">Home</a> --}}
+<header>
+    <div class="header-links">
+        <a href="/home" class="header-link">Home</a>
+        <a href="/updateProfile" class="header-link">Update Profile</a>
+        {{!-- <span>ReviewSphere</span> --}}
+        <a href="/review/createReview" class="header-link">Add Review</a>
+        <a href="/review/getMyReview/{{this._id}}" class="header-link"> My Reviews </a>
+        {{!-- <a href="/myReviews" class="header-link">My Reviews</a> --}}
+        <a href="/logout" class="header-link">Log Out</a>
+    </div>
+</header>
 <div id="homePage">
     <!-- Search Reviews -->
 
-    <div id="addReviewContainer">
+    {{!-- <div id="addReviewContainer">
         <a href="/review/createReview" class="addReviewButton">Add Review</a>
-    </div>
+    </div> --}}
 
     {{> search}}
 
