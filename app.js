@@ -26,18 +26,15 @@ app.use(rewriteUnsupportedBrowserMethods);
 app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-
 // Middleware to implement
 app.use(
-    session({
-      name: "AuthState",
-      secret: "some secret string!",
-      resave: false,
-      saveUninitialized: false,
-    })
-  );
-
-
+  session({
+    name: "AuthState",
+    secret: "some secret string!",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 configRoutes(app);
 
@@ -45,3 +42,5 @@ app.listen(3000, () => {
   console.log("We've now got a server!");
   console.log("Your routes will be running on http://localhost:3000");
 });
+
+export default app;
