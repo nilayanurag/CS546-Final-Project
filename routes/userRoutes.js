@@ -97,7 +97,7 @@ usersRouter
            lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress, userId: loginInfo.userId}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
            console.log("passed login")
-           return res.redirect("home")
+           return res.redirect("/home")
        
       }else{
         return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
@@ -138,17 +138,17 @@ usersRouter
       }
     });
     usersRouter
-    .route('/updateUser')
+    .route('/updateProfile')
     .get(async (req, res) => {
       try {
-        let userId=helper.checkObjectId(req.session.user.userId)
+        helper.checkObjectId(req.session.user.userId)
       } catch (error) {
         return res.status(400)
         .render("error",{errorMessage:"User Not Found"})
       }
       let getUserInfo;
       try {
-        getUserInfo=await userData.getUserById(userId)
+        getUserInfo=await userData.getUserById(req.session.user.userId)
       }
       catch (error) {
         return res.status(400)
@@ -163,7 +163,7 @@ usersRouter
         contactEmail:getUserInfo.contactEmail,
         location:getUserInfo.location
       }
-      return res.render("updateUser",dataToRender)
+      return res.render("updateProfile",dataToRender)
   
     })
     .post(async (req, res) => {
@@ -174,53 +174,18 @@ usersRouter
           .json({error: 'There are no fields in the request body'
         });
       }  
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,userInfo.userIdInput)
-      let username = await routeHelper.routeValidationHelper(helper.checkString,userInfo.usernameInput,"username",1,25)
-      let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
-      let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
-      let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,userInfo.sexInput,"sex")
-      let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkIfEmailPresent,userInfo.contactEmailInput)
-      let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,userInfo.ageInput,12,105)
-      let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
-      let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,userInfo.passwordInput,userInfo.confirmPasswordInput)
-      let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,userInfo.locationInput)
-
-      let errorCode=undefined
-      
-      let dataToRender={
-        usernameDef:username[0],
-        usernameErr:username[1],
-        firstNameDef:firstNameVal[0],
-        firstNameErr:firstNameVal[1],
-        lastNameDef:lastNameVal[0],
-        lastNameErr:lastNameVal[1],
-        sexDef:sexVal[0],
-        sexErr:sexVal[1],
-        ageDef:ageVal[0],
-        ageErr:ageVal[1],
-        contactEmailDef:contactEmailVal[0],
-        contactEmailErr:contactEmailVal[1],
-        passwordErr:passwordVal[1],
-        confirmedPasswordErr:confirmedPasswordVal[1],
-        locationDef:locationVal[0],
-        locationErr:locationVal[1],
-      };
-      if (username[1]||firstNameVal[1]||lastNameVal[1]||sexVal[1]||ageVal[1]||contactEmailVal[1]
-        ||passwordVal[1]||confirmedPasswordVal[1]||locationVal[1]){
-        errorCode=400
-        return res.status(400).render("updateUser",dataToRender)
-      }
-
       try {
-        let updatedInfo=await userData.updateUser(userId[0],username[0],firstNameVal[0],lastNameVal[0],sexVal[0],
-          ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
-        if (updatedInfo.modifiedCount){
-          return res.render("updateUser",dataToRender)
+        console.log(req.session.user.userId, userInfo.usernameInput, userInfo.firstNameInput, userInfo.lastNameInput, userInfo.sexInput, userInfo.ageInput, userInfo.contactEmailInput, userInfo.locationInput)
+
+        let updatedInfo=await userData.updateUser(req.session.user.userId,userInfo.usernameInput,userInfo.firstNameInput,userInfo.lastNameInput,userInfo.sexInput,userInfo.ageInput,userInfo.contactEmailInput,userInfo.locationInput)
+        if (updatedInfo){
+          return res.redirect("/home");
         }else{
           return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        return res.status(400).render("updateUser",dataToRender)
+        // return res.status(400).render("updateUser",dataToRender)
+        throw error
       } 
     }
   );

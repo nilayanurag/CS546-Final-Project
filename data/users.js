@@ -145,7 +145,6 @@ export const updateUser = async (
   sex,
   age,
   contactEmail,
-  password,
   location
 ) => {
   try {
@@ -156,16 +155,13 @@ export const updateUser = async (
     sex = helper.checkSex(sex);
     contactEmail = helper.checkValidEmail(contactEmail);
     age = helper.checkAge(age, 12, 105);
-    password = helper.checkPass(password);
+    // password = helper.checkPass(password);
     location = helper.checkAddress(location);
-    const hash = await bcrypt.hash(password, saltRounds);
-
+    // const hash = await bcrypt.hash(password, saltRounds);
     const userCollection = await users();
-
     let userData = await userCollection
       .find(
-        { _id: userId },
-        { projection: { following: 1, followers: 1, tags: 1 } }
+        { _id: userId }
       )
       .toArray();
     if (userData.following === undefined) userData.following = [];
@@ -180,15 +176,14 @@ export const updateUser = async (
       sex: sex,
       age: age,
       contactEmail: contactEmail,
-      password: hash,
-      following: userData.following,
-      followers: userData.followers,
-      tags: userData.tags,
+      password: userData[0].password,
+      following: userData[0].following,
+      followers: userData[0].followers,
+      tags: userData[0].tags,
       location: location,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
     const updatedUser = await userCollection.findOneAndUpdate(
       { _id: userId },
       { $set: dataPacket },
