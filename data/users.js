@@ -140,7 +140,6 @@ export const updateUser = async (
   password,
   location
 ) => {
-  try {
     userId = new ObjectId(helper.checkObjectId(userId));
     username = helper.checkString(username, "username", 1, 25);
     firstName = helper.checkString(firstName, "firstName", 1, 25);
@@ -190,8 +189,7 @@ export const updateUser = async (
     if (!updatedUser || updatedUser === undefined) {
       throw "could not update event successfully";
     }
-    return updateUser;
-  } catch (error) {}
+    return updatedUser;
 };
 
 // MOST IMP: If you are deleting a user, make sure to FIRST delete all the reviews, comments, and tags associated with it

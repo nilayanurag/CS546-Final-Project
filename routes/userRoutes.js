@@ -175,7 +175,13 @@ usersRouter
           .json({error: 'There are no fields in the request body'
         });
       }  
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,userInfo.userIdInput)
+      if (!req.session.user){
+        return res.status(400).render("error",{errorMessage:"User Not Found"})
+      }
+
+
+
+      let userId=req.session.user.userId
       let username = await routeHelper.routeValidationHelper(helper.checkString,userInfo.usernameInput,"username",1,25)
       let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
       let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
@@ -213,10 +219,10 @@ usersRouter
       }
 
       try {
-        let updatedInfo=await userData.updateUser(userId[0],username[0],firstNameVal[0],lastNameVal[0],sexVal[0],
+        let updatedInfo=await userData.updateUser(userId,username[0],firstNameVal[0],lastNameVal[0],sexVal[0],
           ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
-        if (updatedInfo.modifiedCount){
-          return res.redirect("/")
+        if (updatedInfo){
+          return res.redirect("home")
         }else{
           return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
@@ -649,8 +655,18 @@ usersRouter
     //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
     // }
     try {
-      
-      let getUserHomeDetails = await userData.getHomePageDetails(req.session.user.userId);
+      let existingUserId=undefined;
+      if (req.session.user){
+        existingUserId=req.session.user.userId
+      }
+      try{
+        existingUserId=helper.checkObjectId(existingUserId)
+      }
+      catch(error){
+        return res.redirect("login")
+
+      }
+      let getUserHomeDetails = await userData.getHomePageDetails(existingUserId);
       res.render("home", {
         layout: "main",
         followingUsers: getUserHomeDetails.followingUsername,
