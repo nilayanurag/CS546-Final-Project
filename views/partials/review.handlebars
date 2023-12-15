@@ -16,3 +16,38 @@
         </div>
     </div>
 </div>
+{{!-- <div id="reviewPage">
+    <h2>{{businessName}}: {{review.rating}}</h2>
+    <p>Posted by: {{username}}</p>
+    <div id="reviewDescription">
+        <p>{{review.reviewText}}</p>
+        {{#if review.image}}
+        <img src="{{review.image}}" alt="Review Image">
+        {{/if}}
+        {{#each commentData}}
+        <li> {{this.commentDescription}}, Posted by: {{this.username}}
+            {{!-- {{#if (equals this.userId loggedInUserId)}}
+            <form action="/comments/deleteComment" method="POST">
+                <input type="hidden" name="commentId" value="{{this._id}}">
+                <button type="submit">Delete</button>
+            </form>
+            {{/if}} --}}
+            {{#if canDelete}}
+            <form action="/comments/deleteComment/{{this._id}}" method="POST">
+                <input type="hidden" name="reviewId" value="{{this.reviewId}}">
+                <button type="submit">Delete</button>
+            </form>
+            {{/if}}
+        </li>
+
+        {{else}}
+        <p>No recent comments.</p>
+        {{/each}}
+    </div>
+    <br>
+    <form action="/comments/createComment" method="POST">
+        <input type="hidden" name="reviewId" value="{{review._id}}" />
+        <textarea name="commentDescription" placeholder="Add a comment..."></textarea>
+        <button type="submit">Post Comment</button>
+    </form>
+</div> --}}
