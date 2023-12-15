@@ -1,10 +1,9 @@
 import * as helper from "../helpers/validation.js";
 import { users, reviews, comments, businesses } from "../config/mongoCollections.js";
-import * as reviewFunctions from "./review.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
-import * as reviewFunctions from "./review.js";
+//import * as reviewFunctions from "./review.js";
 
 /*
 Refernce Schema:
