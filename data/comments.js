@@ -1,5 +1,6 @@
 import * as helper from "../helpers/validation.js";
 import { comments, reviews, users } from "../config/mongoCollections.js";
+import * as userFunctions from "../data/users.js";
 import { ObjectId } from "mongodb";
 
 /*
@@ -40,6 +41,17 @@ export const createComment = async (reviewId, userId, commentDescription) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    if(newComment.insertedId){
+      const commentId = newComment.insertedId;
+      await reviewCollection.updateOne(
+        { _id: reviewId },
+        { $push: { comments: commentId } }
+      );
+      await userCollection.updateOne(
+        { _id: userId },
+        { $push: { comments: commentId } }
+      );
+    }
     return { insertedComment: newComment.insertedId ? true : false };
   } catch (error) {
     throw error;
@@ -56,6 +68,10 @@ export const deleteComment = async (commentId) => {
     const commentCollection = await comments();
     const comment = await commentCollection.findOne({ _id: commentId });
     if (!comment) throw "Comment not found";
+    const reviewCollection = await reviews();
+    await reviewCollection.updateOne({ _id: comment.reviewId }, { $pull: { comments: commentId } })    
+    const userCollection = await users();
+    await userCollection.updateOne({ _id: comment.userId }, { $pull: { comments: commentId } })
     const deleteComment = await commentCollection.deleteOne({ _id: commentId });
     if (deleteComment.deletedCount === 0) throw `Could not delete comment with id of ${commentId}`;
         return true;
@@ -132,6 +148,13 @@ export const getCommentsByReviewId  = async (reviewId) => {
     const allComments = await commentCollection
       .find({ reviewId: reviewId })
       .toArray();
+    for (let i = 0; i < allComments.length; i++) {
+      const user = await userFunctions.getUserById(allComments[i].userId.toString());
+      allComments[i]._id = allComments[i]._id.toString();
+      allComments[i].userId = allComments[i].userId.toString();
+      allComments[i].reviewId = allComments[i].reviewId.toString();
+      allComments[i].username = user.username;
+    }
     return allComments;
   } catch (error) {
     throw error;

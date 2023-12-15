@@ -2,6 +2,7 @@ import express from "express";
 import * as businessData from "../data/business.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
+import * as categoryData from "../data/category.js";
 
 const businessRouter = express.Router();
 
@@ -9,12 +10,22 @@ const businessRouter = express.Router();
 businessRouter
 .route("/business/createBusiness")
 .get(async (req, res) => {
-    res.render("createBusiness");
+    const categories = await categoryData.getAllCategory();
+    return res.render("createBusiness",{categories:categories});
 })
 .post(async (req, res) => {
+    console.log(req.body);
     let businessInfo = req.body;
-    let businessNameVal= await routeHelper.routeValidationHelper(helper.checkString,businessInfo.businessName, "Business Name", 3, 50);
-    let locationVal= await routeHelper.routeValidationHelper(helper.checkAddress,businessInfo.location, "Location", 3, 50);
+    let businessNameVal= await routeHelper.routeValidationHelper(helper.checkString,businessInfo.businessName, "Business Name", 1, 100);
+    var location = {
+        firstLine: businessInfo.firstAddressLine,
+        lastLine: businessInfo.lastAddressLine,
+        city: businessInfo.city,
+        state: businessInfo.state,
+        zip: businessInfo.zip,
+        country: businessInfo.country
+    }
+    let locationVal= await routeHelper.routeValidationHelper(helper.checkAddress,location, "Location");
     let categoryIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,businessInfo.categoryId);
     let errorCode=undefined;
 
@@ -23,7 +34,6 @@ businessRouter
         businessNameErr:businessNameVal[1],
         locationDef:locationVal[0],
         locationErr:locationVal[1]
-
     }
 
     if (businessNameVal[1] || locationVal[1] ||categoryIdVal[1]){
@@ -32,9 +42,11 @@ businessRouter
     }
 
     try{
-        let business = await businessData.createBusiness(nameVal[0],locationVal[0],phoneNumberVal[0],websiteVal[0],categoryIdVal[0]);
+        console.log(businessInfo.businessName[0],businessInfo.categoryId[0]);
+        
+        let business = await businessData.createBusiness(businessInfo.businessName,businessInfo.categoryId,location);
         if (business){
-            return res.redirect("/business/getBusiness/"+business._id);
+            return res.redirect("/review/createReview");
         }else{
             errorCode=404;
             return res.status(errorCode).render("createBusiness",dataToRender);
@@ -118,6 +130,12 @@ businessRouter
         return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
     }
     
+});
+
+businessRouter
+.get('/businesses/:categoryId', async (req, res) => {
+    const businesses = await businessData.getBusinessesByCategory(req.params.categoryId);
+    res.json(businesses);
 });
 
 

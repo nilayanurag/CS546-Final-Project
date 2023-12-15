@@ -11,24 +11,24 @@ TODO place holder
         <input type="email" id="contactEmailInput" name="contactEmailInput" placeholder="Enter email-Id" required>
 
         {{#if contactEmailErr}}
-            <div id="contactEmailError" class="errorMessage">
-                {{contactEmailErr}}
-            </div>
+        <div id="contactEmailError" class="errorMessage">
+            {{contactEmailErr}}
+        </div>
         {{/if}}
 
         <label for="passwordInput">Password</label>
         <input type="password" id="passwordInput" name="passwordInput" placeholder="Enter password">
 
         {{#if passwordErr}}
-            <div id="passwordError" class="errorMessage">
-                {{passwordErr}}
-            </div>
+        <div id="passwordError" class="errorMessage">
+            {{passwordErr}}
+        </div>
         {{/if}}
-        
+
         {{#if loginError}}
-            <div id="bothError" class="errorMessage">
-                {{loginError}}
-            </div>
+        <div id="bothError" class="errorMessage">
+            {{loginError}}
+        </div>
         {{/if}}
 
         <button type="submit">Login</button>

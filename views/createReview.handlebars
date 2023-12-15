@@ -1,0 +1,54 @@
+<header>
+    <div class="header-links">
+        <a href="/home" class="header-link">Home</a>
+        <a href="/updateProfile" class="header-link">Update Profile</a>
+        {{!-- <span>ReviewSphere</span> --}}
+        <a href="/review/createReview" class="header-link">Add Review</a>
+        <a href="/review/getMyReview/{{this._id}}" class="header-link"> My Reviews </a>
+        {{!-- <a href="/myReviews" class="header-link">My Reviews</a> --}}
+        <a href="/logout" class="header-link">Log Out</a>
+    </div>
+</header>
+<main>  
+    <form action="/review/createReview" method="POST" name="reviewForm" id="reviewForm">
+        <!-- Categories Dropdown -->
+        <p> Select Category: </p>
+
+        <select name="categoryId" id="categorySelect" onchange="loadBusinesses()" value="{{this._id}}">
+            {{#each categories}}
+            <option value="{{this._id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+
+        <p> Select Business: </p>
+        <!-- Businesses Dropdown -->
+        <select name="businessId" id="businessSelect">
+            <!-- Businesses will be loaded based on selected category -->
+        </select>
+
+        <!-- Link to Add Business Page -->
+        <p>
+            Business not found? <a href="/business/createBusiness">Add one</a>
+
+        </p>
+        <p> Write your review: </p>
+        <!-- Review Text -->
+        <textarea name="reviewText" placeholder="Write your review..." id="reviewText"></textarea>
+        <p>Select rating out of 5: </p>
+        <!-- Rating Dropdown -->
+        <select name="ratingPoints" id="ratingPoints">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <p>Wanna upload the image? </p>
+        <!-- Image Upload -->
+        <input type="file" name="imagePath" id="imagePath">
+        <br>
+        <button type="submit">Submit Review</button>
+    </form>
+</main>
+<script src="/public/js/reviewValidation.js"></script>

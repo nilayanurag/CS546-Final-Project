@@ -138,7 +138,7 @@ usersRouter
       }
     });
     usersRouter
-    .route('/updateUser')
+    .route('/updateProfile')
     .get(async (req, res) => {
       let userId;
       try {
@@ -149,7 +149,7 @@ usersRouter
       }
       let getUserInfo;
       try {
-        getUserInfo=await userData.getUserById(userId)
+        getUserInfo=await userData.getUserById(req.session.user.userId)
       }
       catch (error) {
         return res.status(400)
@@ -164,7 +164,7 @@ usersRouter
         contactEmailDef:getUserInfo.contactEmail,
         locationDef:getUserInfo.location
       }
-      return res.render("updateUser",dataToRender)
+      return res.render("updateProfile",dataToRender)
   
     })
     .post(async (req, res) => {
@@ -227,7 +227,8 @@ usersRouter
           return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        return res.status(400).render("updateUser",dataToRender)
+        // return res.status(400).render("updateUser",dataToRender)
+        throw error
       } 
     }
   );

@@ -4,6 +4,18 @@ header {
     background-color: blueviolet;
     color:cadetblue;
     
+} */
+header {
+    background: linear-gradient(to right, #007bff, #ff1493); 
+    top: 0;
+    color: white; 
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 footer {
     
@@ -88,4 +100,54 @@ footer {
     background-color: #f0f0f0;
     border-radius: 50%;
     /* Other styling as needed */
+}
+
+#contentContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+#userFeed {
+    /* Assuming you want the feed to take more space */
+    flex: 3;
+}
+
+#followingList {
+    flex: 1;
+}
+
+#addReviewContainer {
+    position: absolute;
+    top: 75px;
+    right: 10px;
+}
+
+.addReviewButton {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.addReviewButton:hover {
+    background-color: #0056b3;
+}
+
+.back-to-home-link {
+    display: block;
+    margin-top: 20px;
+    margin-right: 30cm;
+    text-decoration: none;
+    /*color: #000; Adjust the color as needed */
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.wide-form {
+    width: 300px; /* or any width you prefer */
+    /* max-width: 1000px; */
+    /* margin: auto;   */
 }

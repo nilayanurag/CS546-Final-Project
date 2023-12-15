@@ -1,7 +1,6 @@
-import * as reviewFunctions from '../data/review.js';
-import * as userFunctions from '../data/users.js';
-import * as businessFunctions from '../data/business.js';
-
+import * as reviewFunctions from "../data/review.js";
+import * as userFunctions from "../data/users.js";
+import * as businessFunctions from "../data/business.js";
 
 export const seedAllReview = async () => {
     try {
@@ -144,3 +143,16 @@ export const seedAllReview = async () => {
     }
 }
 
+  const review = await reviewFunctions.createReview(
+    businessId,
+    userId,
+    categoryId,
+    4,
+    "The ambience of Napoli's pizzeria was amazing and food was delightful as well. A must visit resto",
+    "./public/images/testImage.png"
+  );
+  if (review.insertedReview) {
+    console.log("Review seeded");
+  } else {
+    console.log("Review not seeded");
+  }

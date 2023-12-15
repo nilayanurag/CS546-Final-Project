@@ -4,6 +4,7 @@ import * as reviewFunctions from "./review.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
+import * as reviewFunctions from "./review.js";
 
 /*
 Refernce Schema:
@@ -76,6 +77,8 @@ export const createUser = async (
     followers,
     tags,
     location,
+    reviews: [],
+    comments: [],
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -106,6 +109,7 @@ export const loginUser = async (contactEmail, password) => {
   }
   if (compareToPassword) {
     return {
+      userId: found._id.toString(),
       firstName: found.firstName,
       lastName: found.lastName,
       contactEmail: found.contactEmail,
@@ -137,7 +141,6 @@ export const updateUser = async (
   sex,
   age,
   contactEmail,
-  password,
   location
 ) => {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -147,16 +150,13 @@ export const updateUser = async (
     sex = helper.checkSex(sex);
     contactEmail = helper.checkValidEmail(contactEmail);
     age = helper.checkAge(age, 12, 105);
-    password = helper.checkPass(password);
+    // password = helper.checkPass(password);
     location = helper.checkAddress(location);
-    const hash = await bcrypt.hash(password, saltRounds);
-
+    // const hash = await bcrypt.hash(password, saltRounds);
     const userCollection = await users();
-
     let userData = await userCollection
       .find(
-        { _id: userId },
-        { projection: { following: 1, followers: 1, tags: 1 } }
+        { _id: userId }
       )
       .toArray();
     if (userData.following === undefined) userData.following = [];
@@ -171,15 +171,14 @@ export const updateUser = async (
       sex: sex,
       age: age,
       contactEmail: contactEmail,
-      password: hash,
-      following: userData.following,
-      followers: userData.followers,
-      tags: userData.tags,
+      password: userData[0].password,
+      following: userData[0].following,
+      followers: userData[0].followers,
+      tags: userData[0].tags,
       location: location,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
     const updatedUser = await userCollection.findOneAndUpdate(
       { _id: userId },
       { $set: dataPacket },
@@ -297,8 +296,7 @@ export const removeFollowing = async (userId, followingId) => {
   } catch (error) {
     throw error;
   }
-}
-
+};
 
 //TODO why are we not using the above function instead of creating unncessary bloat
 //Route has been linked to this function
@@ -343,7 +341,7 @@ export const removeFollower = async (userId, followerId) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 // Route has been linked to this function
 export const addTags = async (userId, tags) => {
@@ -383,7 +381,7 @@ export const deleteTags = async (userId, tags) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 // Route has been linked to this function
 export const addReview = async (userId, reviewId) => {
