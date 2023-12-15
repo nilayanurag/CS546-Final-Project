@@ -85,14 +85,15 @@ $(document).ready(function() {
             </div>
             <div class="row">
                 <div class="col">
-                    <button id="followUnfollowButton" class="btn btn-primary">
-                        ${user.following && user.following.includes(username) ? 'Unfollow' : 'Follow'}
-                    </button>
+                    
                 </div>
             </div>`;
-        
-        $('.container .userProfileFull').html(userProfileHtml);
+        $('.userProfileFull').html('');
+        $('.userProfileFull').html(userProfileHtml);
     }
+    /**<button id="followUnfollowButton" class="btn btn-primary">
+    ${user.following && user.following.includes(username) ? 'Unfollow' : 'Follow'}
+    </button>***/
 
     // $('.search-suggestions').on('click', '.dropdown-item', function() {
     //     $('#userSearchInput').val($(this).text());
