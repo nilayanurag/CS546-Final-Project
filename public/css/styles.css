@@ -4,19 +4,7 @@ header {
     background-color: blueviolet;
     color:cadetblue;
     
-} */
-header {
-    background: linear-gradient(to right, #007bff, #ff1493); 
-    top: 0;
-    color: white; 
-    text-align: center;
-    padding: 10px 20px;
-    position: fixed;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+} 
 footer {
     
     background: blueviolet;

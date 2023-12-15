@@ -21,7 +21,7 @@
             {{/if}}
 
             <label for="usernameInput">Username</label>
-            <input type="text" class="form-control" id="usernameInput" name="usernameInput" value="{{usernameDef}}" required>
+            <input type="text" class="form-control" id="usernameInput" name="usernameInput" value="{{usernameDef}}" readonly>
 
             {{#if usernameErr}}
                 <div id="usernameError" class="errorMessage">
@@ -52,7 +52,7 @@
             {{/if}}
 
             <label for="contactEmailInput">Email Address</label>
-            <input type="email" class="form-control" id="contactEmailInput" name="contactEmailInput" value="{{contactEmailDef}}" required>
+            <input type="email" class="form-control" id="contactEmailInput" name="contactEmailInput" value="{{contactEmailDef}}" readonly>
 
             {{#if contactEmailErr}}
                 <div id="contactEmailError" class="errorMessage">

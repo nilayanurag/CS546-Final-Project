@@ -137,8 +137,9 @@ usersRouter
         .json({errorMessage:"User Not Found"})
       }
     });
+    //comment updateUser vs updateProfile
     usersRouter
-    .route('/updateProfile')
+    .route('/updateUser')
     .get(async (req, res) => {
       let userId;
       try {
@@ -149,7 +150,7 @@ usersRouter
       }
       let getUserInfo;
       try {
-        getUserInfo=await userData.getUserById(req.session.user.userId)
+        getUserInfo=await userData.getUserById(userId)
       }
       catch (error) {
         return res.status(400)
@@ -164,7 +165,7 @@ usersRouter
         contactEmailDef:getUserInfo.contactEmail,
         locationDef:getUserInfo.location
       }
-      return res.render("updateProfile",dataToRender)
+      return res.render("updateUser",dataToRender)
   
     })
     .post(async (req, res) => {
@@ -227,8 +228,7 @@ usersRouter
           return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        // return res.status(400).render("updateUser",dataToRender)
-        throw error
+        return res.status(400).render("updateUser",dataToRender)
       } 
     }
   );
@@ -239,7 +239,7 @@ usersRouter
     let getAllUsersInfo=await userData.getAllUsers()
     return res.json(getAllUsersInfo)
   })
-
+    
   // usersRouter
   // .route("/getByUserName/:username")
   // .get(async (req, res) => {
