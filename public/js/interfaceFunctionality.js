@@ -170,7 +170,7 @@ $(document).ready(function() {
 
     function fetchReviews() {
         $.ajax({
-            url: '/review/getAllReviews', // Your API endpoint
+            url: '/getAllReviews', // Your API endpoint
             type: 'GET',
             success: function(reviews) {
                 reviews.forEach(function(review) {
