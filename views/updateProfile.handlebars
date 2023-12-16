@@ -1,4 +1,4 @@
-<header>
+{{!-- <header>
     <div class="header-links">
         <a href="/home" class="header-link">Home</a>
         <a href="/updateProfile" class="header-link">Update Profile</a>
@@ -8,7 +8,7 @@
     </div>
 </header>
  
-<form action="/updateProfile" method="POST" id="updateProfileForm">
+<form action="/updateUser" method="POST" id="updateProfileForm">
     <label for="username">Username:</label>
     <input type="text" id="username" name="usernameInput" value="{{username}}" required>
     <span class="error">{{usernameErr}}</span>
@@ -42,7 +42,7 @@
     <input type="text" id="location" name="locationInput" value="{{location.firstLine}}" required>
     <span class="error">{{locationErr}}</span> --}}
 
-    <label for="locationFirstLineInput">location Line 1</label>
+    {{!-- <label for="locationFirstLineInput">location Line 1</label>
     <input type="text" id="locationFirstLineInput" name="locationInput[firstLine]" value="{{location.firstLine}}"
         required>
 
@@ -108,4 +108,4 @@
     <br>
     <br>
     <br>
-</form>
+</form> --}}
