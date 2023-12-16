@@ -37,33 +37,81 @@ app.use(
     })
   );
 
-
-  app.get('/', (req, res) => {
-    let user;
+  app.use("/login", async (req, res, next) => {
     if (req.session.user) {
-    user= req.session.user
-    }else{
-    user={}
-    user.firstName="Guest"
+        return res.redirect("/home");
+    } else {
+      next();
     }
-    const data = {
-      user: user,
-      items: ['Item 1', 'Item 2', 'Item 3'] ,
-      reviews:["review1","review2","review3"]
-
-    };
-    res.render('home',{data});
   });
 
-  app.get('/refresh-content', (req, res) => {
-    const data = {
-      items: ['Item 1', 'Item 2', 'Item 3'] // Sample data
-    };
-    res.render('partials/followingList', data, (err, html) => {
-      res.send(html);
-    });
-    // res.render('followingList', data);
+  app.use("/register", async (req, res, next) => {
+    if (req.session.user) {
+        return res.redirect("/home"); 
+    } else {
+      next();
+    }
   });
+
+  app.use("/logout", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
+
+  app.use("/review/createReview", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
+
+  app.use("/review/getMyReview", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
+
+  app.use("/updateUser/", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
+
+
+  // app.get('/', (req, res) => {
+  //   let user;
+  //   if (req.session.user) {
+  //   user= req.session.user
+  //   }else{
+  //   user={}
+  //   user.firstName="Guest"
+  //   }
+  //   const data = {
+  //     user: user,
+  //     items: ['Item 1', 'Item 2', 'Item 3'] ,
+  //     reviews:["review1","review2","review3"]
+
+  //   };
+  //   res.render('home',{data});
+  // });
+
+  // app.get('/refresh-content', (req, res) => {
+  //   const data = {
+  //     items: ['Item 1', 'Item 2', 'Item 3'] // Sample data
+  //   };
+  //   res.render('partials/followingList', data, (err, html) => {
+  //     res.send(html);
+  //   });
+  //   // res.render('followingList', data);
+  // });
 
 
 

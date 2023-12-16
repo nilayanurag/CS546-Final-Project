@@ -37,9 +37,9 @@
                         <a class="nav-link" href="/review/getMyReview">MyReviews<span class="sr-only">(current)</span></a>
                     </li>
                     
-                    <li class="nav-item">
+                    {{!-- <li class="nav-item">
                         <a class="nav-link" href="#">About Us</a>
-                    </li>
+                    </li> --}}
                 </ul>
                 {{!-- <form class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search reviews" aria-label="Search">
@@ -51,9 +51,9 @@
                             My Account
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="#">Profile</a>
-                            <a class="dropdown-item" href="#">Settings</a>
-                            <a class="dropdown-item" href="#">Logout</a>
+                            <a class="dropdown-item" href="/updateUser/{{user.userId}}">Update Profile</a>
+                            {{!-- <a class="dropdown-item" href="#">Settings</a> --}}
+                            <a class="dropdown-item" href="/logout">Logout</a>
                         </div>
                     </li>
                 </ul>
