@@ -2,13 +2,16 @@ import express from "express";
 import * as reviewData from "../data/review.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
+import * as categoryData from "../data/category.js";
 
 const reviewRouter = express.Router();
 
 reviewRouter
 .route("/review/createReview")
 .get(async (req, res) => {
-    return res.render("createReview");
+  // DO NOT REMOVE THIS (to populate the categories in create review page)
+  const categories = await categoryData.getAllCategory();
+  return res.render("createReview", { categories: categories });
 })
 .post(async (req, res) => {
     let reviewInfo = req.body;
@@ -30,6 +33,7 @@ reviewRouter
     }
 
     try{
+      console.log(businessIdVal[0],userIdVal[0],categoryIdVal[0],ratingPointsVal[0],reviewTextVal[0],imagePathVal)
         let review = await reviewData.createReview(businessIdVal[0],userIdVal[0],categoryIdVal[0],ratingPointsVal[0],reviewTextVal[0],imagePathVal);
         if (review){
           return res.redirect("/review/getReview/"+review._id);
