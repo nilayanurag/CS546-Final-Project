@@ -27,7 +27,7 @@ reviews:{
     updatedAt: 2022-02-26T16:37:48.244Z,
 },
  */
-
+//Route linked to this function: POST /review/createReview
 export const createReview = async (
   businessId,
   userId,
@@ -56,13 +56,14 @@ export const createReview = async (
     if (!category) throw "Category not found";
 
     // validate image if there then insert else null
-    let imageBinary;
-    if (imagePath && imagePath.trim() !== "") {
-      const imageBuffer = fs.readFileSync(imagePath);
-      imageBinary = new Binary(imageBuffer);
-    } else {
-      imageBinary = null;
-    }
+    // let imageBinary;
+    // console.log(imagePath);
+    // if (imagePath && imagePath.trim() !== "") {
+    //   const imageBuffer = fs.readFileSync(imagePath);
+    //   imageBinary = new Binary(imageBuffer);
+    // } else {
+    //   imageBinary = null;
+    // }
 
     const reviewCollection = await reviews();
     const newReview = await reviewCollection.insertOne({
@@ -71,19 +72,30 @@ export const createReview = async (
       categoryId: categoryId,
       rating: ratingPoints,
       reviewText: reviewText,
-      images: imageBinary,
+      images: imagePath ? imagePath : null,
       comments: [],
       thumsUp: [],
       thumsDown: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    if(newReview.insertedId){
+      await businessCollection.updateOne(
+        { _id: businessId },
+        { $addToSet: { reviews: newReview.insertedId } }
+      );
+      await userCollection.updateOne(
+        { _id: userId },
+        { $addToSet: { reviews: newReview.insertedId } }
+      );
+    }
     return { insertedReview: newReview.insertedId ? true : false };
   } catch (error) {}
 };
 
 // MOST IMP: You are deleting any review, make sure to FIRST delete all the comments associated with it
 // as well as remove the review from the business document and user document
+// Route linked to this function: DELETE /review/deleteReview/:id
 export const deleteReview = async (reviewId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -98,6 +110,7 @@ export const deleteReview = async (reviewId) => {
   }
 };
 
+//Route linked to this function: POST /review/updateReview
 export const updateReview = async (
   reviewId,
   ratingPoints,
@@ -139,6 +152,9 @@ export const updateReview = async (
   }
 };
 
+
+
+//Route linked to this function: GET /review/getReview/:id
 export const getReviewById = async (reviewId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -151,6 +167,7 @@ export const getReviewById = async (reviewId) => {
   }
 };
 
+//Route linked to this function
 export const addThumbsUp = async (reviewId, userId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -174,6 +191,7 @@ export const addThumbsUp = async (reviewId, userId) => {
   }
 };
 
+// Route linked to this function: POST /review/removeThumbsDown
 export const removeThumbsUp = async (reviewId, userId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -196,6 +214,7 @@ export const removeThumbsUp = async (reviewId, userId) => {
   }
 };
 
+//Route linked to this function: POST /review/addThumbsDown
 export const addThumbsDown = async (reviewId, userId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -219,6 +238,7 @@ export const addThumbsDown = async (reviewId, userId) => {
   }
 };
 
+//Route linked to this function: POST /review/removeThumbsDown
 export const removeThumbsDown = async (reviewId, userId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -241,6 +261,7 @@ export const removeThumbsDown = async (reviewId, userId) => {
   }
 };
 
+//Route linked to this function: POST /review/addComment
 export const addComment = async (reviewId, commentId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -263,6 +284,7 @@ export const addComment = async (reviewId, commentId) => {
   }
 };
 
+//Route linked to this function: POST /review/removeComment
 export const removeComment = async (reviewId, commentId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -285,6 +307,7 @@ export const removeComment = async (reviewId, commentId) => {
   }
 };
 
+//Route linked to this function: GET /review/getAllReviews
 export const getAllReviews = async () => {
   try {
     const reviewCollection = await reviews();
@@ -294,3 +317,15 @@ export const getAllReviews = async () => {
     throw error;
   }
 };
+
+export const getReviewsByUserId = async (userId) => {
+  try {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const allReviews = await reviewCollection.find({ userId: userId }).toArray();
+    return allReviews;
+  } catch (error) {
+    throw error;
+  }
+};
+

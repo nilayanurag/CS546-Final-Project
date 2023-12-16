@@ -1,0 +1,21 @@
+<script id="review-item-template" type="text/x-handlebars-template">
+    <div class="review-item mb-3" id="review-{{id}}">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{name}}</h5>
+                <p class="card-text">{{reviewText}}</p>
+                <p class="card-text"><strong>Rating:</strong> {{rating}}/5</p>
+            </div>
+            <div class="card-footer">
+                {{#if image}}
+                    <img src="{{image}}" alt="Review image" class="img-fluid">
+                {{/if}}
+                <div class="comments-container">
+                   
+                </div>
+                <input type="text" class="form-control comment-input" placeholder="Add a comment...">
+                <button class="btn btn-primary add-comment-btn" data-review-id="{{id}}">Post Comment</button>
+            </div>
+        </div>
+    </div>
+</script>

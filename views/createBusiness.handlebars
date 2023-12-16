@@ -1,0 +1,49 @@
+<div id="create-business" class="container mt-4">
+    <form action="/business/createBusiness" method="POST" name="businessForm" id="businessForm" class="p-4 border rounded">
+
+        <!-- Categories Dropdown -->
+        <div class="form-group">
+            <label for="categorySelect">Select Category:</label>
+            <select name="categoryId" id="categorySelect" class="form-control" value="{{this._id}}">
+                {{#each categories}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <!-- Name of the Business -->
+        <div class="form-group">
+            <label for="businessName">Business Name:</label>
+            <input type="text" class="form-control" name="businessName" id="businessName" required>
+        </div>
+
+        <!-- Location Details -->
+        <div class="form-group">
+            <label for="firstAddressLine">First Address Line:</label>
+            <input type="text" class="form-control" name="firstAddressLine" id="firstAddressLine" placeholder="First Address Line" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="lastAddressLine" id="lastAddressLine" placeholder="Last Address Line">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="country" id="country" placeholder="Country" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="city" id="city" placeholder="City" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="state" id="state" placeholder="State" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="zip" id="zip" placeholder="Zip Code" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Business</button>
+
+    </form>
+</div>

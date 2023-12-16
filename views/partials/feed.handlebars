@@ -1,0 +1,34 @@
+{{!-- <div id="feed-handle-bar" class="class-handlebars">
+  <h3>Feed</h3>
+    <div class="feed-list">
+        {{!-- <ul>
+        {{#each data.reviews}}
+            <li>{{this}}</li>
+        {{/each}}
+        </ul> --}}
+        {{!-- <ul>
+        {{#each reviews}}
+        <li>
+            <a href="/review/getReview/{{this._id}}">
+            
+            <h4>
+                {{this.businessName}}
+            </h4>
+            </a>
+            <h3>{{this.username}}</h3>
+            <p>{{this.description}}</p>
+            {{#if this.image}}
+            <img src="{{this.image}}" alt="Review Image">
+            {{/if}}
+        </li>
+        {{else}}
+        <p>No recent reviews.</p>
+        {{/each}}
+    </ul>
+  </div>
+ --}} 
+
+<div id="reviewsFeed" class="mt-4">
+  <h3>Feed</h3>
+    <!-- Reviews will be dynamically loaded here -->
+</div>

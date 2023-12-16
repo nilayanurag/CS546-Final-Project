@@ -1,0 +1,111 @@
+{{!-- <header>
+    <div class="header-links">
+        <a href="/home" class="header-link">Home</a>
+        <a href="/updateProfile" class="header-link">Update Profile</a>
+        <a href="/review/createReview" class="header-link">Add Review</a>
+        <a href="/review/getMyReview/" class="header-link"> My Reviews </a>
+        <a href="/logout" class="header-link">Log Out</a>
+    </div>
+</header>
+ 
+<form action="/updateUser" method="POST" id="updateProfileForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="usernameInput" value="{{username}}" required>
+    <span class="error">{{usernameErr}}</span>
+
+    <label for="firstName">First Name:</label>
+    
+    <input type="text" id="firstName" name="firstNameInput" value="{{firstName}}" required>
+    <span class="error">{{firstNameErr}}</span>
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastNameInput" value="{{lastName}}" required>
+    <span class="error">{{lastNameErr}}</span>
+
+    <label for="sex">Sex:</label>
+    <select id="sex" name="sexInput" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <!-- Add other genders as needed -->
+    </select>
+    <span class="error">{{sexErr}}</span>
+
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="ageInput" value="{{age}}" required>
+    <span class="error">{{ageErr}}</span>
+
+    <label for="contactEmail">Contact Email:</label>
+    <input type="email" id="contactEmail" name="contactEmailInput" value="{{contactEmail}}" readonly>
+    <span class="error">{{contactEmailErr}}</span>
+
+    {{!-- <label for="location">Location:</label>
+    <input type="text" id="location" name="locationInput" value="{{location.firstLine}}" required>
+    <span class="error">{{locationErr}}</span> --}}
+
+    {{!-- <label for="locationFirstLineInput">location Line 1</label>
+    <input type="text" id="locationFirstLineInput" name="locationInput[firstLine]" value="{{location.firstLine}}"
+        required>
+
+    {{#if locationErr.firstLine}}
+    <div id="locationFirstLineError" class="errorMessage">
+        {{locationErr.firstLine}}
+    </div>
+    {{/if}}
+
+
+    <label for="locationLastLineInput">location Line 2</label>
+    <input type="text" id="locationLastLineInput" name="locationInput[lastLine]" value="{{location.lastLine}}"
+        required>
+
+    {{#if locationErr.lastLine}}
+    <div id="locationLastLineError" class="errorMessage">
+        {{locationErr.lastLine}}
+    </div>
+    {{/if}}
+
+    <!-- Country -->
+    <label for="countryInput">Country</label>
+    <input type="text" id="countryInput" name="locationInput[country]" value="{{location.country}}" required>
+
+    {{#if locationErr.country}}
+    <div id="countryError" class="errorMessage">
+        {{locationErr.country}}
+    </div>
+    {{/if}}
+
+    <!-- City -->
+    <label for="cityInput">City</label>
+    <input type="text" id="cityInput" name="locationInput[city]" value="{{location.city}}" required>
+
+    {{#if locationErr.city}}
+    <div id="cityError" class="errorMessage">
+        {{locationErr.city}}
+    </div>
+    {{/if}}
+
+    <!-- State -->
+    <label for="stateInput">State (2 Letter only)</label>
+    <input type="text" id="stateInput" name="locationInput[state]" maxlength="2" pattern="[A-Za-z]{2}"
+        value="{{location.state}}" required>
+
+    {{#if locationErr.state}}
+    <div id="stateError" class="errorMessage">
+        {{locationErr.state}}
+    </div>
+    {{/if}}
+
+    <!-- Zip Code -->
+    <label for="zipInput">Zip Code</label>
+    <input type="text" id="zipInput" name="locationInput[zip]" value="{{location.zip}}" required>
+
+    {{#if locationErr.zip}}
+    <div id="zipError" class="errorMessage">
+        {{locationErr.zip}}
+    </div>
+    {{/if}}
+
+    <button type="submit">Update Profile</button>
+    <br>
+    <br>
+    <br>
+</form> --}}

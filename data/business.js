@@ -21,6 +21,7 @@ business:{
     updatedAt: 2022-02-26T16:37:48.244Z
 } */
 
+// Route: POST /business/createBusiness 
 export const createBusiness = async(name, categoryId, addressObject)=>{
     try {
         name = helper.checkString(name, "Buisness name", 3, 50);
@@ -47,6 +48,7 @@ export const createBusiness = async(name, categoryId, addressObject)=>{
     }
 }
 
+//Route: GET /business/getBusiness/:pre
 export const getAllBusinessWithPrefix = async(prefix) =>{
     try {
         prefix = helper.checkString(prefix, "prefix", 1, 50);
@@ -60,6 +62,8 @@ export const getAllBusinessWithPrefix = async(prefix) =>{
     }
 }
 
+
+// Route: GET /business/getBusinessByName/:name
 export const getBusinessByName = async(name)=>{
     try {
         name = helper.checkString(name, "Buisness name", 3, 50);
@@ -72,6 +76,7 @@ export const getBusinessByName = async(name)=>{
     }
 }
 
+// Route: GET /business/deleteBusiness/:id
 export const deleteBusiness = async(businessId)=>{
     try {
         businessId = new ObjectId(helper.checkObjectId(businessId));
@@ -86,6 +91,7 @@ export const deleteBusiness = async(businessId)=>{
     }
 }
 
+//Route not needed
 export const addReview = async(reviewId, businessId)=>{
     try {
         reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -104,6 +110,7 @@ export const addReview = async(reviewId, businessId)=>{
     }
 }
 
+// Route not needed
 export const getAllReview = async(businessId)=>{
     try {
         businessId = new ObjectId(helper.checkObjectId(businessId));
@@ -116,6 +123,7 @@ export const getAllReview = async(businessId)=>{
     }
 }
 
+//Route not needed
 export const deleteReview = async(reviewId, businessId)=>{
     try{
         businessId = new ObjectId(helper.checkObjectId(businessId));
@@ -131,6 +139,32 @@ export const deleteReview = async(reviewId, businessId)=>{
         return true;
 
     }catch(error){
+        throw error;
+    }
+}
+
+// Route: GET /business/getBusinessById/:id
+export const getBusinessById = async(businessId)=>{
+    try {
+        businessId = new ObjectId(helper.checkObjectId(businessId));
+        const businessCollection = await businesses();
+        const business = await businessCollection.findOne({ _id: businessId });
+        if (!business) throw "Business not found";
+        return business;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getBusinessesByCategory = async(categoryId)=>{
+    try {
+        categoryId = new ObjectId(helper.checkObjectId(categoryId));
+        const businessCollection = await businesses();
+        const business = await businessCollection.find({ categoryId: categoryId }).toArray();
+        if (!business) throw "Business not found";
+        return business;
+        
+    } catch (error) {
         throw error;
     }
 }

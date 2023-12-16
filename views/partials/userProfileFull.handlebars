@@ -1,0 +1,47 @@
+<div class="container userProfileFull">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="user-image-placeholder">
+            </div>
+        </div>
+        UserProfileFull Placeholder
+        <div class="col-md-8">
+            {{#if targetUsername}}
+                <div id="targetUsername">{{targetUsername}}</div>
+            {{/if}}
+            {{#if user}}
+            <h3>{{user.username}}</h3>
+      
+
+            <h3>{{user.username}}</h3>
+            <p>{{user.firstName}} {{user.lastName}}</p>
+            <p>Sex: {{user.sex}}</p>
+            <p>Age: {{user.age}}</p>
+            <p>Contact: {{user.contactEmail}}</p>
+            {{!-- <p>Tags: {{user.tags.join(', ')}}</p> --}}
+            <p>Location: {{user.location.firstLine}}, {{user.location.secondLine}}, {{user.location.city}}, {{user.location.state}}, {{user.location.zip}}, {{user.location.country}}</p>
+            {{else}}
+                <p>No user found.</p>
+            {{/if}}
+            {{!-- {{#if user}}
+            <h3>{{user.username}}</h3>
+            {{/if}}
+            
+            
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <!--Add follow/unfollow functionality-->
+            <button id="followUnfollowButton" class="btn btn-primary">
+                {{!-- {{#if user.following.includes masterUserId}}
+                    Unfollow
+                {{else}}
+                    Follow
+                {{/if}} --}}
+            </button>
+        </div>
+    </div>
+</div>

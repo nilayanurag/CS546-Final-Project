@@ -115,6 +115,78 @@ export const seedAllBuisness = async () => {
     } catch (error) {
         throw error;
     }
+    try {
+    
+        let category = await categoryFunctions.getCategoryByName("Gym");
+        const buisness1 = await businessFunction.createBusiness("Heights Fitness", category._id.toString(), {
+            firstLine: "100 Second Floor",
+            lastLine: "Central Avenue",
+            country: "US",
+            city: "Jersey City",
+            state: "NJ",
+            zip: "07307",
+        }
+        );     
+        if(buisness1.insertedBusiness){
+            console.log("Buisness 7 created")
+        }
+    } catch (error) {
+        throw error;
+    }
+    try {
+    
+        let category = await categoryFunctions.getCategoryByName("Restraunt");
+        const buisness1 = await businessFunction.createBusiness("Chipotle", category._id.toString(), {
+            firstLine: "229",
+            lastLine: "Washington Street",
+            country: "US",
+            city: "Hoboken",
+            state: "NJ",
+            zip: "07030",
+        }
+        );     
+        if(buisness1.insertedBusiness){
+            console.log("Buisness 8 created")
+        }
+    } catch (error) {
+        throw error;
+    }
+    try {
+    
+        let category = await categoryFunctions.getCategoryByName("Grocery");
+        const buisness1 = await businessFunction.createBusiness("Patel Brothers", category._id.toString(), {
+            firstLine: "718",
+            lastLine: "Newark Avenue",
+            country: "US",
+            city: "Jersey City",
+            state: "NJ",
+            zip: "07003",
+        }
+        );     
+        if(buisness1.insertedBusiness){
+            console.log("Buisness 9 created")
+        }
+    } catch (error) {
+        throw error;
+    }
+    try {
+    
+        let category = await categoryFunctions.getCategoryByName("Cinema");
+        const buisness1 = await businessFunction.createBusiness("AMC Empire 25", category._id.toString(), {
+            firstLine: "234 W",
+            lastLine: "42nd Street",
+            country: "US",
+            city: "New York City",
+            state: "NY",
+            zip: "10036",
+        }
+        );     
+        if(buisness1.insertedBusiness){
+            console.log("Buisness 10 created")
+        }
+    } catch (error) {
+        throw error;
+    }
 
 }
 

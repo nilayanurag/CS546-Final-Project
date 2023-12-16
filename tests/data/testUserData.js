@@ -67,18 +67,18 @@ try {
   throw error;
 }
 
-try {
-  const user = await userFunctions.deleteFollowing(
-    user1,
-    user2
-  );
-  console.log("Test 5: Delete Following", user);
-} catch (error) {
-  throw error;
-}
+// try {
+//   const user = await userFunctions.removeFollowing(
+//     user1,
+//     user2
+//   );
+//   console.log("Test 5: Delete Following", user);
+// } catch (error) {
+//   throw error;
+// }
 
 try {
-  const user = await userFunctions.deleteFollower(
+  const user = await userFunctions.removeFollower(
     user1,
     user2
   );
@@ -105,6 +105,14 @@ try {
     const user = await userFunctions.deleteTags(user1,"veg");
     console.log("Test 9: Delete Tags", user);
 } catch (error) {
+  throw error;
+}
+
+try{
+  const user = await userFunctions.getHomePageDetails("657170a745572a5c1e835e1f");
+  console.log("Test 10: Get Home Page Details", user);
+
+}catch(error){
   throw error;
 }
 

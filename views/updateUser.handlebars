@@ -1,0 +1,155 @@
+
+<main class="container mt-4">
+    <form id="update-form" action="/updateUser" method="post" class="p-4 border rounded">
+        <div class="form-group">
+            <label for="firstNameInput">First Name</label>
+            <input type="text" class="form-control" id="firstNameInput" name="firstNameInput" value="{{firstNameDef}}" required>
+
+            {{#if firstNameErr}}
+                <div id="firstNameError" class="errorMessage">
+                    {{firstNameErr}}
+                </div>
+            {{/if}}
+
+            <label for="lastNameInput">Last Name</label>
+            <input type="text" class="form-control" id="lastNameInput" name="lastNameInput" value="{{lastNameDef}}" required>
+
+            {{#if lastNameErr}}
+                <div id="lastNameError" class="errorMessage">
+                    {{lastNameErr}}
+                </div>
+            {{/if}}
+
+            <label for="usernameInput">Username</label>
+            <input type="text" class="form-control" id="usernameInput" name="usernameInput" value="{{usernameDef}}" readonly>
+
+            {{#if usernameErr}}
+                <div id="usernameError" class="errorMessage">
+                    {{usernameErr}}
+                </div>
+            {{/if}}
+
+            <label for="ageInput">Age</label>
+            <input type="number" class="form-control" id="ageInput" name="ageInput" value="{{ageDef}}" required>
+
+            {{#if ageErr}}
+                <div id="ageError" class="errorMessage">
+                    {{ageErr}}
+                </div>
+            {{/if}}
+
+            <label for="sexInput">Sex</label>
+            <select id="sexInput" class="form-control" name="sexInput" value="{{sexDef}}" required>
+                <option value="" selected disabled hidden>Choose here</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+            {{#if sexErr}}
+                <div id="sexError" class="errorMessage">
+                    {{sexErr}}
+                </div>
+            {{/if}}
+
+            <label for="contactEmailInput">Email Address</label>
+            <input type="email" class="form-control" id="contactEmailInput" name="contactEmailInput" value="{{contactEmailDef}}" readonly>
+
+            {{#if contactEmailErr}}
+                <div id="contactEmailError" class="errorMessage">
+                    {{contactEmailErr}}
+                </div>
+            {{/if}}
+
+
+            <label for="passwordInput">Password</label>
+            <input type="password" class="form-control" id="passwordInput" name="passwordInput" required>
+
+            {{#if passwordErr}}
+                <div id="passwordError" class="errorMessage">
+                    {{passwordErr}}
+                </div>
+            {{/if}}
+
+            <label for="confirmPasswordInput">Confirm Password</label>
+            <input type="password" class="form-control" id="confirmPasswordInput" name="confirmPasswordInput" required>
+
+            {{#if confirmedPasswordErr}}
+                <div id="confirmedPasswordError" class="errorMessage">
+                    {{confirmedPasswordErr}}
+                </div>
+            {{/if}}
+
+            <label for="locationFirstLineInput">location Line 1</label>
+            <input type="text" class="form-control" id="locationFirstLineInput" name="locationInput[firstLine]" value="{{locationDef.firstLine}}" required>
+
+            {{#if locationErr.firstLine}}
+                <div id="locationFirstLineError" class="errorMessage">
+                    {{locationErr.firstLine}}
+                </div>
+            {{/if}}
+
+        
+            <label for="locationLastLineInput">location Line 2</label>
+            <input type="text" class="form-control" id="locationLastLineInput" name="locationInput[lastLine]" value="{{locationDef.lastLine}}" required>
+
+            {{#if locationErr.lastLine}}
+                <div id="locationLastLineError" class="errorMessage">
+                    {{locationErr.lastLine}}
+                </div>
+            {{/if}}
+
+            <!-- Country -->
+            <label for="countryInput">Country</label>
+            <input type="text" class="form-control" id="countryInput" name="locationInput[country]" value="{{locationDef.country}}" required>
+
+            {{#if locationErr.country}}
+                <div id="countryError" class="errorMessage">
+                    {{locationErr.country}}
+                </div>
+            {{/if}}
+
+            <!-- City -->
+            <label for="cityInput">City</label>
+            <input type="text" class="form-control" id="cityInput" name="locationInput[city]" value="{{locationDef.city}}" required>
+
+            {{#if locationErr.city}}
+                <div id="cityError" class="errorMessage">
+                    {{locationErr.city}}
+                </div>
+            {{/if}}
+
+            <!-- State -->
+            <label for="stateInput">State (2 Letter only)</label>
+            <input type="text" class="form-control" id="stateInput" name="locationInput[state]" maxlength="2" pattern="[A-Za-z]{2}" value="{{locationDef.state}}" required>
+
+            {{#if locationErr.state}}
+                <div id="stateError" class="errorMessage">
+                    {{locationErr.state}}
+                </div>
+            {{/if}}
+
+            <!-- Zip Code -->
+            <label for="zipInput">Zip Code</label>
+            <input type="text" class="form-control" id="zipInput" name="locationInput[zip]" value="{{locationDef.zip}}" required>
+
+            {{#if locationErr.zip}}
+                <div id="zipError" class="errorMessage">
+                    {{locationErr.zip}}
+                </div>
+            {{/if}}
+
+        </div>
+
+       
+        <!-- Repeat for other fields -->
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </form>
+
+    <p id="loginLinkForExistingUser" class="text-center">
+        <a href="/login">Already have an account? Click here to log-in</a>
+    </p>
+</main>
+

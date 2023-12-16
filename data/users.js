@@ -1,8 +1,9 @@
 import * as helper from "../helpers/validation.js";
-import { users, reviews, comments } from "../config/mongoCollections.js";
+import { users, reviews, comments, businesses } from "../config/mongoCollections.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
+//import * as reviewFunctions from "./review.js";
 
 /*
 Refernce Schema:
@@ -36,6 +37,7 @@ users:{
 }
 */
 
+// Route has been linked to this function
 export const createUser = async (
   username,
   firstName,
@@ -74,6 +76,8 @@ export const createUser = async (
     followers,
     tags,
     location,
+    reviews: [],
+    comments: [],
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -86,6 +90,7 @@ export const createUser = async (
   }
 };
 
+// Route has been linked to this function
 export const loginUser = async (contactEmail, password) => {
   contactEmail = await helper.checkValidEmail(contactEmail);
   password = helper.checkPass(password);
@@ -103,6 +108,7 @@ export const loginUser = async (contactEmail, password) => {
   }
   if (compareToPassword) {
     return {
+      userId: found._id.toString(),
       firstName: found.firstName,
       lastName: found.lastName,
       contactEmail: found.contactEmail,
@@ -112,6 +118,7 @@ export const loginUser = async (contactEmail, password) => {
   }
 };
 
+// Route has been linked to this function
 export const getUserById = async (userId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -124,6 +131,7 @@ export const getUserById = async (userId) => {
   }
 };
 
+// Route has been linked to this function
 export const updateUser = async (
   userId,
   username,
@@ -135,7 +143,6 @@ export const updateUser = async (
   password,
   location
 ) => {
-  try {
     userId = new ObjectId(helper.checkObjectId(userId));
     username = helper.checkString(username, "username", 1, 25);
     firstName = helper.checkString(firstName, "firstName", 1, 25);
@@ -185,11 +192,11 @@ export const updateUser = async (
     if (!updatedUser || updatedUser === undefined) {
       throw "could not update event successfully";
     }
-    return updateUser;
-  } catch (error) {}
+    return updatedUser;
 };
 
 // MOST IMP: If you are deleting a user, make sure to FIRST delete all the reviews, comments, and tags associated with it
+// Route has been linked to this function
 export const deleteUser = async (userId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -243,6 +250,7 @@ export const deleteUser = async (userId) => {
 //   }
 // };
 
+//Route has been linked to this function
 export const addFollowing = async (userId, followingId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -268,7 +276,8 @@ export const addFollowing = async (userId, followingId) => {
   }
 };
 
-export const deleteFollowing = async (userId, followingId) => {
+//Route has been linked to this function
+export const removeFollowing = async (userId, followingId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
     followingId = new ObjectId(helper.checkObjectId(followingId));
@@ -291,7 +300,20 @@ export const deleteFollowing = async (userId, followingId) => {
   } catch (error) {
     throw error;
   }
-}
+};
+
+//TODO why are we not using the above function instead of creating unncessary bloat
+//Route has been linked to this function
+export const addFollowerByUserName = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  let addedFollower=await addFollower(mainUserId,followerUserId);
+  let addedFollowing=await addFollowing(followerUserId,mainUserId);
+  return addedFollower && addedFollowing;
+};
+
 
 export const addFollower = async (userId, followerId) => {
   try {
@@ -314,7 +336,8 @@ export const addFollower = async (userId, followerId) => {
   }
 };
 
-export const deleteFollower = async (userId, followerId) => {
+//route has been linked to this function
+export const removeFollower = async (userId, followerId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
     followerId = new ObjectId(helper.checkObjectId(followerId));
@@ -333,8 +356,9 @@ export const deleteFollower = async (userId, followerId) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
+// Route has been linked to this function
 export const addTags = async (userId, tags) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -354,6 +378,7 @@ export const addTags = async (userId, tags) => {
   }
 };
 
+//Route has been linked to this function
 export const deleteTags = async (userId, tags) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -371,8 +396,9 @@ export const deleteTags = async (userId, tags) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
+// Route has been linked to this function
 export const addReview = async (userId, reviewId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -395,6 +421,7 @@ export const addReview = async (userId, reviewId) => {
   }
 };
 
+//route has been linked to this function
 export const deleteReview = async (userId, reviewId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -416,6 +443,7 @@ export const deleteReview = async (userId, reviewId) => {
   }
 };
 
+// Route has been linked to this function
 export const addComment = async (userId, commentId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -438,6 +466,7 @@ export const addComment = async (userId, commentId) => {
   }
 };
 
+//Route has been linked to this function
 export const deleteComment = async (userId, commentId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -459,6 +488,7 @@ export const deleteComment = async (userId, commentId) => {
   }
 };
 
+// Route has been linked to this function
 export const getUserByUsername = async (username) => {
   try {
     username = helper.checkString(username, "username", 1, 50);
@@ -472,6 +502,18 @@ export const getUserByUsername = async (username) => {
   }
 };
 
+export const getUserByEmailAddress = async (contactEmail) => {
+  try {
+    contactEmail = helper.checkValidEmail(contactEmail);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ contactEmail: contactEmail });
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Route has been linked to this function
 export const getAllUsers = async () => {
   try {
     const userCollection = await users();
@@ -480,4 +522,87 @@ export const getAllUsers = async () => {
   } catch (error) {
     throw error;
   }
+};
+
+//Route linked to this function
+export const getAllUserWithPrefix = async(prefix) =>{
+  try {
+      prefix = helper.checkString(prefix, "prefix", 1, 50);
+      const userCollection = await users();
+      // name: { $regex: `^${prefix}`, $options: 'i' }  To search for prefix only
+      const userList = await userCollection.find({username: { $regex: prefix, $options: 'i' }}).toArray(); // This to search for prefix anywhere in the string
+      return userList;
+      
+  } catch (error) {
+      throw error;
+  }
+}
+
+export const getHomePageDetails = async (userId) => {
+  userId = helper.checkObjectId(userId);
+  const businessCollection = await businesses();
+  const reviewCollection = await reviews();
+  let followingUserIds = await getUserById(userId);
+  const username = followingUserIds.username;
+
+  followingUserIds = followingUserIds.following;
+  if (followingUserIds.length === 0) {
+    return {
+      reviewsByFollowing: [],
+      followingUsername: [],
+    };
+  }
+
+  let followingUsername = [];
+  for (let i = 0; i < followingUserIds.length; i++) {
+    const followingUser = await getUserById(followingUserIds[i].toString());
+    followingUserIds[i] = new ObjectId(followingUserIds[i]);
+    const userData = {
+      name: followingUser.username,
+      userId: followingUserIds[i].toString(),
+    };
+    followingUsername.push(userData);
+  }
+  let reviewsByFollowing = await reviewCollection
+    .find(
+      { userId: { $in: followingUserIds } },
+      {
+        projection: {
+          _id: 1,
+          userId: 1,
+          businessId: 1,
+          rating: 1,
+          reviewText: 1,
+        },
+      }
+    )
+    .toArray();
+
+  for (let i = 0; i < reviewsByFollowing.length; i++) {
+    const business = await businessCollection.findOne({
+      _id: reviewsByFollowing[i].businessId,
+    });
+    reviewsByFollowing[i].businessName = business.name;
+  }
+
+  reviewsByFollowing = reviewsByFollowing.map((review) => {
+    const user = followingUsername.find(
+      (user) => user.userId === review.userId.toString()
+    );
+    return {
+      _id: review._id.toString(),
+      userId: review.userId.toString(),
+      businessId: review.businessId.toString(),
+      businessName: review.businessName,
+      rating: review.rating,
+      description: review.reviewText,
+      username: user.username,
+    };
+  });
+
+  return {
+    reviewsByFollowing: reviewsByFollowing,
+    followingUsername: followingUsername,
+    username: username,
+  };
 };
