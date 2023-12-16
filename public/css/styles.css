@@ -143,3 +143,7 @@ footer {
 .lower-column {
     margin-top: 20px; /* Adjust the value as needed */
 }
+
+body {
+    margin-bottom: 60px; /* Adjust this value to the height of your footer */
+}

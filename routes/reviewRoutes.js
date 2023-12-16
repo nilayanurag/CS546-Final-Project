@@ -445,22 +445,10 @@ reviewRouter.route("/review/removeComment").post(async (req, res) => {
 // Important route for get my reviews (DO NOT DELETE)
 reviewRouter.route("/review/getMyReview").get(async (req, res) => {
   try {
-    /*
-            reviews{
-              businessName: businessName,
-              description,
-              image,
-              commentData: [
-                {commentDescription,
-                username}
-              ]
-            }
-            */
     let reviews = [];
     let reviewInfo = await reviewData.getReviewsByUserId(
       req.session.user.userId
     );
-
     for (let i = 0; i < reviewInfo.length; i++) {
       let businessinfo = await businessData.getBusinessById(
         reviewInfo[i].businessId.toString()
@@ -472,8 +460,8 @@ reviewRouter.route("/review/getMyReview").get(async (req, res) => {
       review.rating = reviewInfo[i].rating;
       review.commentData = [];
       for (let j = 0; j < reviewInfo[i].comments.length; j++) {
-        let commentInfo = await commentData.getCommentsByReviewId(
-          reviewInfo.comments[j].toString()
+        let commentInfo = await commentData.getCommentById(
+          reviewInfo[i].comments[j].toString()
         );
         let info = {};
         info.commentDescription = commentInfo.commentDescription;
