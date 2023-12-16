@@ -190,6 +190,7 @@ $(document).ready(function() {
             <div class="review-item mb-3">
                 <div class="card">
                     <div class="card-body">
+                        <a href="/review/getReview/${review._id}">
                         <h5 class="card-title">${review.name}</h5>
                         <p class="card-text">${review.reviewText}</p>
                         <p class="card-text"><strong>Rating:</strong> ${review.rating}/5</p>
