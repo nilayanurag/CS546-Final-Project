@@ -1,32 +1,49 @@
-<main>
-    <form action="/business/createBusiness" method="POST" name="businessForm" id="businessForm" class="wide-form">
+<div id="create-business" class="container mt-4">
+    <form action="/business/createBusiness" method="POST" name="businessForm" id="businessForm" class="p-4 border rounded">
+
         <!-- Categories Dropdown -->
-        <p> Select Category: </p>
-
-
-        <select name="categoryId" id="categorySelect" value="{{this._id}}">
-            {{#each categories}}
-            <option value="{{this._id}}">{{this.name}}</option>
-            {{/each}}
-        </select>
+        <div class="form-group">
+            <label for="categorySelect">Select Category:</label>
+            <select name="categoryId" id="categorySelect" class="form-control" value="{{this._id}}">
+                {{#each categories}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
 
         <!-- Name of the Business -->
-        <p> Business Name: </p>
-        <input type="text" name="businessName" id="businessName" required>
+        <div class="form-group">
+            <label for="businessName">Business Name:</label>
+            <input type="text" class="form-control" name="businessName" id="businessName" required>
+        </div>
 
         <!-- Location Details -->
-        <p> Location: </p>
-        <input type="text" name="firstAddressLine" placeholder="First Address Line" id="firstAddressLine" required>
-        <input type="text" name="lastAddressLine" placeholder="Last Address Line" id="lastAddressLine">
-        <input type="text" name="country" placeholder="Country" id="country" required>
-        <input type="text" name="city" placeholder="City" id="city" required>
-        <input type="text" name="state" placeholder="State" id="state" required>
-        <input type="text" name="zip" placeholder="Zip Code" id="zip" required>
+        <div class="form-group">
+            <label for="firstAddressLine">First Address Line:</label>
+            <input type="text" class="form-control" name="firstAddressLine" id="firstAddressLine" placeholder="First Address Line" required>
+        </div>
 
-        <!-- Submit Button -->
-        <button type="submit">Create Business</button>
-        {{!-- <p id="error-message" class="error">Input can't be empty or just spaces</p>
-        <p class="error-message hidden"></p> --}}
+        <div class="form-group">
+            <input type="text" class="form-control" name="lastAddressLine" id="lastAddressLine" placeholder="Last Address Line">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="country" id="country" placeholder="Country" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="city" id="city" placeholder="City" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="state" id="state" placeholder="State" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="zip" id="zip" placeholder="Zip Code" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Business</button>
+
     </form>
-</main>
-<script src="/public/js/reviewValidation.js"></script>
+</div>
