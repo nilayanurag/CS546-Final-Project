@@ -1,44 +1,52 @@
-
-<main>  
-    <form action="/review/createReview" method="POST" name="reviewForm" id="reviewForm">
+<div class="container mt-4">
+    <form action="/review/createReview" method="POST" name="reviewForm" id="reviewForm" class="p-4 border rounded">
+        
         <!-- Categories Dropdown -->
-        <p> Select Category: </p>
+        <div class="form-group">
+            <label for="categorySelect">Select Category:</label>
+            <select name="categoryId" id="categorySelect" class="form-control" onchange="loadBusinesses()">
+                {{#each categories}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
 
-        <select name="categoryId" id="categorySelect" onchange="loadBusinesses()" value="{{this._id}}">
-            {{#each categories}}
-            <option value="{{this._id}}">{{this.name}}</option>
-            {{/each}}
-        </select>
-
-        <p> Select Business: </p>
         <!-- Businesses Dropdown -->
-        <select name="businessId" id="businessSelect">
-            <!-- Businesses will be loaded based on selected category -->
-        </select>
+        <div class="form-group">
+            <label for="businessSelect">Select Business:</label>
+            <select name="businessId" id="businessSelect" class="form-control">
+                <!-- Businesses will be loaded based on selected category -->
+            </select>
+        </div>
 
         <!-- Link to Add Business Page -->
-        <p>
-            Business not found? <a href="/business/createBusiness">Add one</a>
+        <p>Business not found? <a href="/business/createBusiness">Add one</a></p>
 
-        </p>
-        <p> Write your review: </p>
         <!-- Review Text -->
-        <textarea name="reviewText" placeholder="Write your review..." id="reviewText"></textarea>
-        <p>Select rating out of 5: </p>
-        <!-- Rating Dropdown -->
-        <select name="ratingPoints" id="ratingPoints">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
+        <div class="form-group">
+            <label for="reviewText">Write your review:</label>
+            <textarea name="reviewText" class="form-control" id="reviewText" placeholder="Write your review..."></textarea>
+        </div>
 
-        <p>Wanna upload the image? </p>
+        <!-- Rating Dropdown -->
+        <div class="form-group">
+            <label for="ratingPoints">Select rating out of 5:</label>
+            <select name="ratingPoints" id="ratingPoints" class="form-control">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+
         <!-- Image Upload -->
-        <input type="file" name="imagePath" id="imagePath">
-        <br>
-        <button type="submit">Submit Review</button>
+        <div class="form-group">
+            <label for="imagePath">Wanna upload the image?</label>
+            <input type="file" name="imagePath" id="imagePath" class="form-control-file">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Review</button>
     </form>
-</main>
-<script src="/public/js/reviewValidation.js"></script>
+</div>
+

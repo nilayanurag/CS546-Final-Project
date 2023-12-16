@@ -304,6 +304,17 @@ export const removeFollowing = async (userId, followingId) => {
 
 //TODO why are we not using the above function instead of creating unncessary bloat
 //Route has been linked to this function
+export const addFollowerByUserName = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  let addedFollower=await addFollower(mainUserId,followerUserId);
+  let addedFollowing=await addFollowing(followerUserId,mainUserId);
+  return addedFollower && addedFollowing;
+};
+
+
 export const addFollower = async (userId, followerId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));

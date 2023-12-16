@@ -139,3 +139,7 @@ footer {
     /* max-width: 1000px; */
     /* margin: auto;   */
 }
+
+.lower-column {
+    margin-top: 20px; /* Adjust the value as needed */
+}

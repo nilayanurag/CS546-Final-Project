@@ -1,0 +1,38 @@
+<!-- Review Page -->
+<div id="reviewPage" class="container mt-4">
+    <div class="card mb-3">
+        <div class="card-body">
+            Create Review
+            <h2 class="card-title">{{businessName}}: {{review.rating}}</h2>
+            <p class="card-subtitle mb-2 text-muted">Posted by: {{username}}</p>
+            <p class="card-text">{{review.reviewText}}</p>
+            {{#if review.image}}
+                <img src="{{review.image}}" alt="Review Image" class="img-fluid">
+            {{/if}}
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        {{#each commentData}}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{this.commentDescription}} <span class="text-muted">Posted by: {{this.username}}</span>
+                {{#if canDelete}}
+                    <form action="/comments/deleteComment/{{this._id}}" method="POST" class="ml-auto">
+                        <input type="hidden" name="reviewId" value="{{this.reviewId}}">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                {{/if}}
+            </li>
+        {{else}}
+            <li class="list-group-item">No recent comments.</li>
+        {{/each}}
+    </ul>
+
+    <form action="/comments/createComment" method="POST" class="mt-3">
+        <input type="hidden" name="reviewId" value="{{review._id}}" />
+        <div class="form-group">
+            <textarea class="form-control" name="commentDescription" placeholder="Add a comment..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    </form>
+</div>

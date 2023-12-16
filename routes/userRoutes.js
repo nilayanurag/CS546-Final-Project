@@ -318,6 +318,39 @@ usersRouter
   //   }
   // })
   usersRouter
+  .route("/addFollowerByUsername").post(async (req, res) => {
+
+    let taskInfo=req.body;
+    if (!taskInfo || Object.keys(taskInfo).length === 0) {
+      return res
+        .status(400)
+        .json({error: 'There are no fields in the request body'});
+      }
+    let username=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.userUsername,"username",1,25)
+    let followerUsername=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.adminUsername,"adminUsername",1,25)
+    
+    let errorCode=undefined
+
+    if (username[1]||followerUsername[1]){
+      errorCode=400
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
+
+    try {
+      let addedFollower=await userData.addFollowerByUserName(username[0],followerUsername[0])
+      // let addedFollowing=await userData.addFollowingByUserName(followerUsername[0],username[0])
+      if (addedFollower){//&&addedFollowing.modifiedCount){ 
+        return res.json({addedFollower})
+      }else{
+        return res.status(500).json({errorMessage:"Internal Server Error"})
+      }
+    }catch (error) {
+      return res.status(400).json({errorMessage:"Cannot add follower"})
+    }
+  }
+  );
+
+  usersRouter
   .route("/addFollower").post(async (req, res) => {
 
     let taskInfo=req.body;
@@ -673,6 +706,72 @@ usersRouter
         followingUsers: getUserHomeDetails.followingUsername,
         reviews: getUserHomeDetails.reviewsByFollowing,
         username: getUserHomeDetails.username,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  });
+
+  usersRouter.route("/getCreateReviewPage").get(async (req, res) => {
+    // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+    // if (userId[1]){
+    //   errorCode=400
+    //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+    // }
+    try {
+      // let existingUserId=undefined;
+      // if (req.session.user){
+      //   existingUserId=req.session.user.userId
+      // }
+      // try{
+      //   existingUserId=helper.checkObjectId(existingUserId)
+      // }
+      // catch(error){
+      //   return res.redirect("login")
+
+      // }
+      // let getUserHomeDetails = await userData.getHomePageDetails(existingUserId);
+      res.render("createReviewPage", {
+        layout: "main"
+        // followingUsers: getUserHomeDetails.followingUsername,
+        // reviews: getUserHomeDetails.reviewsByFollowing,
+        // username: getUserHomeDetails.username,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  });
+
+  usersRouter.route("/getUserProfilePage/:username").get(async (req, res) => {
+    // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+    // if (userId[1]){
+    //   errorCode=400
+    //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+    // }
+    const username= req.params.username;
+    
+    try {
+      let existingUserId=undefined;
+      if (req.session.user){
+        existingUserId=req.session.user.userId
+      }
+      try{
+        existingUserId=helper.checkObjectId(existingUserId)
+      }
+      catch(error){
+        return res.redirect("login")
+
+      }
+      let getUserHomeDetails = await userData.getHomePageDetails(existingUserId);
+      
+      res.render("userProfilePage", {
+        layout: "main",
+        targetUsername: username,
+        followingUsers: getUserHomeDetails.followingUsername,
+        reviews: getUserHomeDetails.reviewsByFollowing,
+        userProfileFull: getUserHomeDetails.username,
       });
     } catch (error) {
       console.log(error);

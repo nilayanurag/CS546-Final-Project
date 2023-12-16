@@ -43,16 +43,18 @@ $(document).ready(function() {
         var userName = $('#userSearchInput').val().trim();
 
         if (userName.length > 0) {
-            $.ajax({
-                url: `/getUserDetails/${encodeURI(userName)}`,
-                type: 'GET',
-                success: function(userObject) {
-                    updateUserProfileFull(userObject);
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
+            window.location.href = `/getUserProfilePage/${encodeURIComponent(userName)}`;
+            // $.ajax({
+            //     url: `/getUserPage?username=${encodeURIComponent(userName)}`,
+            //     type: 'GET',
+            //     success: function(response) {
+            //         window.location.href = `/getUserPage?username=${encodeURIComponent(userNameuserName)}`;
+            //         // updateUserProfileFull(userObject);
+            //     },
+            //     error: function(error) {
+            //         console.log(error);
+            //     }
+            // });
 
         }
         else{
@@ -60,40 +62,38 @@ $(document).ready(function() {
         }
     });
  
-    function formatLocation(location) {
-        if (!location) return 'Location not specified';
-        return `${location.firstLine || ''}, ${location.secondLine || ''}, ${location.city || ''}, ${location.state || ''}, ${location.zip || ''}, ${location.country || ''}`;
-    }
+    // function formatLocation(location) {
+    //     if (!location) return 'Location not specified';
+    //     return `${location.firstLine || ''}, ${location.secondLine || ''}, ${location.city || ''}, ${location.state || ''}, ${location.zip || ''}, ${location.country || ''}`;
+    // }
 
     
-    function updateUserProfileFull(user) {
-        var userProfileHtml = `
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="user-image-placeholder">
-                        ${user.imageUrl ? `<img src="${user.imageUrl}" alt="${user.firstName}'s image" class="img-fluid rounded-circle">` : ''}
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <h3>${user.username ? user.username : ''}</h3>
-                    <p>${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}</p>
-                    <p>Sex: ${user.sex ? user.sex : 'N/A'}</p>
-                    <p>Age: ${user.age ? user.age : 'N/A'}</p>
-                    <p>Contact: ${user.contactEmail ? user.contactEmail : 'N/A'}</p>
-                    <p>Location: ${user.location ? formatLocation(user.location) : 'N/A'}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
+    // function updateUserProfileFull(user) {
+    //     var userProfileHtml = `
+    //         <div class="row">
+    //             <div class="col-md-4">
+    //                 <div class="user-image-placeholder">
+    //                     ${user.imageUrl ? `<img src="${user.imageUrl}" alt="${user.firstName}'s image" class="img-fluid rounded-circle">` : ''}
+    //                 </div>
+    //             </div>
+    //             <div class="col-md-8">
+    //                 <h3>${user.username ? user.username : ''}</h3>
+    //                 <p>${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}</p>
+    //                 <p>Sex: ${user.sex ? user.sex : 'N/A'}</p>
+    //                 <p>Age: ${user.age ? user.age : 'N/A'}</p>
+    //                 <p>Contact: ${user.contactEmail ? user.contactEmail : 'N/A'}</p>
+    //                 <p>Location: ${user.location ? formatLocation(user.location) : 'N/A'}</p>
+    //             </div>
+    //         </div>
+    //         <div class="row">
+    //             <div class="col">
                     
-                </div>
-            </div>`;
-        $('.userProfileFull').html('');
-        $('.userProfileFull').html(userProfileHtml);
-    }
-    /**<button id="followUnfollowButton" class="btn btn-primary">
-    ${user.following && user.following.includes(username) ? 'Unfollow' : 'Follow'}
-    </button>***/
+    //             </div>
+    //         </div>`;
+    //     $('.userProfileFull').html('');
+    //     $('.userProfileFull').html(userProfileHtml);
+    // }
+    
 
     // $('.search-suggestions').on('click', '.dropdown-item', function() {
     //     $('#userSearchInput').val($(this).text());

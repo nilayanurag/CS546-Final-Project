@@ -1,40 +1,29 @@
-<header>
-    <div class="header-links">
-        <a href="/home" class="header-link">Home</a>
-        <a href="/updateProfile" class="header-link">Update Profile</a>
-        {{!-- <span>ReviewSphere</span> --}}
-        <a href="/review/createReview" class="header-link">Add Review</a>
-        <a href="/review/getMyReview/{{this._id}}" class="header-link"> My Reviews </a>
-        {{!-- <a href="/myReviews" class="header-link">My Reviews</a> --}}
-        <a href="/logout" class="header-link">Log Out</a>
-    </div>
-</header>
-<div id="userFeed">
+<div id="my-review" class="container mt-4">
     <h3>My Reviews</h3>
-    <ul>
-        {{#each reviews}}
-        <li>
-            <h2>
-                {{this.businessName}}:
-            </h2>
-            <h4>
-                Ratings: {{this.rating}}
-            </h4>
-            {{!-- <h3>{{this.username}}</h3> --}}
-            <p>{{this.description}}</p>
-            {{#if this.image}}
-            <img src="{{this.image}}" alt="Review Image">
-            {{/if}}
-            {{#each commentData}}
-        <li>
-            {{this.commentDescription}}, Posted by: {{this.username}}
-        </li>
-        {{else}}
-        <p>No recent comments.</p>
-        {{/each}}
-        </li>
-        {{else}}
+
+    {{#each reviews}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="h5">{{this.businessName}}:</h2>
+            </div>
+            <div class="card-body">
+                <h4 class="h6">Ratings: {{this.rating}}</h4>
+                <p>{{this.description}}</p>
+                {{#if this.image}}
+                    <img src="{{this.image}}" alt="Review Image" class="img-fluid">
+                {{/if}}
+            </div>
+            <ul class="list-group list-group-flush">
+                {{#each commentData}}
+                    <li class="list-group-item">
+                        {{this.commentDescription}}, Posted by: {{this.username}}
+                    </li>
+                {{else}}
+                    <li class="list-group-item">No recent comments.</li>
+                {{/each}}
+            </ul>
+        </div>
+    {{else}}
         <p>No recent reviews.</p>
-        {{/each}}
-    </ul>
+    {{/each}}
 </div>

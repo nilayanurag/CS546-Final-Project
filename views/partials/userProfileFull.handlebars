@@ -6,6 +6,9 @@
         </div>
         UserProfileFull Placeholder
         <div class="col-md-8">
+            {{#if targetUsername}}
+                <div id="targetUsername">{{targetUsername}}</div>
+            {{/if}}
             {{#if user}}
             <h3>{{user.username}}</h3>
       
