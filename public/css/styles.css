@@ -1,142 +1,93 @@
-/*Temp Style*/
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f4f4f4;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
-/* header {
-    background: linear-gradient(to right, #007bff, #ff1493); 
-    top: 0;
-    color: white; 
-    text-align: center;
-    padding: 10px 20px;
-    position: fixed;
-    width: 100%;
-    
-} */
+
 header {
-    background: linear-gradient(to right, #007bff, #ff1493); 
-    top: 0;
-    color: white; 
-    text-align: center;
-    padding: 10px 20px;
-    position: fixed;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-links {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.header-link {
-    color: white;
-    text-decoration: none;
-    padding: 5px 10px;
-    margin: 0 10px;
-}
-
-.header-link:hover {
-    text-decoration: underline;
-}
-
-
+    background: blueviolet;
+    background-color: blueviolet;
+    color:cadetblue;
+    
+} 
 footer {
-    background: linear-gradient(to right, #008080, #ffa500);
-    color: white; 
-    text-align: center;
-    padding: 10px 0; 
-    position: fixed;
+    
+    background: blueviolet;
     bottom: 0;
-    width: 100%;
+    margin-top: 50px;
+    position: fixed;
+    width:100%;
+}
+.userProfile {
+    text-align: right;
+}
+
+.searchBar {
+    text-align: left;
+}
+
+#searchTypeDropdown + .dropdown-menu {
+    left: 0;
+}
+
+.d-flex .form-check {
+    margin-right: 10px;
 }
 
 
-main {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-}
-
-/* Labels and Inputs */
-label {
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
-    width: 100%;
-    padding: 8px;
+#searchInput, #searchButton {
     margin-bottom: 10px;
+}
+
+
+@media (max-width: 768px) {
+    .d-flex .form-check {
+        flex-basis: 100%;
+        margin-bottom: 5px;
+    }
+}
+
+.user-profile {
+    padding: 10px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 5px;
+    max-width: 300px;
 }
 
-/* Error Message Styling */
-/* .errorMessage {
-    color: red;
-    font-size: 0.8rem;
-    margin-bottom: 10px;
-} */
-
-.error-message {
-    color: red;
-    text-align: center;
-    display: none; /* Hidden by default */
+.user-image-placeholder {
+    /* Styles for the image placeholder */
+    width: 50px;
+    height: 50px;
+    background-color: #f0f0f0; /* Light grey background */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px; /* Adjust as needed */
 }
 
-.error {
-    color: red;
-    margin: 10px 0;
-    font-weight: bold;
-    display: none;
+.user-info {
+    font-size: 0.9rem;
 }
 
-/* Button Styling */
-button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
+.search-suggestions {
+    position: absolute;
+    width: 100%;
+    z-index: 1000; /* Ensure it's above other content */
+    display: none; /* Initially hidden */
+}
+
+.search-suggestions .dropdown-item {
     cursor: pointer;
-    margin-top: 10px;
+    padding: 5px 10px;
 }
 
-button:hover {
-    background: #0056b3;
+/* Show suggestions when there are items */
+#userSearchInput:not(:empty) ~ .search-suggestions {
+    display: block;
 }
 
-/* Link Styling */
-p a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-p a:hover {
-    text-decoration: underline;
+.userProfileFull .user-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    /* Other styling as needed */
 }
 
 #contentContainer {
@@ -187,4 +138,8 @@ p a:hover {
     width: 300px; /* or any width you prefer */
     /* max-width: 1000px; */
     /* margin: auto;   */
+}
+
+.lower-column {
+    margin-top: 20px; /* Adjust the value as needed */
 }

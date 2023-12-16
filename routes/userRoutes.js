@@ -92,12 +92,12 @@ usersRouter
 
     try {
       let loginInfo=await userData.loginUser(contactEmailVal[0],passwordVal[0])
-      if (loginInfo.firstName){
-        req.session.user= {firstName: loginInfo.firstName,
-           lastName: loginInfo.lastName, emailAddress: loginInfo.emailAddress, userId: loginInfo.userId}
+      if (loginInfo.firstName){//TODO: Hey dont return password here
+        let userDetail=await userData.getUserByEmailAddress(loginInfo.contactEmail)
+        req.session.user= {firstName: loginInfo.firstName, contactEmail: loginInfo.contactEmail,userId:userDetail._id}
            //https://stackoverflow.com/questions/52083218/i-want-to-redirect-to-different-pages-based-on-some-condition
-           console.log("passed login")
-           return res.redirect("/home")
+           res.cookie('username',userDetail.username,{maxAge: 3600000})
+           return res.redirect("home")
        
       }else{
         return res.statusMessage(500).render("error",{errorMessage:"Internal Server Error"})
@@ -137,33 +137,35 @@ usersRouter
         .json({errorMessage:"User Not Found"})
       }
     });
+    //comment updateUser vs updateProfile
     usersRouter
-    .route('/updateProfile')
+    .route('/updateUser')
     .get(async (req, res) => {
+      let userId;
       try {
-        helper.checkObjectId(req.session.user.userId)
+        userId=helper.checkObjectId(req.session.user.userId)
       } catch (error) {
         return res.status(400)
         .render("error",{errorMessage:"User Not Found"})
       }
       let getUserInfo;
       try {
-        getUserInfo=await userData.getUserById(req.session.user.userId)
+        getUserInfo=await userData.getUserById(userId)
       }
       catch (error) {
         return res.status(400)
         .render("error",{errorMessage:"User Not Found"})
       }
       let dataToRender={ 
-        username:getUserInfo.username,
-        firstName:getUserInfo.firstName,
-        lastName:getUserInfo.lastName,
-        sex:getUserInfo.sex,
-        age:getUserInfo.age,
-        contactEmail:getUserInfo.contactEmail,
-        location:getUserInfo.location
+        usernameDef:getUserInfo.username,
+        firstNameDef:getUserInfo.firstName,
+        lastNameDef:getUserInfo.lastName,
+        sexDef:getUserInfo.sex,
+        ageDef:getUserInfo.age,
+        contactEmailDef:getUserInfo.contactEmail,
+        locationDef:getUserInfo.location
       }
-      return res.render("updateProfile",dataToRender)
+      return res.render("updateUser",dataToRender)
   
     })
     .post(async (req, res) => {
@@ -174,18 +176,59 @@ usersRouter
           .json({error: 'There are no fields in the request body'
         });
       }  
-      try {
-        console.log(req.session.user.userId, userInfo.usernameInput, userInfo.firstNameInput, userInfo.lastNameInput, userInfo.sexInput, userInfo.ageInput, userInfo.contactEmailInput, userInfo.locationInput)
+      if (!req.session.user){
+        return res.status(400).render("error",{errorMessage:"User Not Found"})
+      }
 
-        let updatedInfo=await userData.updateUser(req.session.user.userId,userInfo.usernameInput,userInfo.firstNameInput,userInfo.lastNameInput,userInfo.sexInput,userInfo.ageInput,userInfo.contactEmailInput,userInfo.locationInput)
+
+
+      let userId=req.session.user.userId
+      let username = await routeHelper.routeValidationHelper(helper.checkString,userInfo.usernameInput,"username",1,25)
+      let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
+      let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
+      let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,userInfo.sexInput,"sex")
+      let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,userInfo.contactEmailInput)
+      let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,userInfo.ageInput,12,105)
+      let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
+      let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,userInfo.passwordInput,userInfo.confirmPasswordInput)
+      let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,userInfo.locationInput)
+
+      let errorCode=undefined
+      
+      let dataToRender={
+        usernameDef:username[0],
+        usernameErr:username[1],
+        firstNameDef:firstNameVal[0],
+        firstNameErr:firstNameVal[1],
+        lastNameDef:lastNameVal[0],
+        lastNameErr:lastNameVal[1],
+        sexDef:sexVal[0],
+        sexErr:sexVal[1],
+        ageDef:ageVal[0],
+        ageErr:ageVal[1],
+        contactEmailDef:contactEmailVal[0],
+        contactEmailErr:contactEmailVal[1],
+        passwordErr:passwordVal[1],
+        confirmedPasswordErr:confirmedPasswordVal[1],
+        locationDef:locationVal[0],
+        locationErr:locationVal[1],
+      };
+      if (username[1]||firstNameVal[1]||lastNameVal[1]||sexVal[1]||ageVal[1]||contactEmailVal[1]
+        ||passwordVal[1]||confirmedPasswordVal[1]||locationVal[1]){
+        errorCode=400
+        return res.status(400).render("updateUser",dataToRender)
+      }
+
+      try {
+        let updatedInfo=await userData.updateUser(userId,username[0],firstNameVal[0],lastNameVal[0],sexVal[0],
+          ageVal[0],contactEmailVal[0],passwordVal[0],locationVal[0])
         if (updatedInfo){
-          return res.redirect("/home");
+          return res.redirect("home")
         }else{
           return res.status(500).render("error",{errorMessage:"Internal Server Error"})
         }
       }catch (error) {
-        // return res.status(400).render("updateUser",dataToRender)
-        throw error
+        return res.status(400).render("updateUser",dataToRender)
       } 
     }
   );
@@ -196,84 +239,117 @@ usersRouter
     let getAllUsersInfo=await userData.getAllUsers()
     return res.json(getAllUsersInfo)
   })
+    
+  // usersRouter
+  // .route("/getByUserName/:username")
+  // .get(async (req, res) => {
+  //   let username=await routeHelper.routeValidationHelper(helper.checkString,req.params.username,"username",1,25)
+  //   if (username[1]){
+  //     return res.status(400)
+  //     .json({errorMessage:"Invalid Username"})
+  //   }else{
+  //     try {
+  //       let getUserInfo=await userData.getUserByUsername(username[0])[0]
+  //       return res.json(getUserInfo)
+  //     } catch (error) {
+  //       return res.status(400)
+  //       .json({errorMessage:"User Not Found"})
+  //     }
+  //   }
+  // })
 
-  usersRouter
-  .route("/getByUserName/:username")
-  .get(async (req, res) => {
-    let username=await routeHelper.routeValidationHelper(helper.checkString,req.params.username,"username",1,25)
-    if (username[1]){
-      return res.status(400)
-      .json({errorMessage:"Invalid Username"})
-    }else{
-      try {
-        let getUserInfo=await userData.getUserByUserName(username[0])
-        return res.json(getUserInfo)
-      } catch (error) {
-        return res.status(400)
-        .json({errorMessage:"User Not Found"})
-      }
-    }
-  })
+  // usersRouter
+  // .route("/addFollowing").post(async (req, res) => {
+  //   let taskInfo=req.body;
+  //   if (!taskInfo || Object.keys(taskInfo).length === 0) {
+  //     return res
+  //       .status(400)
+  //       .json({error: 'There are no fields in the request body'});
+  //   }
+  //   let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+  //   let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
 
+  //   let errorCode=undefined
+    
+  //   if (userId[1]||followingId[1]){
+  //     errorCode=400
+  //     return res.status(400).json({errorMessage:"Invalid ObjectId"})
+  //   }
+
+  //   try {
+  //     let addedFollowing=await userData.addFollowing(userId[0],followingId[0])
+  //     if (addedFollowing.modifiedCount){
+  //       return res.json({addedFollowing})
+  //     }else{
+  //       return res.status(500).json({errorMessage:"Internal Server Error"})
+  //     }
+  //   }catch (error) {
+  //     return res.status(400).json({errorMessage:"Cannot add following"})
+  //   }
+  // })
+
+  // usersRouter
+  // .route("/removeFollowing").post(async (req, res) => {
+  //   let taskInfo=req.body;
+  //   if (!taskInfo || Object.keys(taskInfo).length === 0) {
+  //     return res
+  //       .status(400)
+  //       .json({error: 'There are no fields in the request body'});
+  //   }
+  //   let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+  //   let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
+
+  //   let errorCode=undefined
+    
+  //   if (userId[1]||followingId[1]){
+  //     errorCode=400
+  //     return res.status(400).json({errorMessage:"Invalid ObjectId"})
+  //   }
+
+  //   try {
+  //     let removeFollowing=await userData.removeFollowing(userId[0],followingId[0])
+  //     if (removeFollowing.modifiedCount){
+  //       return res.json({removeFollowing})
+  //     }else{
+  //       return res.status(500).json({errorMessage:"Internal Server Error"})
+  //     }
+  //   }catch (error) {
+  //     return res.status(400).json({errorMessage:"Cannot remove following"})
+  //   }
+  // })
   usersRouter
-  .route("/addFollowing").post(async (req, res) => {
+  .route("/addFollowerByUsername").post(async (req, res) => {
+
     let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
         .json({error: 'There are no fields in the request body'});
-    }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
-
-    let errorCode=undefined
+      }
+    let username=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.userUsername,"username",1,25)
+    let followerUsername=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.adminUsername,"adminUsername",1,25)
     
-    if (userId[1]||followingId[1]){
+    let errorCode=undefined
+
+    if (username[1]||followerUsername[1]){
       errorCode=400
-      return res.status(400).json({errorMessage:"Invalid ObjectId"})
+      return res.status(400).json({errorMessage:"Invalid Username"})
     }
 
     try {
-      let addedFollowing=await userData.addFollowing(userId[0],followingId[0])
-      if (addedFollowing.modifiedCount){
-        return res.json({addedFollowing})
+      let addedFollower=await userData.addFollowerByUserName(username[0],followerUsername[0])
+      // let addedFollowing=await userData.addFollowingByUserName(followerUsername[0],username[0])
+      if (addedFollower){//&&addedFollowing.modifiedCount){ 
+        return res.json({addedFollower})
       }else{
         return res.status(500).json({errorMessage:"Internal Server Error"})
       }
     }catch (error) {
-      return res.status(400).json({errorMessage:"Cannot add following"})
+      return res.status(400).json({errorMessage:"Cannot add follower"})
     }
-  })
+  }
+  );
 
-  usersRouter
-  .route("/removeFollowing").post(async (req, res) => {
-    let taskInfo=req.body;
-    if (!taskInfo || Object.keys(taskInfo).length === 0) {
-      return res
-        .status(400)
-        .json({error: 'There are no fields in the request body'});
-    }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let followingId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followingIdInput)
-
-    let errorCode=undefined
-    
-    if (userId[1]||followingId[1]){
-      errorCode=400
-      return res.status(400).json({errorMessage:"Invalid ObjectId"})
-    }
-
-    try {
-      let removeFollowing=await userData.removeFollowing(userId[0],followingId[0])
-      if (removeFollowing.modifiedCount){
-        return res.json({removeFollowing})
-      }else{
-        return res.status(500).json({errorMessage:"Internal Server Error"})
-      }
-    }catch (error) {
-      return res.status(400).json({errorMessage:"Cannot remove following"})
-    }
-  })
   usersRouter
   .route("/addFollower").post(async (req, res) => {
 
@@ -295,7 +371,8 @@ usersRouter
     
     try {
       let addedFollower=await userData.addFollower(userId[0],followerId[0])
-      if (addedFollower.modifiedCount){
+      let addedFollowing=await userData.addFollowing(followerId[0],userId[0])
+      if (addedFollower.modifiedCount && addedFollowing.modifiedCount){
         return res.json({addedFollower})
       }else{
         return res.status(500).json({errorMessage:"Internal Server Error"})
@@ -513,44 +590,200 @@ usersRouter
         return res.status(400).json({errorMessage:"Cannot delete comment"})
       }
     })
-
-    const dummyFollowingUsers = [
-      { name: "Alice" },
-      { name: "Bob" },
-      { name: "Charlie" },
-    ];
-    
-    const dummyReviews = [
-      {
-        businessName: "Cafe Delight",
-        description: "Great coffee and pastries.",
-        image: "./public/images/testImage.png",
-      },
-      {
-        businessName: "Tech Gadgets",
-        description: "Found the latest tech gadgets here.",
-        image: "",
-      },
-    ];
-    
-    usersRouter.route("/home").get(async (req, res) => {
-      // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-      // if (userId[1]){
-      //   errorCode=400
-      //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
-      // }
-      try {
-        
-        let getUserHomeDetails = await userData.getHomePageDetails(req.session.user.userId);
-        res.render("home", {
-          layout: "main",
-          followingUsers: getUserHomeDetails.followingUsername,
-          reviews: getUserHomeDetails.reviewsByFollowing,
-        });
-      } catch (error) {
-        console.log(error);
-        res.status(500).send("Server Error");
-      }
+    usersRouter
+    .route("/getUsersByPrefix")
+    .get(async (req, res) => {
+        let userNamePrefix = req.query.prefix;
+        let errorCode=undefined;
+        let prefix=await routeHelper.routeValidationHelper(helper.checkString,userNamePrefix, "Prefix", 1, 50);
+        if (prefix[1]){
+            errorCode=400;
+            return res.status(errorCode).json({errorMessage: "Bad Request"});  
+        }
+        try {
+            let userList = await userData.getAllUserWithPrefix(prefix[0]);
+            if (userList.length>0){
+                return res.json(userList);
+            }else{
+                errorCode=404;
+                return res.status(errorCode).json({errorMessage: "Not Found"});  
+            }
+        } catch (error) {
+            errorCode=500;
+            return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+            
+        }
     });
+
+    usersRouter
+    .route("/getUserDetails/:username")
+    .get(async (req, res) => {
+      let username = req.params.username;
+      let errorCode=undefined;
+      username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
+      if (username[1]){
+          errorCode=400;
+          return res.status(errorCode).json({errorMessage: "Bad Request"});  
+      }
+      try {
+          let user = await userData.getUserByUsername(username[0]);
+          if (user[0]){
+              return res.json(user[0]);
+          }else{
+              errorCode=404;
+              return res.status(errorCode).json({errorMessage: "Not Found"});  
+          }
+      } catch (error) {
+          errorCode=500;
+          return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+          
+      }
+  }
+  );
+
+  usersRouter
+    .route("/renderUserDetails/:username")
+    .get(async (req, res) => {
+      let username = req.params.username;
+      let errorCode=undefined;
+      username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
+      if (username[1]){
+          errorCode=400;
+          return res.status(errorCode).json({errorMessage: "Bad Request"});  
+      }
+      try {
+          let user = await userData.getUserByUsername(username[0]);
+          if (user[0]){
+              return res.render("partials/userDetail",{user:user[0],adminUser:req.session.user});
+          }else{
+              errorCode=404;
+              return res.status(errorCode).json({errorMessage: "Not Found"});  
+          }
+      } catch (error) {
+          errorCode=500;
+          return res.status(errorCode).json({errorMessage: "Internal Server Error"});  
+          
+      }
+  }
+  );
+
+
+
+
+  usersRouter
+.route('/admin').get(async (req, res) => {
+    //code here for GET
+    let dataToRender={
+      firstName:req.session.user.firstName,
+      lastName:req.session.user.lastName,
+      currentTime:new Date().toLocaleTimeString(),
+      role:req.session.user.role
+    }
+    res.render("admin",dataToRender)
+  });
+
+  usersRouter.route("/home").get(async (req, res) => {
+    // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+    // if (userId[1]){
+    //   errorCode=400
+    //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+    // }
+    try {
+      let existingUserId=undefined;
+      if (req.session.user){
+        existingUserId=req.session.user.userId
+      }
+      try{
+        existingUserId=helper.checkObjectId(existingUserId)
+      }
+      catch(error){
+        return res.redirect("login")
+
+      }
+      let getUserHomeDetails = await userData.getHomePageDetails(existingUserId);
+      res.render("home", {
+        layout: "main",
+        followingUsers: getUserHomeDetails.followingUsername,
+        reviews: getUserHomeDetails.reviewsByFollowing,
+        username: getUserHomeDetails.username,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  });
+
+  usersRouter.route("/getCreateReviewPage").get(async (req, res) => {
+    // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+    // if (userId[1]){
+    //   errorCode=400
+    //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+    // }
+    try {
+      // let existingUserId=undefined;
+      // if (req.session.user){
+      //   existingUserId=req.session.user.userId
+      // }
+      // try{
+      //   existingUserId=helper.checkObjectId(existingUserId)
+      // }
+      // catch(error){
+      //   return res.redirect("login")
+
+      // }
+      // let getUserHomeDetails = await userData.getHomePageDetails(existingUserId);
+      res.render("createReviewPage", {
+        layout: "main"
+        // followingUsers: getUserHomeDetails.followingUsername,
+        // reviews: getUserHomeDetails.reviewsByFollowing,
+        // username: getUserHomeDetails.username,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  });
+
+  usersRouter.route("/getUserProfilePage/:username").get(async (req, res) => {
+    // let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
+    // if (userId[1]){
+    //   errorCode=400
+    //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
+    // }
+    const username= req.params.username;
+    
+    try {
+      let existingUserId=undefined;
+      if (req.session.user){
+        existingUserId=req.session.user.userId
+      }
+      try{
+        existingUserId=helper.checkObjectId(existingUserId)
+      }
+      catch(error){
+        return res.redirect("login")
+
+      }
+      let getUserHomeDetails = await userData.getHomePageDetails(existingUserId);
+      
+      res.render("userProfilePage", {
+        layout: "main",
+        targetUsername: username,
+        followingUsers: getUserHomeDetails.followingUsername,
+        reviews: getUserHomeDetails.reviewsByFollowing,
+        userProfileFull: getUserHomeDetails.username,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  });
+
+  usersRouter.route('/logout').get(async (req, res) => {
+    req.session.destroy(); 
+    res.clearCookie("AuthState");
+    res.render("login");
+  
+  });
 
 export default usersRouter;

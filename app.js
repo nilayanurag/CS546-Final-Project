@@ -38,6 +38,34 @@ app.use(
   );
 
 
+  app.get('/', (req, res) => {
+    let user;
+    if (req.session.user) {
+    user= req.session.user
+    }else{
+    user={}
+    user.firstName="Guest"
+    }
+    const data = {
+      user: user,
+      items: ['Item 1', 'Item 2', 'Item 3'] ,
+      reviews:["review1","review2","review3"]
+
+    };
+    res.render('home',{data});
+  });
+
+  app.get('/refresh-content', (req, res) => {
+    const data = {
+      items: ['Item 1', 'Item 2', 'Item 3'] // Sample data
+    };
+    res.render('partials/followingList', data, (err, html) => {
+      res.send(html);
+    });
+    // res.render('followingList', data);
+  });
+
+
 
 configRoutes(app);
 

@@ -1,14 +1,9 @@
 import * as helper from "../helpers/validation.js";
-import {
-  users,
-  reviews,
-  comments,
-  businesses,
-} from "../config/mongoCollections.js";
+import { users, reviews, comments, businesses } from "../config/mongoCollections.js";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 const saltRounds = 10;
-import * as reviewFunctions from "./review.js";
+//import * as reviewFunctions from "./review.js";
 
 /*
 Refernce Schema:
@@ -145,9 +140,9 @@ export const updateUser = async (
   sex,
   age,
   contactEmail,
+  password,
   location
 ) => {
-  try {
     userId = new ObjectId(helper.checkObjectId(userId));
     username = helper.checkString(username, "username", 1, 25);
     firstName = helper.checkString(firstName, "firstName", 1, 25);
@@ -155,13 +150,16 @@ export const updateUser = async (
     sex = helper.checkSex(sex);
     contactEmail = helper.checkValidEmail(contactEmail);
     age = helper.checkAge(age, 12, 105);
-    // password = helper.checkPass(password);
+    password = helper.checkPass(password);
     location = helper.checkAddress(location);
-    // const hash = await bcrypt.hash(password, saltRounds);
+    const hash = await bcrypt.hash(password, saltRounds);
+
     const userCollection = await users();
+
     let userData = await userCollection
       .find(
-        { _id: userId }
+        { _id: userId },
+        { projection: { following: 1, followers: 1, tags: 1 } }
       )
       .toArray();
     if (userData.following === undefined) userData.following = [];
@@ -176,14 +174,15 @@ export const updateUser = async (
       sex: sex,
       age: age,
       contactEmail: contactEmail,
-      password: userData[0].password,
-      following: userData[0].following,
-      followers: userData[0].followers,
-      tags: userData[0].tags,
+      password: hash,
+      following: userData.following,
+      followers: userData.followers,
+      tags: userData.tags,
       location: location,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
     const updatedUser = await userCollection.findOneAndUpdate(
       { _id: userId },
       { $set: dataPacket },
@@ -193,8 +192,7 @@ export const updateUser = async (
     if (!updatedUser || updatedUser === undefined) {
       throw "could not update event successfully";
     }
-    return updateUser;
-  } catch (error) {}
+    return updatedUser;
 };
 
 // MOST IMP: If you are deleting a user, make sure to FIRST delete all the reviews, comments, and tags associated with it
@@ -306,6 +304,17 @@ export const removeFollowing = async (userId, followingId) => {
 
 //TODO why are we not using the above function instead of creating unncessary bloat
 //Route has been linked to this function
+export const addFollowerByUserName = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  let addedFollower=await addFollower(mainUserId,followerUserId);
+  let addedFollowing=await addFollowing(followerUserId,mainUserId);
+  return addedFollower && addedFollowing;
+};
+
+
 export const addFollower = async (userId, followerId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -493,6 +502,17 @@ export const getUserByUsername = async (username) => {
   }
 };
 
+export const getUserByEmailAddress = async (contactEmail) => {
+  try {
+    contactEmail = helper.checkValidEmail(contactEmail);
+    const userCollection = await users();
+    const user = await userCollection.findOne({ contactEmail: contactEmail });
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Route has been linked to this function
 export const getAllUsers = async () => {
   try {
@@ -504,12 +524,26 @@ export const getAllUsers = async () => {
   }
 };
 
+//Route linked to this function
+export const getAllUserWithPrefix = async(prefix) =>{
+  try {
+      prefix = helper.checkString(prefix, "prefix", 1, 50);
+      const userCollection = await users();
+      // name: { $regex: `^${prefix}`, $options: 'i' }  To search for prefix only
+      const userList = await userCollection.find({username: { $regex: prefix, $options: 'i' }}).toArray(); // This to search for prefix anywhere in the string
+      return userList;
+      
+  } catch (error) {
+      throw error;
+  }
+}
+
 export const getHomePageDetails = async (userId) => {
   userId = helper.checkObjectId(userId);
-  const userCollection = await users();
   const businessCollection = await businesses();
   const reviewCollection = await reviews();
   let followingUserIds = await getUserById(userId);
+  const username = followingUserIds.username;
 
   followingUserIds = followingUserIds.following;
   if (followingUserIds.length === 0) {
@@ -569,5 +603,6 @@ export const getHomePageDetails = async (userId) => {
   return {
     reviewsByFollowing: reviewsByFollowing,
     followingUsername: followingUsername,
+    username: username,
   };
 };

@@ -1,7 +1,12 @@
-<!-- User Feed -->
-<div id="userFeed">
-    <h3>Recent Reviews</h3>
-    <ul>
+{{!-- <div id="feed-handle-bar" class="class-handlebars">
+  <h3>Feed</h3>
+    <div class="feed-list">
+        {{!-- <ul>
+        {{#each data.reviews}}
+            <li>{{this}}</li>
+        {{/each}}
+        </ul> --}}
+        {{!-- <ul>
         {{#each reviews}}
         <li>
             <a href="/review/getReview/{{this._id}}">
@@ -20,4 +25,10 @@
         <p>No recent reviews.</p>
         {{/each}}
     </ul>
+  </div>
+ --}} 
+
+<div id="reviewsFeed" class="mt-4">
+  <h3>Feed</h3>
+    <!-- Reviews will be dynamically loaded here -->
 </div>

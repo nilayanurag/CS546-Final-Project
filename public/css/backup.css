@@ -1,0 +1,245 @@
+/* Temp Style
+body {
+    font-family: Arial, sans-serif;
+    margin: auto;
+    padding: 0;
+    background: #f4f4f4;
+
+    flex-direction: column;
+ 
+    min-height: 100vh;
+
+}
+header {
+    background: linear-gradient(to right, #007bff, #ff1493); 
+    top: 0;
+    color: white; 
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    width: 100%;
+    
+}
+
+footer {
+    background: linear-gradient(to right, #008080, #ffa500);
+    bottom: 0;
+    left: 0;
+    color: white;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    width:100%;
+  
+  
+  
+}
+
+
+main {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width:300px;
+    margin-top: 100px;
+    margin-left: 200px;
+
+}
+.register{
+    margin-bottom: 70px;
+    width: 400px;
+    margin-top: 10px;
+}
+#registerLink{
+    margin-left: 200px;
+}
+.business-search-bar{
+    font-family: "Poppins";
+    font-size: 14px;
+ 
+
+  
+    padding: 3px 12px 3px 12px;
+
+    outline-width: 0px;
+
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}
+.search-bar{
+    margin-left: 725px;
+    width: 200px;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+   
+}
+
+/* Labels and Inputs */
+label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.feed{
+    text-align: center;
+    
+}
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 90%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-left: 10px;
+
+}
+
+/* Error Message Styling */
+.errorMessage {
+    color: red;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+}
+
+/* Button Styling */
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Link Styling */
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+.handlebars-container {
+    display: grid;
+    grid-template-columns: 30% 40% 30%; /* 3 columns */
+    gap: 10px; /* Space between grid items */
+    padding-top: 60px; /* Adjust as needed to avoid overlapping with the header */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+
+
+}
+
+#user-profile-handle-bar,
+#feed-handle-bar,
+#following-list-handle-bar {
+
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+
+}
+
+#user-profile-handle-bar {
+    grid-column: 1;
+  
+
+}
+
+#feed-handle-bar {
+    grid-column: 2;
+  width: 430px;
+  margin-left: 250px;
+  margin-top: 100px;
+ text-align: center;
+
+
+  
+}
+
+
+#following-list-handle-bar {
+    grid-column: 3;
+    margin-top: -50px;
+    margin-right:100px;
+    float: left;
+    margin-left: 0px;
+    padding: 20px 20px;
+    width: 200px;
+    
+}
+.search-dropdown {
+    display: none; /* Initially hidden */
+    position: absolute; /* Positioned relative to the search container */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 80%; /* Same width as the input field */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    background-color: white;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f0f0f0;
+  }
+  .user-profile{
+   float:right;
+    width: 200px;
+    height:auto;
+ padding-right: 20px;
+    /* margin-left: 750px; */
+
+  }
+  #login-screen{
+    margin-top:0px;
+    margin-left: 0px;  
+
+  }
+  #edit-profile{
+    margin-top: -35px;
+    margin-left: 80px;
+
+  }
+  #user-search{
+    width: 90%;
+  }
+  .following-list{
+   width:150px;
+
+ 
+  }
+a{
+  color: white;
+text-decoration: underline #007bff ;
+
+}
+ a:hover{
+    text-decoration: underline #0056b3;
+}
+.refreshbutton:hover{
+    text-decoration: underline #0056b3;
+}
+.refreshbutton{
+    text-align: center;
+    align-self: flex-end;
+    
+} 

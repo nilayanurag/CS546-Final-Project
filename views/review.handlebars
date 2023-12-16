@@ -1,16 +1,5 @@
 <!-- Review Page -->
-<header>
-    <div class="header-links">
-        <a href="/home" class="header-link">Home</a>
-        <a href="/updateProfile" class="header-link">Update Profile</a>
-        {{!-- <span>ReviewSphere</span> --}}
-        <a href="/review/createReview" class="header-link">Add Review</a>
-        <a href="/review/getMyReview/{{this._id}}" class="header-link"> My Reviews </a>
-        {{!-- <a href="/myReviews" class="header-link">My Reviews</a> --}}
-        <a href="/logout" class="header-link">Log Out</a>
-    </div>
-</header>
-<div id="reviewPage">
+{{!-- <div id="reviewPage">
     <h2>{{businessName}}: {{review.rating}}</h2>
     <p>Posted by: {{username}}</p>
     <div id="reviewDescription">
@@ -19,14 +8,14 @@
         <img src="{{review.image}}" alt="Review Image">
         {{/if}}
         {{#each commentData}}
-        <li> {{this.commentDescription}}, Posted by: {{this.username}}
+        <li> {{this.commentDescription}}, Posted by: {{this.username}} --}}
             {{!-- {{#if (equals this.userId loggedInUserId)}}
             <form action="/comments/deleteComment" method="POST">
                 <input type="hidden" name="commentId" value="{{this._id}}">
                 <button type="submit">Delete</button>
             </form>
             {{/if}} --}}
-            {{#if canDelete}}
+            {{!-- {{#if canDelete}}
             <form action="/comments/deleteComment/{{this._id}}" method="POST">
                 <input type="hidden" name="reviewId" value="{{this.reviewId}}">
                 <button type="submit">Delete</button>
@@ -43,5 +32,41 @@
         <input type="hidden" name="reviewId" value="{{review._id}}" />
         <textarea name="commentDescription" placeholder="Add a comment..."></textarea>
         <button type="submit">Post Comment</button>
+    </form>
+</div> --}}
+
+
+<!-- Review Page -->
+<div id="reviewPage" class="container mt-4">
+    <h2 class="text-primary">{{businessName}}: {{review.rating}}</h2>
+    <p class="font-italic">Posted by: {{username}}</p>
+    <div id="reviewDescription" class="border rounded p-3 bg-light">
+        <p>{{review.reviewText}}</p>
+        {{#if review.image}}
+        <img src="{{review.image}}" alt="Review Image" class="img-fluid">
+        {{/if}}
+        <ul class="list-unstyled mt-3">
+            {{#each commentData}}
+            <li class="border-bottom pb-2 mb-2">
+                {{this.commentDescription}}, Posted by: {{this.username}}
+                {{#if canDelete}}
+                <form action="/comments/deleteComment/{{this._id}}" method="POST" class="d-inline-block ml-2">
+                    <input type="hidden" name="reviewId" value="{{this.reviewId}}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+                {{/if}}
+            </li>
+            {{else}}
+            <p>No recent comments.</p>
+            {{/each}}
+        </ul>
+    </div>
+    <br>
+    <form action="/comments/createComment" method="POST" class="mt-3">
+        <input type="hidden" name="reviewId" value="{{review._id}}" />
+        <div class="form-group">
+            <textarea name="commentDescription" class="form-control" placeholder="Add a comment..." rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
     </form>
 </div>

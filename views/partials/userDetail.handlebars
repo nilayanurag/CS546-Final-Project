@@ -1,0 +1,10 @@
+<div id="user-details-handle-bar" class="class-handlebars">
+  <h1>Non-User Profile</h1>
+  <div class="user-info">
+    <p>Name: {{user.firstName}}</p>
+    <p>UserName: {{user.username}}</p>
+  </div>
+  <form action="/addFollowing" admin-user-id ="{{adminUser.userId}}" data-user-id="{{user.userId}}" method="post">
+  <button type="submit" id="add-following-button">Follow User</button>
+   </form>
+</div>
