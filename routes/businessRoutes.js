@@ -15,7 +15,7 @@ businessRouter
 })
 .post(async (req, res) => {
     console.log(req.body);
-    let businessInfo = xss(req.body);
+    let businessInfo = req.body;
     let businessNameVal= await routeHelper.routeValidationHelper(helper.checkString,businessInfo.businessName, "Business Name", 1, 100);
     var location = {
         firstLine: businessInfo.firstAddressLine,

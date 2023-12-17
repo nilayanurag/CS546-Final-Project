@@ -18,21 +18,24 @@ $(document).ready(function() {
         return username;
     }
     
-    
+    function populateUserFollowingList(username){
 
-    $.ajax({
-        url: '/getAllUsers',
-        type: 'GET',
-        success: function(followingUsers) {
-            followingUsers.forEach(function(user) {
-                $('.following-list .list-group').append('<li class="list-group-item">' + user.firstName +" "+user.lastName+ '</li>');
-            });
-        },
-        error: function(error) {
-            // Handle error
-            console.error(error);
-        }
-    });
+        $.ajax({
+            url: `/getFollowing/${username}`,
+            type: 'GET',
+            success: function(followingUsers) {
+                followingUsers.forEach(function(user) {
+                    $('.following-list .list-group').append('<li class="list-group-item">' + user.firstName +" "+user.lastName+ '</li>');
+                });
+            },
+            error: function(error) {
+                // Handle error
+                console.error(error);
+            }
+        });
+    }
+
+    
 
     $("#search-button").click(function(event) {
         event.preventDefault();
@@ -168,9 +171,9 @@ $(document).ready(function() {
     }
     
 
-    function fetchReviews() {
+    function fetchReviews(username) {
         $.ajax({
-            url: '/getAllReviews', // Your API endpoint
+            url: `/review/getFeed/${username}`, // Your API endpoint
             type: 'GET',
             success: function(reviews) {
                 reviews.forEach(function(review) {
@@ -185,43 +188,80 @@ $(document).ready(function() {
     }
     
 
+    // function createReviewHtml(review) {
+    //     return `
+    //         <div class="review-item mb-3">
+    //             <div class="card">
+    //                 <div class="card-body">
+    //                     <a href="/review/getReview/${review._id}">
+    //                     <h5 class="card-title">${review.name}</h5>
+    //                     <p class="card-text">${review.reviewText}</p>
+    //                     <p class="card-text"><strong>Rating:</strong> ${review.rating}/5</p>
+    //                 </div>
+    //                 <div class="card-footer d-flex justify-content-between align-items-center">
+    //                     ${review.image ? `<img src="${review.image}" alt="Review image" class="img-fluid">` : ''}
+    //                     <div>
+    //                         <input type="text" class="form-control comment-input mb-2" placeholder="Add a comment...">
+    //                         <button class="btn btn-primary add-comment-btn mb-2" data-review-id="${review.id}">Post Comment</button>
+    //                         <div>
+    //                             <button class="btn btn-outline-success btn-sm mr-2 thumbs-up" data-review-id="${review.id}">
+    //                                 <i class="fa fa-thumbs-up"></i>
+    //                             </button>
+    //                             <button class="btn btn-outline-danger btn-sm thumbs-down" data-review-id="${review.id}">
+    //                                 <i class="fa fa-thumbs-down"></i>
+    //                             </button>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>`;
+    // }
     function createReviewHtml(review) {
+        const placeholderImage = "/images/imageNotFound.jpg"; // Replace with your placeholder image path
+        // const starIconFilled = "path/to/your/star-filled/icon.jpg"; // Replace with your filled star icon path
+        // const starIconEmpty = "path/to/your/star-empty/icon.jpg"; // Replace with your empty star icon path
+    
+        const totalStars = 5;
+        let starsHtml = '';
+        // for (let i = 0; i < totalStars; i++) {
+        //     starsHtml += `<img src="${i < review.rating ? starIconFilled : starIconEmpty}" alt="Star" class="star-icon">`;
+        // }
+    
         return `
             <div class="review-item mb-3">
                 <div class="card">
                     <div class="card-body">
-                        <a href="/review/getReview/${review._id}">
-                        <h5 class="card-title">${review.name}</h5>
-                        <p class="card-text">${review.reviewText}</p>
-                        <p class="card-text"><strong>Rating:</strong> ${review.rating}/5</p>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        ${review.image ? `<img src="${review.image}" alt="Review image" class="img-fluid">` : ''}
-                        <div>
-                            <input type="text" class="form-control comment-input mb-2" placeholder="Add a comment...">
-                            <button class="btn btn-primary add-comment-btn mb-2" data-review-id="${review.id}">Post Comment</button>
+                    <a href="/review/getReview/${review._id}">
+                        <h5 class="card-title">${review.businessName}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${review.categoryName}</h6>
+                        <p>Review by: <em>${review.userName}</em></p>
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="card-text">${review.reviewText}</p>
+                                <p class="card-text"><strong>Rating:</strong> ${starsHtml} ${review.rating}/5</p>
+                                <p class="card-text">👍 ${review.thumsUp.length} 👎 ${review.thumsDown.length}</p>
+                            </div>
                             <div>
-                                <button class="btn btn-outline-success btn-sm mr-2 thumbs-up" data-review-id="${review.id}">
-                                    <i class="fa fa-thumbs-up"></i>
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm thumbs-down" data-review-id="${review.id}">
-                                    <i class="fa fa-thumbs-down"></i>
-                                </button>
+                                <img src="${review.image ? review.image : placeholderImage}" alt="Review image" class="img-fluid rounded">
                             </div>
                         </div>
+                    </a>
                     </div>
                 </div>
             </div>`;
     }
     
-    try {
-        fetchReviews();
-    } catch (error) {
-      console.error(error);
-    }
+    
+    
     // loadAllReviews();
     const username = getUsernameFromCookie();
     console.log('Logged in as:', username);
+    try {
+        fetchReviews(username);
+    } catch (error) {
+      console.error(error);
+    }
+    populateUserFollowingList(username)
     getAndDisplayUserProfile(username);
     
 });

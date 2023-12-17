@@ -115,6 +115,20 @@ export function checkValidEmail(emailId) {
     }
 }
 
+export async function checkValidUsername(username) {
+    username=checkString(username,"username",1,50)
+    const userCollection = await users();
+    const userInfo = await userCollection.findOne({ username: username });
+
+    
+    if (userInfo) {
+        return username
+    }
+    else{
+        throw "Username not found"
+    }
+}
+
 export async function checkIfEmailPresent(emailId) {
     emailId = checkValidEmail(emailId)
     

@@ -11,7 +11,7 @@ usersRouter
     res.render("register")
   })
   .post(async (req, res) => {
-    let userInfo=xss(req.body);
+    let userInfo=req.body;
 
     if (!userInfo || Object.keys(userInfo).length === 0) {
       return res
@@ -75,7 +75,7 @@ usersRouter
     return res.render("login")
   })
   .post(async (req, res) => {
-    let userInfo=xss(req.body);
+    let userInfo=req.body;
 
     if (!userInfo || Object.keys(userInfo).length === 0) {
       return res
@@ -169,7 +169,7 @@ usersRouter
   
     })
     .post(async (req, res) => {
-      let userInfo=xss(req.body);
+      let userInfo=req.body;
       if (!userInfo || Object.keys(userInfo).length === 0) {
         return res
           .status(400)
@@ -317,10 +317,33 @@ usersRouter
   //     return res.status(400).json({errorMessage:"Cannot remove following"})
   //   }
   // })
+
+  usersRouter
+  .route("/getFollowing/:username")
+  .get(async (req, res) => {
+    let username=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(req.params.username))
+    if (username[1]){
+      return res.status(400)
+      .json({errorMessage:"Invalid ObjectId"})
+    }
+    try {
+      let userId=await userData.getUserByUsername(username[0])
+      let stringId=userId[0]._id.toString()
+      let getFollowingInfo=await userData.getFollowing(stringId)
+
+      return res.json(getFollowingInfo)
+    } catch (error) {
+      console.log(error)
+      return res.status(400)
+      .json({errorMessage:"User Not Found"})
+    }
+  }
+  );
+
   usersRouter
   .route("/addFollowerByUsername").post(async (req, res) => {
 
-    let taskInfo=xss(req.body);
+    let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -353,7 +376,7 @@ usersRouter
   usersRouter
   .route("/addFollower").post(async (req, res) => {
 
-    let taskInfo=xss(req.body);
+    let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -385,7 +408,7 @@ usersRouter
 
   usersRouter
   .route("/removeFollower").post(async (req, res) => {
-    let taskInfo=xss(req.body);
+    let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -416,7 +439,7 @@ usersRouter
 
   usersRouter
   .route("/addTags").post(async (req, res) => {
-    let taskInfo=xss(req.body);
+    let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -446,7 +469,7 @@ usersRouter
 
   usersRouter
   .route("/removeTags").post(async (req, res) => {
-    let taskInfo=xss(req.body);
+    let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -476,7 +499,7 @@ usersRouter
 
   usersRouter
   .route("/addReview").post(async (req, res) => {
-    let taskInfo=xss(req.body);
+    let taskInfo=req.body;
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -505,7 +528,7 @@ usersRouter
   })
 
     usersRouter.route("/removeReview").post(async (req, res) => {
-      let taskInfo=xss(req.body);
+      let taskInfo=req.body;
       if (!taskInfo || Object.keys(taskInfo).length === 0) {
         return res
           .status(400)
@@ -534,7 +557,7 @@ usersRouter
     })
 
     usersRouter.route("/addComment").post(async (req, res) => {
-      let taskInfo=xss(req.body);
+      let taskInfo=req.body;
       if (!taskInfo || Object.keys(taskInfo).length === 0) {
         return res
           .status(400)
@@ -563,7 +586,7 @@ usersRouter
     })
 
     usersRouter.route("/removeComment").post(async (req, res) => {
-      let taskInfo=xss(req.body);
+      let taskInfo=req.body;
       if (!taskInfo || Object.keys(taskInfo).length === 0) {
         return res
           .status(400)

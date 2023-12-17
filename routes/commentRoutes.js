@@ -8,7 +8,7 @@ const commentRouter = express.Router();
 commentRouter
 .route("/comments/createComment")
 .post(async (req, res) => {
-    let commentInfo = xss(req.body);
+    let commentInfo = req.body;
     let reviewIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.reviewId);
     let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,req.session.user.userId);
     let commentDescriptionVal= await routeHelper.routeValidationHelper(helper.checkString,commentInfo.commentDescription, "Comment Description", 1, 500);
@@ -93,7 +93,7 @@ commentRouter
 commentRouter
 .route("/comments/updateComment")
 .post(async (req, res) => {
-    let commentInfo = xss(req.body);
+    let commentInfo = req.body;
     let commentIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.commentId);
     let reviewIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.reviewId);
     let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.userId);

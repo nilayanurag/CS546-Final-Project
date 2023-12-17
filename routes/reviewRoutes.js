@@ -18,7 +18,7 @@ reviewRouter
   })
   .post(async (req, res) => {
     // MADE some changes here to make it work with the new createReview.handlebars
-    let reviewInfo = xss(req.body);
+    let reviewInfo = req.body;
     let businessIdVal = await routeHelper.routeValidationHelper(
       helper.checkObjectId,
       reviewInfo.businessId
@@ -105,7 +105,7 @@ reviewRouter.route("/review/deleteReview/:id").get(async (req, res) => {
 });
 
 reviewRouter.route("/review/updateReview").post(async (req, res) => {
-  let reviewInfo = xss(req.body);
+  let reviewInfo = req.body;
   let reviewIdVal = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
     reviewInfo.reviewId
@@ -204,8 +204,11 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
 });
 
 reviewRouter.route("/getAllReviews").get(async (req, res) => {
+  let errorCode = undefined;
+
   try {
     let reviewList = await reviewData.getAllReviews();
+    
     if (reviewList) {
       return res.json(reviewList);
     } else {
@@ -220,8 +223,31 @@ reviewRouter.route("/getAllReviews").get(async (req, res) => {
   }
 });
 
+reviewRouter.route("/review/getFeed/:username").get(async (req, res) => {
+  let username=xss(req.params.username);
+  let errorCode = undefined;
+  try {
+    let user=await userData.getUserByUsername(username);
+    let userId=user[0]._id.toString() ;
+    let reviewList = await reviewData.getFeed(userId);
+    if (reviewList) {
+      return res.json(reviewList);
+    } else {
+      errorCode = 404;
+      return res.status(errorCode).json({ errorMessage: "Reviews not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    errorCode = 500;
+    return res
+      .status(errorCode)
+      .json({ errorMessage: "Internal Server Error" });
+  }
+}
+);
+
 reviewRouter.route("/review/addThumbsUp").post(async (req, res) => {
-  let taskInfo = xss(req.body);
+  let taskInfo = req.body;
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)
@@ -256,7 +282,7 @@ reviewRouter.route("/review/addThumbsUp").post(async (req, res) => {
 });
 
 reviewRouter.route("/review/removeThumbsUp").post(async (req, res) => {
-  let taskInfo = xss(req.body);
+  let taskInfo = req.body;
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)
@@ -294,7 +320,7 @@ reviewRouter.route("/review/removeThumbsUp").post(async (req, res) => {
 });
 
 reviewRouter.route("/review/addThumbsDown").post(async (req, res) => {
-  let taskInfo = xss(req.body);
+  let taskInfo = req.body;
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)
@@ -329,7 +355,7 @@ reviewRouter.route("/review/addThumbsDown").post(async (req, res) => {
 });
 
 reviewRouter.route("/review/removeThumbsDown").post(async (req, res) => {
-  let taskInfo = xss(req.body);
+  let taskInfo = req.body;
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)
@@ -367,7 +393,7 @@ reviewRouter.route("/review/removeThumbsDown").post(async (req, res) => {
 });
 
 reviewRouter.route("/review/addComment").post(async (req, res) => {
-  let taskInfo = xss(req.body);
+  let taskInfo = req.body;
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)
@@ -405,7 +431,7 @@ reviewRouter.route("/review/addComment").post(async (req, res) => {
 });
 
 reviewRouter.route("/review/removeComment").post(async (req, res) => {
-  let taskInfo = xss(req.body);
+  let taskInfo = req.body;
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)

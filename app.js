@@ -19,6 +19,7 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
 };
 
 app.use("/public", staticDir);
+app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(rewriteUnsupportedBrowserMethods);
@@ -28,6 +29,7 @@ app.set("view engine", "handlebars");
 
 
 // Middleware to implement
+
 app.use(
     session({
       name: "AuthState",
@@ -36,6 +38,10 @@ app.use(
       saveUninitialized: false,
     })
   );
+
+  
+
+  
 
   app.use("/login", async (req, res, next) => {
     if (req.session.user) {
@@ -61,6 +67,14 @@ app.use(
     }
   });
 
+  // app.use("/home", async (req, res, next) => {
+  //   if (req.session.user) {
+  //       next();
+  //   } else {
+  //     return res.redirect("/login");
+  //   }
+  // });
+
   app.use("/review/createReview", async (req, res, next) => {
     if (!req.session.user) {
       return res.redirect("/login");
@@ -84,7 +98,15 @@ app.use(
       next();
     }
   });
+  
 
+  // app.use("*", async (req, res, next) => {
+  //   if (req.session.user) {
+  //       next();
+  //   } else {
+  //     return res.redirect("/home");
+  //   }
+  // });
 
   // app.get('/', (req, res) => {
   //   let user;

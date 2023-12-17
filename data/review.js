@@ -7,6 +7,7 @@ import {
   comments,
 } from "../config/mongoCollections.js";
 import fs from "fs";
+import * as userData from "../data/users.js";
 import { Binary, ObjectId } from "mongodb";
 
 /*
@@ -317,6 +318,42 @@ export const getAllReviews = async () => {
     throw error;
   }
 };
+
+export const getFeed = async (userId) => {
+  var totalReviewId=[];
+
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+  const categoryCollection = await categories();
+
+
+  const user = await userData.getUserById(userId);
+  totalReviewId=totalReviewId.concat(user.reviews);
+  const following = user.following;
+  for (let each of following) {
+    let stringId=each.toString();
+    const followingUser = await userData.getUserById(stringId);
+    totalReviewId=totalReviewId.concat(followingUser.reviews);
+  }
+
+  const allReviews = await reviewCollection
+    .find({ _id: { $in: totalReviewId } })
+    .sort({ updatedAt: -1 }) // -1 for descending order
+    .toArray();
+  for (let each of allReviews) {
+    const business = await businessCollection.findOne({ _id: each.businessId });
+    const category = await categoryCollection.findOne({ _id: each.categoryId });
+    const user = await userCollection.findOne({ _id: each.userId });
+    each.businessName = business.name;
+    each.categoryName = category.name;
+    each.userName = user.firstName + " " + user.lastName;
+
+  }
+
+  return allReviews;
+}
+
 
 export const getReviewsByUserId = async (userId) => {
   try {
