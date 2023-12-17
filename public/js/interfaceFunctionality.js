@@ -231,7 +231,7 @@ $(document).ready(function() {
             <div class="review-item mb-3">
                 <div class="card">
                     <div class="card-body">
-                    <a href="/review/getReview/${review._id}">
+                    <a href="/review/getReview/${review._id}" class="no-highlight-link">
                         <h5 class="card-title">${review.businessName}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${review.categoryName}</h6>
                         <p>Review by: <em>${review.userName}</em></p>
