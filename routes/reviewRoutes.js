@@ -22,7 +22,6 @@ reviewRouter.get("/review/createReview", async (req, res) => {
 reviewRouter.post("/review/createReview", upload.single('imagePath'), async (req, res) => {
     // MADE some changes here to make it work with the new createReview.handlebars
     let reviewInfo = req.body;
-    console.log(req.file);
     let businessIdVal = await routeHelper.routeValidationHelper(
       helper.checkObjectId,
       reviewInfo.businessId
