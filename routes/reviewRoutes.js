@@ -7,16 +7,20 @@ import * as businessData from "../data/business.js";
 import * as commentData from "../data/comments.js";
 import * as userData from "../data/users.js";
 import xss from "xss";
-const reviewRouter = express.Router();
+import multer from 'multer';
+import fs from 'fs';
 
-reviewRouter
-  .route("/review/createReview")
-  .get(async (req, res) => {
-    // DO NOT REMOVE THIS (to populate the categories in create review page)
-    const categories = await categoryData.getAllCategory();
-    return res.render("createReview", { categories: categories });
-  })
-  .post(async (req, res) => {
+const reviewRouter = express.Router();
+const upload = multer({ dest: 'uploads/' });
+
+
+reviewRouter.get("/review/createReview", async (req, res) => {
+  // DO NOT REMOVE THIS (to populate the categories in create review page)
+  const categories = await categoryData.getAllCategory();
+  return res.render("createReview", { categories: categories });
+});
+
+reviewRouter.post("/review/createReview", upload.single('imagePath'), async (req, res) => {
     // MADE some changes here to make it work with the new createReview.handlebars
     let reviewInfo = req.body;
     let businessIdVal = await routeHelper.routeValidationHelper(
@@ -45,7 +49,10 @@ reviewRouter
       1,
       500
     );
-    let imagePathVal = reviewInfo.imagePath;
+    let fileType = req.file ? req.file.mimetype.split("/")[1] : null;
+    let imagePathVal = req.file ? req.file.path + "." + fileType : null;
+    imagePathVal = req.file ? req.file.path.replace(/\\/g, "/") : null;
+    console.log("from routes: ", imagePathVal);
     let errorCode = undefined;
 
     let dataToRender = {
@@ -77,8 +84,8 @@ reviewRouter
       return res.status(errorCode).render("createReview", dataToRender);
     }
   });
-
-reviewRouter.route("/review/deleteReview/:id").get(async (req, res) => {
+  
+reviewRouter.route("/review/deleteReview/:id").post(async (req, res) => {
   let reviewIdVal = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
     xss(req.params.id)
@@ -91,7 +98,7 @@ reviewRouter.route("/review/deleteReview/:id").get(async (req, res) => {
   try {
     let deleted = await reviewData.deleteReview(reviewIdVal[0]);
     if (deleted) {
-      return res.json({ deleted });
+      return res.redirect("/review/getMyReview");
     } else {
       errorCode = 404;
       return res.status(errorCode).json({ errorMessage: "Review not found" });
@@ -183,6 +190,7 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
         commentInfo[i].canDelete = true;
       }
     }
+    reviewInfo._id = reviewInfo._id.toString();
     if (reviewInfo) {
       return res.render("review", {
         review: reviewInfo,
@@ -190,6 +198,8 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
         loggedInUser: req.session.user.userId,
         businessName: businessinfo.name,
         commentData: commentInfo,
+        likes: reviewInfo.thumsUp.length,
+        dislikes: reviewInfo.thumsDown.length
       });
     } else {
       errorCode = 404;
@@ -200,6 +210,56 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
     return res
       .status(errorCode)
       .json({ errorMessage: "Internal Server Error" });
+  }
+});
+
+reviewRouter.route("/review/like/:id").post(async (req, res) => {
+    let reviewId = await routeHelper.routeValidationHelper(
+      helper.checkObjectId,
+      req.params.id
+    );
+    let errorCode = undefined;
+    if (reviewId[1]) {
+      errorCode = 400;
+      return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
+    }
+    try{
+
+      reviewData.addThumbsUp(reviewId[0], req.session.user.userId);
+      let reviewInfo = await reviewData.getReviewById(reviewId[0]);
+      const likes = reviewInfo.thumsUp.length;
+        const dislikes = reviewInfo.thumsDown.length;
+
+      res.json({ success: true, likes, dislikes });
+
+    }catch(error){
+      errorCode = 500;
+      return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
+    }
+});
+
+reviewRouter.route("/review/dislike/:id").post(async (req, res) => {
+  let reviewId = await routeHelper.routeValidationHelper(
+    helper.checkObjectId,
+    req.params.id
+  );
+  let errorCode = undefined;
+  if (reviewId[1]) {
+    errorCode = 400;
+    return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
+  }
+  try{
+
+    reviewData.addThumbsDown(reviewId[0], req.session.user.userId);
+    let reviewInfo = await reviewData.getReviewById(reviewId[0]);
+    const likes = reviewInfo.thumsUp.length;
+    const dislikes = reviewInfo.thumsDown.length;
+
+    res.json({ success: true, likes, dislikes });
+
+  }catch(error){
+    errorCode = 500;
+    return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
   }
 });
 
@@ -480,6 +540,7 @@ reviewRouter.route("/review/getMyReview").get(async (req, res) => {
         reviewInfo[i].businessId.toString()
       );
       const review = {};
+      review._id = reviewInfo[i]._id;
       review.businessName = businessinfo.name;
       review.description = reviewInfo[i].reviewText;
       review.image = reviewInfo[i].images;
