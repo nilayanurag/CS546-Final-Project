@@ -505,4 +505,46 @@ reviewRouter.route("/review/getMyReview").get(async (req, res) => {
   }
 });
 
+reviewRouter
+.route("/review/searchReview")
+.post(async (req, res) => {
+  let taskInfo = req.body;
+  
+  if (!taskInfo || Object.keys(taskInfo).length === 0) {
+    return res
+      .status(400)
+      .json({ error: "There are no fields in the request body" });
+  }
+  let errorCode=undefined;
+  try {    
+    //valdiation function
+    // let searchVal = await routeHelper.routeValidationHelper(
+    //   helper.checkString,
+    //   taskInfo.searchInput,
+    //   "Search",
+    //   1,
+    //   500
+    // );
+  } catch (error) {
+    errorCode = 400;
+    return res.status(errorCode).json({ errorMessage: "Incorrect Details" });
+  }
+  try{
+    let searchResult = await reviewData.searchReview();
+    if(searchResult){
+      return res.json(searchResult);
+    }else{
+      errorCode = 404;
+      return res.status(errorCode).json({ errorMessage: "Reviews not found" });
+    }
+  }
+  catch(error){
+    console.log(error);
+    errorCode = 500;
+    return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
+  }
+
+
+})  
+
 export default reviewRouter;

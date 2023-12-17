@@ -321,13 +321,6 @@ export const getAllReviews = async () => {
 
 export const getFeed = async (userId) => {
   var totalReviewId=[];
-
-  const userCollection = await users();
-  const reviewCollection = await reviews();
-  const businessCollection = await businesses();
-  const categoryCollection = await categories();
-
-
   const user = await userData.getUserById(userId);
   totalReviewId=totalReviewId.concat(user.reviews);
   const following = user.following;
@@ -337,6 +330,16 @@ export const getFeed = async (userId) => {
     totalReviewId=totalReviewId.concat(followingUser.reviews);
   }
 
+  let allReviews= getAllReviewPlusName(totalReviewId);
+
+  return allReviews;
+}
+
+export const getAllReviewPlusName = async (totalReviewId) => {
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+  const categoryCollection = await categories();
   const allReviews = await reviewCollection
     .find({ _id: { $in: totalReviewId } })
     .sort({ updatedAt: -1 }) // -1 for descending order
@@ -350,10 +353,25 @@ export const getFeed = async (userId) => {
     each.userName = user.firstName + " " + user.lastName;
 
   }
-
   return allReviews;
 }
 
+export const populateReviewWithData = async (allReviews) => {
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+  const categoryCollection = await categories();
+  for (let each of allReviews) {
+    const business = await businessCollection.findOne({ _id: each.businessId });
+    const category = await categoryCollection.findOne({ _id: each.categoryId });
+    const user = await userCollection.findOne({ _id: each.userId });
+    each.businessName = business.name;
+    each.categoryName = category.name;
+    each.userName = user.firstName + " " + user.lastName;
+
+  }
+  return allReviews;
+}
 
 export const getReviewsByUserId = async (userId) => {
   try {
@@ -366,3 +384,9 @@ export const getReviewsByUserId = async (userId) => {
   }
 };
 
+export const searchReview = async (condition) => {
+  const reviewCollection = await reviews();
+  let allReviewList = await reviewCollection.find({}).toArray();
+  allReviewList=await populateReviewWithData(allReviewList);
+  return allReviewList;
+}

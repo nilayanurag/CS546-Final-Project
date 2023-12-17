@@ -37,7 +37,7 @@ $(document).ready(function() {
 
     
 
-    $("#search-button").click(function(event) {
+    $("#searchButton").click(function(event) {
         event.preventDefault();
         var searchType = $("#searchTypeDropdown").text().trim();
         var searchTerm = $('#searchInput').val();
@@ -46,17 +46,20 @@ $(document).ready(function() {
             option2: $('#option2').is(':checked')
         };
         $.ajax({
-            url: "/search",
+            url: "review/searchReview",
             type: "POST",
             data: {
                 searchType: searchType,
                 searchTerm: searchTerm,
                 options: options
             },
-            success: function(data) {
-                console.log(data);
-                const searchHtml = Handlebars.partials['search']({ searchResults: data });
-                $('#search-results').html(searchHtml);
+            success: function(reviews) {
+                $('#reviewsFeed').html('');
+                let rankNumber = 0;
+                reviews.forEach(function(review,rankNumber) {
+                    var reviewHtml = createReviewHtml(review,true,rankNumber+1);
+                    $('#reviewsFeed').append(reviewHtml);
+                });
             },
             error: function(error) {
                 console.log(error);
@@ -176,6 +179,7 @@ $(document).ready(function() {
             url: `/review/getFeed/${username}`, // Your API endpoint
             type: 'GET',
             success: function(reviews) {
+                $('#reviewsFeed').html('');
                 reviews.forEach(function(review) {
                     var reviewHtml = createReviewHtml(review);
                     $('#reviewsFeed').append(reviewHtml);
@@ -216,21 +220,23 @@ $(document).ready(function() {
     //             </div>
     //         </div>`;
     // }
-    function createReviewHtml(review) {
-        const placeholderImage = "/images/imageNotFound.jpg"; // Replace with your placeholder image path
-        // const starIconFilled = "path/to/your/star-filled/icon.jpg"; // Replace with your filled star icon path
-        // const starIconEmpty = "path/to/your/star-empty/icon.jpg"; // Replace with your empty star icon path
+    // 
+    function createReviewHtml(review, ranked, rankNumber) {
+        const placeholderImage = "/images/imageNotFound.jpg"; 
+        const starIconFilled = "images/starfilled.png"; 
+        const starIconEmpty = "images/emptystar.png";
     
         const totalStars = 5;
         let starsHtml = '';
-        // for (let i = 0; i < totalStars; i++) {
-        //     starsHtml += `<img src="${i < review.rating ? starIconFilled : starIconEmpty}" alt="Star" class="star-icon">`;
-        // }
+        for (let i = 0; i < totalStars; i++) {
+            starsHtml += `<img src="${i < review.rating ? starIconFilled : starIconEmpty}" alt="Star" class="star-icon">`;
+        }
     
         return `
             <div class="review-item mb-3">
                 <div class="card">
                     <div class="card-body">
+                    ${ranked ? `<span class="badge badge-secondary mr-2">${rankNumber}</span>` : ''}
                     <a href="/review/getReview/${review._id}" class="no-highlight-link">
                         <h5 class="card-title">${review.businessName}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${review.categoryName}</h6>
@@ -238,7 +244,8 @@ $(document).ready(function() {
                         <div class="d-flex">
                             <div class="flex-grow-1">
                                 <p class="card-text">${review.reviewText}</p>
-                                <p class="card-text"><strong>Rating:</strong> ${starsHtml} ${review.rating}/5</p>
+                                <p class="card-text bold-text">Rating:${review.rating}/5</p>
+                                <p class="card-text">${starsHtml}</p>
                                 <p class="card-text">👍 ${review.thumsUp.length} 👎 ${review.thumsDown.length}</p>
                             </div>
                             <div>
@@ -250,6 +257,7 @@ $(document).ready(function() {
                 </div>
             </div>`;
     }
+    
     
     
     
