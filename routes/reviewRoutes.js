@@ -6,19 +6,22 @@ import * as categoryData from "../data/category.js";
 import * as businessData from "../data/business.js";
 import * as commentData from "../data/comments.js";
 import * as userData from "../data/users.js";
+import multer from 'multer';
 
 const reviewRouter = express.Router();
+const upload = multer({ dest: 'uploads/' });
 
-reviewRouter
-  .route("/review/createReview")
-  .get(async (req, res) => {
-    // DO NOT REMOVE THIS (to populate the categories in create review page)
-    const categories = await categoryData.getAllCategory();
-    return res.render("createReview", { categories: categories });
-  })
-  .post(async (req, res) => {
+
+reviewRouter.get("/review/createReview", async (req, res) => {
+  // DO NOT REMOVE THIS (to populate the categories in create review page)
+  const categories = await categoryData.getAllCategory();
+  return res.render("createReview", { categories: categories });
+});
+
+reviewRouter.post("/review/createReview", upload.single('imagePath'), async (req, res) => {
     // MADE some changes here to make it work with the new createReview.handlebars
     let reviewInfo = req.body;
+    console.log(req.file);
     let businessIdVal = await routeHelper.routeValidationHelper(
       helper.checkObjectId,
       reviewInfo.businessId
@@ -77,8 +80,8 @@ reviewRouter
       return res.status(errorCode).render("createReview", dataToRender);
     }
   });
-
-reviewRouter.route("/review/deleteReview/:id").get(async (req, res) => {
+  
+reviewRouter.route("/review/deleteReview/:id").post(async (req, res) => {
   let reviewIdVal = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
     req.params.id
@@ -91,7 +94,7 @@ reviewRouter.route("/review/deleteReview/:id").get(async (req, res) => {
   try {
     let deleted = await reviewData.deleteReview(reviewIdVal[0]);
     if (deleted) {
-      return res.json({ deleted });
+      return res.redirect("/review/getMyReview");
     } else {
       errorCode = 404;
       return res.status(errorCode).json({ errorMessage: "Review not found" });
@@ -454,6 +457,7 @@ reviewRouter.route("/review/getMyReview").get(async (req, res) => {
         reviewInfo[i].businessId.toString()
       );
       const review = {};
+      review._id = reviewInfo[i]._id;
       review.businessName = businessinfo.name;
       review.description = reviewInfo[i].reviewText;
       review.image = reviewInfo[i].images;

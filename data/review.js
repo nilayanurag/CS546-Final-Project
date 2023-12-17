@@ -102,6 +102,16 @@ export const deleteReview = async (reviewId) => {
     const reviewCollection = await reviews();
     const review = await reviewCollection.findOne({ _id: reviewId });
     if (!review) throw "Review not found";
+    const businessCollection = await businesses();
+    const userCollection = await users();
+    await businessCollection.updateOne(
+      { _id: review.businessId.toString() },
+      { $pull: { reviews: reviewId } }
+    );
+    await userCollection.updateOne(
+      { _id: review.userId.toString() },
+      { $pull: { reviews: reviewId } }
+    );
     const deletionInfo = await reviewCollection.deleteOne({ _id: reviewId });
     if (deletionInfo.deletedCount === 0) throw "Could not delete review";
     return true;
