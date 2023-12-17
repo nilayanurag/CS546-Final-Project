@@ -7,6 +7,11 @@ import configRoutes from "./routes/index.js";
 import exphbs from "express-handlebars";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+import path from 'path';
+// app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const staticDir = express.static(__dirname + "/public");
 

@@ -7,6 +7,7 @@ import * as businessData from "../data/business.js";
 import * as commentData from "../data/comments.js";
 import * as userData from "../data/users.js";
 import multer from 'multer';
+import fs from 'fs';
 
 const reviewRouter = express.Router();
 const upload = multer({ dest: 'uploads/' });
@@ -48,7 +49,10 @@ reviewRouter.post("/review/createReview", upload.single('imagePath'), async (req
       1,
       500
     );
-    let imagePathVal = reviewInfo.imagePath;
+    let fileType = req.file ? req.file.mimetype.split("/")[1] : null;
+    let imagePathVal = req.file ? req.file.path + "." + fileType : null;
+    imagePathVal = req.file ? req.file.path.replace(/\\/g, "/") : null;
+    console.log("from routes: ", imagePathVal);
     let errorCode = undefined;
 
     let dataToRender = {
