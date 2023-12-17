@@ -189,6 +189,7 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
         commentInfo[i].canDelete = true;
       }
     }
+    reviewInfo._id = reviewInfo._id.toString();
     if (reviewInfo) {
       return res.render("review", {
         review: reviewInfo,
@@ -196,6 +197,8 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
         loggedInUser: req.session.user.userId,
         businessName: businessinfo.name,
         commentData: commentInfo,
+        likes: reviewInfo.thumsUp.length,
+        dislikes: reviewInfo.thumsDown.length
       });
     } else {
       errorCode = 404;
@@ -206,6 +209,56 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
     return res
       .status(errorCode)
       .json({ errorMessage: "Internal Server Error" });
+  }
+});
+
+reviewRouter.route("/review/like/:id").post(async (req, res) => {
+    let reviewId = await routeHelper.routeValidationHelper(
+      helper.checkObjectId,
+      req.params.id
+    );
+    let errorCode = undefined;
+    if (reviewId[1]) {
+      errorCode = 400;
+      return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
+    }
+    try{
+
+      reviewData.addThumbsUp(reviewId[0], req.session.user.userId);
+      let reviewInfo = await reviewData.getReviewById(reviewId[0]);
+      const likes = reviewInfo.thumsUp.length;
+        const dislikes = reviewInfo.thumsDown.length;
+
+      res.json({ success: true, likes, dislikes });
+
+    }catch(error){
+      errorCode = 500;
+      return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
+    }
+});
+
+reviewRouter.route("/review/dislike/:id").post(async (req, res) => {
+  let reviewId = await routeHelper.routeValidationHelper(
+    helper.checkObjectId,
+    req.params.id
+  );
+  let errorCode = undefined;
+  if (reviewId[1]) {
+    errorCode = 400;
+    return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
+  }
+  try{
+
+    reviewData.addThumbsDown(reviewId[0], req.session.user.userId);
+    let reviewInfo = await reviewData.getReviewById(reviewId[0]);
+    const likes = reviewInfo.thumsUp.length;
+    const dislikes = reviewInfo.thumsDown.length;
+
+    res.json({ success: true, likes, dislikes });
+
+  }catch(error){
+    errorCode = 500;
+    return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
   }
 });
 
