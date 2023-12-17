@@ -2,13 +2,13 @@ import express from "express";
 import * as commentData from "../data/comments.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
-
+import xss from "xss";
 const commentRouter = express.Router();
 
 commentRouter
 .route("/comments/createComment")
 .post(async (req, res) => {
-    let commentInfo = req.body;
+    let commentInfo = xss(req.body);
     let reviewIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.reviewId);
     let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,req.session.user.userId);
     let commentDescriptionVal= await routeHelper.routeValidationHelper(helper.checkString,commentInfo.commentDescription, "Comment Description", 1, 500);
@@ -48,18 +48,18 @@ commentRouter
 commentRouter
 .route("/comments/deleteComment/:id")
 .post(async (req, res) => {
-    let commentIdVal= routeHelper.routeValidationHelper(helper.checkObjectId, req.params.id);
+    let commentIdVal= routeHelper.routeValidationHelper(helper.checkObjectId, xss(req.params.id));
     if (commentIdVal[1]) {
         return res.status(400).json({ errorMessage: "Not a valid Object" });
         
     }
     try {
         
-        let deleted = await commentData.deleteComment(req.params.id);
+        let deleted = await commentData.deleteComment(xss(req.params.id));
         
         if (deleted)
         {
-            return res.redirect("/review/getReview/"+req.body.reviewId);
+            return res.redirect("/review/getReview/"+xss(req.body.reviewId));
         }else{
             return res.status(404).json({ errorMessage: "Comment not found" });
         }
@@ -72,7 +72,7 @@ commentRouter
 commentRouter
 .route("/comments/getComment/:id")
 .get(async (req, res) => {
-    let commentIdVal= routeHelper.routeValidationHelper(helper.checkObjectId, req.params.id);
+    let commentIdVal= routeHelper.routeValidationHelper(helper.checkObjectId,xss(req.params.id));
     if (commentIdVal[1]) {
         return res.status(400).json({ errorMessage: "Not a valid Object" });
         
@@ -93,7 +93,7 @@ commentRouter
 commentRouter
 .route("/comments/updateComment")
 .post(async (req, res) => {
-    let commentInfo = req.body;
+    let commentInfo = xss(req.body);
     let commentIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.commentId);
     let reviewIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.reviewId);
     let userIdVal= await routeHelper.routeValidationHelper(helper.checkObjectId,commentInfo.userId);
@@ -134,7 +134,7 @@ commentRouter
 commentRouter
 .route("/comments/getAllbyId/:id")
 .get(async (req, res) => {
-    let reviewIdVal= routeHelper.routeValidationHelper(helper.checkObjectId, req.params.id);
+    let reviewIdVal= routeHelper.routeValidationHelper(helper.checkObjectId, xss(req.params.id));
     if (reviewIdVal[1]) {
         return res.status(400).json({ errorMessage: "Not a valid Object" });
         

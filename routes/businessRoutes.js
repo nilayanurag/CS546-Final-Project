@@ -3,7 +3,7 @@ import * as businessData from "../data/business.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
 import * as categoryData from "../data/category.js";
-
+import xss from "xss";
 const businessRouter = express.Router();
 
 
@@ -15,7 +15,7 @@ businessRouter
 })
 .post(async (req, res) => {
     console.log(req.body);
-    let businessInfo = req.body;
+    let businessInfo = xss(req.body);
     let businessNameVal= await routeHelper.routeValidationHelper(helper.checkString,businessInfo.businessName, "Business Name", 1, 100);
     var location = {
         firstLine: businessInfo.firstAddressLine,
@@ -60,7 +60,7 @@ businessRouter
 businessRouter
 .route("/business/getBusiness/:pre")
 .get(async (req, res) => {
-    let businessIdPrefix = req.params.pre;
+    let businessIdPrefix = xss(req.params.pre);
     let errorCode=undefined;
     let prefix=await routeHelper.routeValidationHelper(helper.checkString,businessIdPrefix, "Prefix", 1, 50);
     if (prefix[1]){
@@ -85,7 +85,7 @@ businessRouter
 businessRouter
 .route("/business/getBusinessByName/:name")
 .get(async (req, res) => {
-    let businessName = req.params.name;
+    let businessName = xss(req.params.name);
     let errorCode=undefined;
     let name=await routeHelper.routeValidationHelper(helper.checkString,businessName, "Business Name", 3, 50);
     if (name[1]){
@@ -110,7 +110,7 @@ businessRouter
 businessRouter
 .route("/business/deleteBusiness/:id")
 .get(async (req, res) => {
-    let businessId = req.params.id;
+    let businessId = xss(req.params.id);
     let errorCode=undefined;
     businessId=routeHelper.routeValidationHelper(helper.checkObjectId,businessId);
     if (businessId[1]){
@@ -134,7 +134,7 @@ businessRouter
 
 businessRouter
 .get('/businesses/:categoryId', async (req, res) => {
-    const businesses = await businessData.getBusinessesByCategory(req.params.categoryId);
+    const businesses = await businessData.getBusinessesByCategory(xss(req.params.categoryId));
     res.json(businesses);
 });
 

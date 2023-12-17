@@ -2,7 +2,7 @@ import express from "express";
 import * as userData from "../data/users.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
-
+import xss from "xss";
 const usersRouter = express.Router();
 
 usersRouter
@@ -11,7 +11,7 @@ usersRouter
     res.render("register")
   })
   .post(async (req, res) => {
-    let userInfo=req.body;
+    let userInfo=xss(req.body);
 
     if (!userInfo || Object.keys(userInfo).length === 0) {
       return res
@@ -75,7 +75,7 @@ usersRouter
     return res.render("login")
   })
   .post(async (req, res) => {
-    let userInfo=req.body;
+    let userInfo=xss(req.body);
 
     if (!userInfo || Object.keys(userInfo).length === 0) {
       return res
@@ -110,7 +110,7 @@ usersRouter
 
   usersRouter
   .route('/getUser/:id').get(async (req, res) => {
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,req.params.id)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(req.params.id))
       if (userId[1])
         {return res.status(400)
           .json({errorMessage:"Invalid ObjectId"})} 
@@ -125,7 +125,7 @@ usersRouter
 
     usersRouter
   .route('/deleteUser/:id').get(async (req, res) => {
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,req.params.id)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(req.params.id))
       if (userId[1])
         {return res.status(400)
           .json({errorMessage:"Invalid ObjectId"})} 
@@ -169,7 +169,7 @@ usersRouter
   
     })
     .post(async (req, res) => {
-      let userInfo=req.body;
+      let userInfo=xss(req.body);
       if (!userInfo || Object.keys(userInfo).length === 0) {
         return res
           .status(400)
@@ -320,7 +320,7 @@ usersRouter
   usersRouter
   .route("/addFollowerByUsername").post(async (req, res) => {
 
-    let taskInfo=req.body;
+    let taskInfo=xss(req.body);
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -353,7 +353,7 @@ usersRouter
   usersRouter
   .route("/addFollower").post(async (req, res) => {
 
-    let taskInfo=req.body;
+    let taskInfo=xss(req.body);
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -385,7 +385,7 @@ usersRouter
 
   usersRouter
   .route("/removeFollower").post(async (req, res) => {
-    let taskInfo=req.body;
+    let taskInfo=xss(req.body);
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -416,7 +416,7 @@ usersRouter
 
   usersRouter
   .route("/addTags").post(async (req, res) => {
-    let taskInfo=req.body;
+    let taskInfo=xss(req.body);
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -446,7 +446,7 @@ usersRouter
 
   usersRouter
   .route("/removeTags").post(async (req, res) => {
-    let taskInfo=req.body;
+    let taskInfo=xss(req.body);
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -476,7 +476,7 @@ usersRouter
 
   usersRouter
   .route("/addReview").post(async (req, res) => {
-    let taskInfo=req.body;
+    let taskInfo=xss(req.body);
     if (!taskInfo || Object.keys(taskInfo).length === 0) {
       return res
         .status(400)
@@ -505,7 +505,7 @@ usersRouter
   })
 
     usersRouter.route("/removeReview").post(async (req, res) => {
-      let taskInfo=req.body;
+      let taskInfo=xss(req.body);
       if (!taskInfo || Object.keys(taskInfo).length === 0) {
         return res
           .status(400)
@@ -534,7 +534,7 @@ usersRouter
     })
 
     usersRouter.route("/addComment").post(async (req, res) => {
-      let taskInfo=req.body;
+      let taskInfo=xss(req.body);
       if (!taskInfo || Object.keys(taskInfo).length === 0) {
         return res
           .status(400)
@@ -563,7 +563,7 @@ usersRouter
     })
 
     usersRouter.route("/removeComment").post(async (req, res) => {
-      let taskInfo=req.body;
+      let taskInfo=xss(req.body);
       if (!taskInfo || Object.keys(taskInfo).length === 0) {
         return res
           .status(400)
@@ -618,7 +618,7 @@ usersRouter
     usersRouter
     .route("/getUserDetails/:username")
     .get(async (req, res) => {
-      let username = req.params.username;
+      let username = xss(req.params.username);
       let errorCode=undefined;
       username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
       if (username[1]){
@@ -644,7 +644,7 @@ usersRouter
   usersRouter
     .route("/renderUserDetails/:username")
     .get(async (req, res) => {
-      let username = req.params.username;
+      let username = xss(req.params.username);
       let errorCode=undefined;
       username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
       if (username[1]){
@@ -750,7 +750,7 @@ usersRouter
     //   errorCode=400
     //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
     // }
-    const username= req.params.username;
+    const username= xss(req.params.username);
     
     try {
       let existingUserId=undefined;
