@@ -1,13 +1,10 @@
 $(document).ready(function() {
 
-    $('.userProfileFull').on('click', '#followUnfollowButton', function(event) {
+    $('.userProfileFull').on('click', '#followButton', function(event) {
         // Your event handler code here
         event.preventDefault();
-        var userUsername = $('#followUnfollowButton').data('user-username');
-        var adminUsername = $('#followUnfollowButton').data('admin-username');
-        var followState = $('#followUnfollowButton').data('follow-state');
-        
-        var followUnfollowUrl = followState === 'follow' ? "/addFollowerByUsername" : "/removeFollowerByUsername";
+        var userUsername = $('#followButton').data('user-username');
+        var adminUsername = $('#followButton').data('admin-username');
         
         $.ajax({
             url: followUnfollowUrl,
@@ -17,15 +14,33 @@ $(document).ready(function() {
                 adminUsername: adminUsername
             },
             success: function(response) {
-
-                if (followState === 'follow') {
-                    $('#followUnfollowButton').data('follow-state', 'unfollow');
-                    $('#followUnfollowButton').text('Unfollow');
-                } else {
-                    $('#followUnfollowButton').data('follow-state', 'follow');
-                    $('#followUnfollowButton').text('Follow');
-                }
+                $('#followButton').hide();
+                $('#UnfollowButton').show();
+                populateUserProfile(userUsername,adminUsername);
                 
+            },
+            error: function(error) {
+                console.error("Error: ", error);
+            }
+        });
+        
+    });
+    $('.userProfileFull').on('click', '#unFollowButton', function(event) {
+        // Your event handler code here
+        event.preventDefault();
+        var userUsername = $('unFollowButton').data('user-username');
+        var adminUsername = $('unFollowButton').data('admin-username');
+        
+        $.ajax({
+            url: followUnfollowUrl,
+            type: 'POST',
+            data: {
+                userUsername: userUsername,
+                adminUsername: adminUsername
+            },
+            success: function(response) {
+                $('#followButton').show();
+                $('#UnfollowButton').hide();
                 populateUserProfile(userUsername,adminUsername);
                 
             },
@@ -77,11 +92,16 @@ $(document).ready(function() {
             <div class="row">
                 <div class="col">
                 <form id="followUnfollowForm">
-                <button type="submit" id="followUnfollowButton" class="btn btn-primary"
+                <button type="submit" id="UnfollowButton" class="btn btn-primary"
+                data-user-username="${user.username}" 
+                data-admin-username="${adminUsername}">
+                Unfollow
+                </button>
+                <button type="submit" id="followButton" class="btn btn-primary"
                 data-user-username="${user.username}" 
                 data-admin-username="${adminUsername}" 
-                data-follow-state="${user.following.includes(adminUsername) ? 'unfollow' : 'follow'}">
-                ${user.following && user.following.includes(adminUsername) ? 'Unfollow' : 'Follow'} 
+                data-follow-state="follow">
+                Follow
                 </button>
                     <form>
                 </div>

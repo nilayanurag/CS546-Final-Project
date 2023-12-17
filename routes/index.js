@@ -10,7 +10,8 @@ const constructorMethod = (app) => {
   app.use("/", commentRouter);
   app.use("/", businessRouter);
   app.use("*", (req, res) => {
-    res.status(404).json({ error: "Route not found" });
+    res.redirect("/");
+    //res.status(404).json({ error: "Route not found" });
   });
 };
 

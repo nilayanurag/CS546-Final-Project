@@ -318,6 +318,23 @@ export const addFollowerByUserName = async (mainUsername, followerUsername) => {
   return addedFollower && addedFollowing;
 };
 
+export const removeFollowerByUsername = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  let removedFollower=await removeFollower(mainUserId,followerUserId);
+  let removedFollowing=await removeFollowing(followerUserId,mainUserId);
+  return removedFollower && removedFollowing  ;
+};
+
+export const checkFollowerByUsername = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  return ifFollowing(mainUserId,followerUserId);
+};
 
 export const addFollower = async (userId, followerId) => {
   try {
@@ -362,6 +379,24 @@ export const removeFollower = async (userId, followerId) => {
   }
 };
 
+
+export const isFollower = async (userId, followerId) => {
+
+    userId = new ObjectId(helper.checkObjectId(userId));
+    followerId = new ObjectId(helper.checkObjectId(followerId));
+
+   
+    const userCollection = await users();
+
+  
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+
+    
+    const isFollower = user.followers.includes(followerId);
+
+    return isFollower;
+};
 // Route has been linked to this function
 export const addTags = async (userId, tags) => {
   try {
