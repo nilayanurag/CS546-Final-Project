@@ -25,7 +25,13 @@ $(document).ready(function() {
             type: 'GET',
             success: function(followingUsers) {
                 followingUsers.forEach(function(user) {
-                    $('.following-list .list-group').append('<li class="list-group-item">' + user.firstName +" "+user.lastName+ '</li>');
+                    // $('.following-list .list-group').append('<li class="list-group-item">' + user.firstName +" "+user.lastName+ '</li>');
+                    $('.following-list .list-group').append(
+                        '<li class="list-group-item">' +
+                        '<a class =".no-highlight-link" href="/getUserProfilePage/' + encodeURIComponent(user.username) + '">' +
+                        user.firstName + " " + user.lastName +
+                        '</a></li>'
+                    );
                 });
             },
             error: function(error) {

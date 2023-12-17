@@ -349,9 +349,15 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
       }
-    let username=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.userUsername,"username",1,25)
-    let followerUsername=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.adminUsername,"adminUsername",1,25)
-    
+      let username;
+    let followerUsername;
+      try{
+      username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
+      followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+      }catch(error){
+        return res.status(400).json({errorMessage:"Invalid Username"})
+      }
+      
     let errorCode=undefined
 
     if (username[1]||followerUsername[1]||username[0]===followerUsername[0]){
@@ -382,8 +388,15 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
       }
-    let username=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.userUsername,"username",1,25)
-    let followerUsername=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.adminUsername,"adminUsername",1,25)
+
+      let username;
+    let followerUsername;
+    try{
+    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
+    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+    }catch(error){
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
     
     let errorCode=undefined
 
@@ -406,9 +419,21 @@ usersRouter
   }
   );
   usersRouter
-  .route("/checkIffollower").post(async (req, res) => {
-    let username=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.userUsername,"username",1,25)
-    let followerUsername=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.adminUsername,"adminUsername",1,25)
+  .route("/checkIfFollower").post(async (req, res) => {
+    let taskInfo=req.body;
+    if (!taskInfo || Object.keys(taskInfo).length === 0) {
+      return res
+        .status(400)
+        .json({error: 'There are no fields in the request body'});
+      }
+    let username;
+    let followerUsername;
+    try{
+    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
+    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+    }catch(error){
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
     
     let errorCode=undefined
 
@@ -416,6 +441,10 @@ usersRouter
       errorCode=400
       return res.status(400).json({errorMessage:"Invalid Username"})
     }
+
+    let boolVal=await userData.checkFollowerByUsername(username[0],followerUsername[0])
+    return res.json({boolVal})
+
   })
 
 

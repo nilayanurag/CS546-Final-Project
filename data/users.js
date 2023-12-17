@@ -333,7 +333,7 @@ export const checkFollowerByUsername = async (mainUsername, followerUsername) =>
   let followerUser= await getUserByUsername(followerUsername);
   let mainUserId=mainUser[0]._id.toString();
   let followerUserId=followerUser[0]._id.toString();
-  return ifFollowing(mainUserId,followerUserId);
+  return (await isFollower(mainUserId,followerUserId));
 };
 
 export const addFollower = async (userId, followerId) => {
@@ -382,8 +382,8 @@ export const removeFollower = async (userId, followerId) => {
 
 export const isFollower = async (userId, followerId) => {
 
-    userId = new ObjectId(helper.checkObjectId(userId));
-    followerId = new ObjectId(helper.checkObjectId(followerId));
+    userId = new ObjectId(await helper.checkObjectId(userId));
+    followerId = new ObjectId(await helper.checkObjectId(followerId));
 
    
     const userCollection = await users();
@@ -393,7 +393,8 @@ export const isFollower = async (userId, followerId) => {
     if (!user) throw "User not found";
 
     
-    const isFollower = user.followers.includes(followerId);
+    // const isFollower = user.followers.includes(followerId);
+    const isFollower = user.followers.map(id => id.toString()).includes(followerId.toString());
 
     return isFollower;
 };
