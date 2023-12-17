@@ -386,7 +386,10 @@ export const getReviewsByUserId = async (userId) => {
 
 export const searchReview = async (condition) => {
   const reviewCollection = await reviews();
-  let allReviewList = await reviewCollection.find({}).toArray();
+  let allReviewList = await reviewCollection
+    .find({})
+    .sort({ rating: -1 })
+    .toArray();
   allReviewList=await populateReviewWithData(allReviewList);
   return allReviewList;
 }
