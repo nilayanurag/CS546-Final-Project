@@ -72,6 +72,7 @@ businessRouter
       }
     } catch (error) {
       errorCode = 500;
+      console.log(error)
       return res
         .status(errorCode)
         .json({ errorMessage: "Internal Server Error" });

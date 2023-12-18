@@ -20,6 +20,7 @@ commentRouter.route("/comments/createComment").post(async (req, res) => {
   } catch (error) {
     return res.status(400).json({ errorMessage: error });
   }
+  let errorCode = undefined;
   try {
     let comment = await commentData.createComment(
       commentInfo.reviewId,
