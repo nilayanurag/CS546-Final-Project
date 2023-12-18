@@ -143,7 +143,7 @@ export async function checkIfEmailPresent(emailId) {
 
 export function checkPass(password) {
     //temprory changing to less lengh got easy testing changit back to 8
-    password = checkString(password, "password",3)
+    password = checkString(password, "password",8)
     let upperCheck = false
     let numCheck = false
     let specialCheck = false
