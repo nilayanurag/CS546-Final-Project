@@ -9,14 +9,14 @@ const commentRouter = express.Router();
 commentRouter.route("/comments/createComment").post(async (req, res) => {
   let commentInfo = req.body;
   try {
-    commentInfo.reviewId = validate.checkObjectId(commentInfo.reviewId);
+    commentInfo.reviewId = validate.checkObjectId(xss(commentInfo.reviewId));
     commentInfo.commentDescription = validate.checkString(
       commentInfo.commentDescription,
       "Comment Description",
       2,
       500
     );
-    req.session.user.userId = validate.checkObjectId(req.session.user.userId);
+    req.session.user.userId = validate.checkObjectId(xss(req.session.user.userId));
   } catch (error) {
     return res.status(400).json({ errorMessage: error });
   }
@@ -45,7 +45,7 @@ commentRouter.route("/comments/createComment").post(async (req, res) => {
 commentRouter.route("/comments/deleteComment/:id").post(async (req, res) => {
   let commentId = req.params.id;
   try {
-    req.body.reviewId = validate.checkObjectId(req.body.reviewId);
+    req.body.reviewId = validate.checkObjectId(xss(req.body.reviewId));
     commentId = validate.checkObjectId(commentId);
   } catch (error) {
     return res.status(400).json({ errorMessage: error });
@@ -87,19 +87,19 @@ commentRouter.route("/comments/updateComment").post(async (req, res) => {
   let commentInfo = req.body;
   let commentIdVal = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    commentInfo.commentId
+    xss(commentInfo.commentId)
   );
   let reviewIdVal = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    commentInfo.reviewId
+    xss(commentInfo.reviewId)
   );
   let userIdVal = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    commentInfo.userId
+    xss(commentInfo.userId)
   );
   let commentDescriptionVal = await routeHelper.routeValidationHelper(
     helper.checkString,
-    commentInfo.commentDescription,
+    xss(commentInfo.commentDescription),
     "Comment Description",
     1,
     500

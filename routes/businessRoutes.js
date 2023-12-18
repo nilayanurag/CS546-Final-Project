@@ -15,12 +15,12 @@ businessRouter
   .post(async (req, res) => {
     let businessInfo = req.body;
     var location = {
-      firstLine: businessInfo.firstAddressLine,
-      lastLine: businessInfo.lastAddressLine,
-      city: businessInfo.city,
-      state: businessInfo.state,
-      zip: businessInfo.zip,
-      country: businessInfo.country,
+      firstLine: xss(businessInfo.firstAddressLine),
+      lastLine: xss(businessInfo.lastAddressLine),
+      city: xss(businessInfo.city),
+      state: xss(businessInfo.state),
+      zip: xss(businessInfo.zip),
+      country: xss(businessInfo.country),
     };
     try {
         businessInfo.businessName = helper.checkString(businessInfo.businessName, "Business Name", 2, 100);
