@@ -311,11 +311,11 @@ $(document).ready(function() {
     }
     
     $.ajax({
-        url: '/categories/getAllCatgoriesH',
+        url: '/categories/getAllCatgories',
         method: 'GET',
         success: function(categories) {
             categories.forEach(function(category) {
-                $('#categorySelect1').append(new Option(category.name, category.id));
+                $('#categorySelectSearch').append(new Option(category.name, category.id));
             });
         },
         error: function(error) {
@@ -324,11 +324,11 @@ $(document).ready(function() {
         }
     });
     
-    $('#searchButton').click(function(e) {
+    $('#searchButtonRanking').click(function(e) {
         e.preventDefault();
 
         const data = {
-            category: $('#categorySelect').val(),
+            category: $('#categorySelectSearch').val(),
             male: $('#maleCheckbox').is(':checked'),
             female: $('#femaleCheckbox').is(':checked'),
             min: $('#minAge').val(),
@@ -337,28 +337,43 @@ $(document).ready(function() {
         };
 
         $.ajax({
-            url: '/getBusinessRanking',
+            url: '/customSearch',
             method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(busData) {
-                console.log(busData.blist)
-                console.log(busData.bList.length);
+            data:data,
+            success: function(businessData) {
+                console.log(businessData)
+               
             },
-            success: function(reviews) {
-                $('#reviewsFeed').html('');
-                reviews.bList.forEach(function(review) {
-                    console.log(review)
-                    var reviewHtml = createBusinessCardHtml(review);
-                    $('#reviewsFeed').append(reviewHtml);
-                });
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log('AJAX error:', textStatus, errorThrown);
+            error: function(error) {
+                alert(error);
+
             }
         });
     });
-     
+
+
+        // $.ajax({
+        //     url: '/getBusinessRanking',
+        //     method: 'POST',
+        //     contentType: 'application/json',
+        //     data: JSON.stringify(data),
+        //     success: function(busData) {
+        //         console.log(busData.blist)
+        //         console.log(busData.bList.length);
+        //     },
+        //     success: function(reviews) {
+        //         $('#reviewsFeed').html('');
+        //         reviews.bList.forEach(function(review) {
+        //             console.log(review)
+        //             var reviewHtml = createBusinessCardHtml(review);
+        //             $('#reviewsFeed').append(reviewHtml);
+        //         });
+        //     },
+        //     error: function(jqXHR, textStatus, errorThrown) {
+        //         console.log('AJAX error:', textStatus, errorThrown);
+        //     }
+        // });
+
     
     // loadAllReviews();
     const username = getUsernameFromCookie();

@@ -391,31 +391,46 @@ export const searchReview = async (condition) => {
   return allReviewList;
 }
 
-export const populateRating = async (businessId) => {
-  businessId = new ObjectId(helper.checkObjectId(businessId));
 
-
-  const businessCollection = await businesses();
-  const reviewCollection = await reviews();
-  let reviewList=[]
-  const business = await businessCollection.findOne({ _id: businessId })
-  for (let each of business.reviews) {
-    const review = await reviewCollection.findOne({ _id: each });
-    reviewList.push(review._id);
-  }
-  let ratingVal=await calculateRating(reviewList);
-  try {
-    let updatedBusiness=await businessCollection.updateOne(
-      { _id: businessId },
-      { $set: { averageRating: ratingVal } }
-    );
-    return updatedBusiness
+// export const populateAllRating = async () => {
+//   const businessCollection = await businesses();
+//   const allBusiness = await businessCollection.find({}).toArray();
+//   try {
+//     for (let each of allBusiness) {
+//       populateRating(each._id.toString());
+//     }
     
-  } catch (error) {
-    console.log(error);
-    throw error
-  }
-} 
+//   } catch (error) {
+//     console.log("error in populateAllRating:",error); 
+//   }
+
+
+
+// export const populateRating = async (businessId) => {
+//   businessId = new ObjectId(helper.checkObjectId(businessId));
+//   const businessCollection = await businesses();
+//   const reviewCollection = await reviews();
+
+
+//   let reviewList=[]
+//   const business = await businessCollection.findOne({ _id: businessId })
+//   for (let each of business.reviews) {
+//     const review = await reviewCollection.findOne({ _id: each });
+//     reviewList.push(review._id);
+//   }
+//   let ratingVal=await calculateRating(reviewList);
+//   try {
+//     let updatedBusiness=await businessCollection.updateOne(
+//       { _id: businessId },
+//       { $set: { averageRating: ratingVal } }
+//     );
+//     return updatedBusiness
+    
+//   } catch (error) {
+//     console.log(error);
+//     throw error
+//   }
+// } 
 
 export const getVibeReview = async (userId,businessId) => {
   userId= new ObjectId(helper.checkObjectId(userId));
@@ -444,31 +459,31 @@ export const getVibeReview = async (userId,businessId) => {
 
 
 
-export const calculateRating = async (reviewList) => {
-  let ratingList=[]
-  const reviewCollection = await reviews();
-  for (let each of reviewList) {
-    var reviewId = new ObjectId(each._id);
-    var review = await reviewCollection.findOne({ _id: reviewId });
-    ratingList.push(review.rating);
+// export const calculateRating = async (reviewList) => {
+//   let ratingList=[]
+//   const reviewCollection = await reviews();
+//   for (let each of reviewList) {
+//     var reviewId = new ObjectId(each._id);
+//     var review = await reviewCollection.findOne({ _id: reviewId });
+//     ratingList.push(review.rating);
 
-  }
-  const sum = ratingList.reduce((a, b) => a + b, 0);
-  const avg = (sum / ratingList.length) || 0;
-  let mean=  Number(avg.toFixed(1))
+//   }
+//   const sum = ratingList.reduce((a, b) => a + b, 0);
+//   const avg = (sum / ratingList.length) || 0;
+//   let mean=  Number(avg.toFixed(1))
 
-  return mean
-}
+//   return mean
+// }
 
-export const checkIfReviewExists = async (businessId, userId) => {
-  try {
-    businessId = new ObjectId(helper.checkObjectId(businessId));
-    userId = new ObjectId(helper.checkObjectId(userId));
-    const reviewCollection = await reviews();
-    const review = await reviewCollection.findOne({ businessId: businessId, userId: userId });
-    if (!review) return false;
-    return true;
-  } catch (error) {
-    throw error;
-  }
-}
+// export const checkIfReviewExists = async (businessId, userId) => {
+//   try {
+//     businessId = new ObjectId(helper.checkObjectId(businessId));
+//     userId = new ObjectId(helper.checkObjectId(userId));
+//     const reviewCollection = await reviews();
+//     const review = await reviewCollection.findOne({ businessId: businessId, userId: userId });
+//     if (!review) return false;
+//     return true;
+//   } catch (error) {
+//     throw error;
+//   }
+// }
