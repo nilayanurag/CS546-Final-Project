@@ -20,6 +20,7 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
     req.method = req.body._method;
     delete req.body._method;
   }
+  
   next();
 };
 

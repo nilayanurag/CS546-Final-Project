@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import * as EmailValidator from 'email-validator';
 import { users } from "../config/mongoCollections.js"
+import xss from "xss";
 
 export function checkStringHelper(strVal, varName) {
     if (!varName) varName = "Value"
@@ -155,7 +156,11 @@ export async function checkIfEmailPresent(emailId) {
 
 export function checkPass(password) {
     //temprory changing to less lengh got easy testing changit back to 8
-    password = checkString(password, "password",8)
+    try {
+        password = checkString(password, "password", 8)
+    } catch (e) {
+        throw "Password not valid Format.Check ruleset"
+    }
     let upperCheck = false
     let numCheck = false
     let specialCheck = false
@@ -192,11 +197,11 @@ export function checkSamePass(password, cnfPassword) {
 
 export function checkAddress(addressObject) {
     if (typeof (addressObject) != "object") throw "Not obj"
-    addressObject.firstLine = checkString(addressObject.firstLine, "firstAddressLine", 1, 50)
-    addressObject.lastLine = checkString(addressObject.lastLine, "lastAddressLine", 1, 50)
-    addressObject.city = checkString(addressObject.city, "city", 3, 50)
-    addressObject.country = checkString(addressObject.country, "country", 2)
-    let state = checkString(addressObject.state, "state", 2).toUpperCase()
+    addressObject.firstLine = checkString(xss(addressObject.firstLine), "firstAddressLine", 1, 50)
+    addressObject.lastLine = checkString(xss(addressObject.lastLine), "lastAddressLine", 1, 50)
+    addressObject.city = checkString(xss(addressObject.city), "city", 3, 50)
+    addressObject.country = checkString(xss(addressObject.country), "country", 2,50)
+    let state = checkString(xss(addressObject.state), "state", 2).toUpperCase()
     const states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
         'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
         'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
@@ -205,9 +210,9 @@ export function checkAddress(addressObject) {
     if (states.includes(state)) { }
     else { throw "Not valid state" }
     addressObject.state = state
-    let zip = checkString(addressObject.zip, "Zip", 5)
+    let zip = checkString(xss(addressObject.zip), "Zip", 5)
     if (zip.length != 5) throw "invalid"
-    checkWholeNumber(Number(checkStringIsNum(zip)))
+    zip=checkWholeNumber(Number(checkStringIsNum(zip)))
     addressObject.zip = zip
 
     return addressObject

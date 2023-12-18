@@ -51,8 +51,8 @@ export const createUser = async (
   const userCollection = await users();
 
   username = await helper.checkUniqueUsername(username);
-  firstName = helper.checkString(firstName, "firstName", 1, 25);
-  lastName = helper.checkString(lastName, "lastName", 1, 25);
+  firstName = helper.checkString(firstName, "firstName", 2, 25);
+  lastName = helper.checkString(lastName, "lastName", 2, 25);
   sex = helper.checkSex(sex);
   contactEmail = await helper.checkIfEmailPresent(contactEmail);
   age = helper.checkAge(age, 12, 105);
@@ -104,7 +104,7 @@ export const loginUser = async (contactEmail, password) => {
   try {
     compareToPassword = await bcrypt.compare(password, found.password);
   } catch (e) {
-    //no op
+    throw "password not detected"
   }
   if (compareToPassword) {
     return {
@@ -145,8 +145,8 @@ export const updateUser = async (
 ) => {
     userId = new ObjectId(helper.checkObjectId(userId));
     username = await helper.checkValidUsername(username);
-    firstName = helper.checkString(firstName, "firstName", 1, 25);
-    lastName = helper.checkString(lastName, "lastName", 1, 25);
+    firstName = helper.checkString(firstName, "firstName", 2, 25);
+    lastName = helper.checkString(lastName, "lastName", 2, 25);
     sex = helper.checkSex(sex);
     contactEmail = helper.checkValidEmail(contactEmail);
     age = helper.checkAge(age, 12, 105);
