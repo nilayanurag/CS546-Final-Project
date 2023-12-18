@@ -18,15 +18,15 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.firstNameInput),"firstName",1,25)
-    let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.lastNameInput),"lastName",1,25)
-    let usernameVal = await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.usernameInput),"username",1,25)
+    let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.firstNameInput),"firstName",2,25)
+    let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.lastNameInput),"lastName",2,25)
+    let usernameVal = await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.usernameInput),"username",2,25)
     let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,xss(userInfo.sexInput),"sex")
-    let contactEmailVal=await routeHelper.routeValidationHelper(helper.xss(checkIfEmailPresent),userInfo.contactEmailInput)
+    let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkIfEmailPresent,xss(userInfo.contactEmailInput))
     let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,xss(userInfo.ageInput),12,105)
     let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,xss(userInfo.passwordInput))
-    let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,xss(userInfo.passwordInput),userInfo.confirmPasswordInput)
-    let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,xss(userInfo.locationInput))
+    let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,xss(userInfo.passwordInput),xss(userInfo.confirmPasswordInput))
+    let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,userInfo.locationInput)
 
 
     let errorCode=undefined
@@ -183,15 +183,15 @@ usersRouter
 
 
       let userId=req.session.user.userId
-      let username = await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.usernameInput),"username",1,25)
-      let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.firstNameInput),"firstName",1,25)
-      let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.lastNameInput),"lastName",1,25)
+      let username = await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.usernameInput),"username",2,25)
+      let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.firstNameInput),"firstName",2,25)
+      let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.lastNameInput),"lastName",2,25)
       let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,xss(userInfo.sexInput),"sex")
       let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,xss(userInfo.contactEmailInput))
       let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,xss(userInfo.ageInput),12,105)
       let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,xss(userInfo.passwordInput))
       let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,xss(userInfo.passwordInput),xss(userInfo.confirmPasswordInput))
-      let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,xss(userInfo.locationInput))
+      let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,userInfo.locationInput)
 
       let errorCode=undefined
       
