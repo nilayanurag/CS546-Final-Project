@@ -127,6 +127,18 @@ export async function checkValidUsername(username) {
     }
 }
 
+export async function checkUniqueUsername(username) {
+    username=checkString(username,"username",1,50)
+    const userCollection = await users();
+    const userInfo = await userCollection.findOne({ username: username });
+
+    
+    if (userInfo) {
+        throw "Username Already Taken"    }
+    else{
+        return username
+    }
+}
 export async function checkIfEmailPresent(emailId) {
     emailId = checkValidEmail(emailId)
     
