@@ -9,7 +9,7 @@ categoryRouter
 .route("/categories/getAll")
 .get(async (req, res) => {  
     try {
-        const categories = await categoryData.getAll();
+        const categories = await categoryData.getAllCategory();
         res.json(categories);
     } catch (e) {
         res.status(500).json({ errorMessage:"Internal Server Error" });

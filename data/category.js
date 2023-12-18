@@ -52,13 +52,10 @@ export const getCategoryByName = async (categoryName) => {
 
 // Route: GET /categories/getAll
 export const getAllCategory = async () => {
-    try {
+   
         const categoryCollection = await categories();
         const category = await categoryCollection.find({}).toArray();
         if (!category) throw "Category not found";
         return category;
-        
-    } catch (error) {
-        throw error;
-    }
+
 };

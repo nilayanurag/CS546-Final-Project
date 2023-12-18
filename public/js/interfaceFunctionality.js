@@ -70,7 +70,7 @@ $(document).ready(function() {
             error: function(error) {
                 console.log(error);
             }
-        });
+        }); 
     }
     );
 
@@ -254,18 +254,114 @@ $(document).ready(function() {
                                 <p class="card-text">${starsHtml}</p>
                                 <p class="card-text">👍 ${review.thumsUp.length} 👎 ${review.thumsDown.length}</p>
                             </div>
-                            <div>
-                                <img src="${review.image ? review.image : placeholderImage}" alt="Review image" class="img-fluid rounded">
-                            </div>
+                            
                         </div>
                     </a>
                     </div>
                 </div>
             </div>`;
     }
+    // <div>
+    //                             <img src="${review.image ? review.image : placeholderImage}" alt="Review image" class="img-fluid rounded">
+    //                         </div>
     
+    function createBusinessCardHtml(business) {
+        let starsHtml = generateStarsHtml(business.averageRating);
+        // Optional vibe rating
+        let vibeRatingHtml = business.vibeRating ? 
+            `<p class="card-text">Vibe Rating: ${business.vibeRating}/5 ${generateStarsHtml(business.vibeRating)}</p>` : '';
     
+        return `
+            <div class="business-item mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${business.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${business.categoryName}</h6>
+                        <p class="card-text">Average Rating: ${business.averageRating}/5</p>
+                        <p class="card-text">${starsHtml}</p>
+                        ${vibeRatingHtml}
+                    </div>
+                </div>
+            </div>`;
+
+    }
+
+        
+    function generateStarsHtml(rating) {
+        const starIconFilled = "images/starfilled.png";
+        const starIconHalf = "images/starhalf.png";
+        const starIconEmpty = "images/emptystar.png";
+        const totalStars = 5;
+        let starsHtml = '';
     
+        for (let i = 0; i < totalStars; i++) {
+            if (i < Math.floor(rating)) {
+                // Full star
+                starsHtml += `<img src="${starIconFilled}" alt="Star" class="star-icon">`;
+            } else if (i < Math.ceil(rating) && i === Math.floor(rating)) {
+                // Half star for decimal part
+                starsHtml += `<img src="${starIconHalf}" alt="Star" class="star-icon">`;
+            } else {
+                // Empty star
+                starsHtml += `<img src="${starIconEmpty}" alt="Star" class="star-icon">`;
+            }
+        }
+    
+        return starsHtml;
+    }
+    
+    $.ajax({
+        url: '/categories/getAll',
+        method: 'GET',
+        success: function(categories) {
+            categories.forEach(function(category) {
+                $('#categorySelect').append(new Option(category.name, category.id));
+            });
+        },
+        error: function(error) {
+            // Handle error
+            console.error(error);
+        }
+    });
+    
+    // $('#searchButton').click(function(e) {
+    //     e.preventDefault();
+
+    //     const data = {
+    //         category: $('#categorySelect').val(),
+    //         gender: {
+    //             male: $('#maleCheckbox').is(':checked'),
+    //             female: $('#femaleCheckbox').is(':checked')
+    //         },
+    //         ageRange: {
+    //             min: $('#minAge').val(),
+    //             max: $('#maxAge').val()
+    //         },
+    //         username: getUsernameFromCookie()
+    //     };
+
+    //     $.ajax({
+    //         url: '/getBusinessRanking',
+    //         method: 'POST',
+    //         contentType: 'application/json',
+    //         data: JSON.stringify(data),
+    //         success: function(busData) {
+    //             console.log(busData.blist)
+    //             console.log(busData.bList.length);
+    //         },
+    //         success: function(reviews) {
+    //             $('#reviewsFeed').html('');
+    //             reviews.forEach(function(review) {
+    //                 var reviewHtml = createBusinessCardHtml(review);
+    //                 $('#reviewsFeed').append(reviewHtml);
+    //             });
+    //         },
+    //         error: function(jqXHR, textStatus, errorThrown) {
+    //             console.log('AJAX error:', textStatus, errorThrown);
+    //         }
+    //     });
+    // });
+     
     
     // loadAllReviews();
     const username = getUsernameFromCookie();

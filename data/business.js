@@ -1,6 +1,11 @@
 import * as helper from "../helpers/validation.js"
-import {businesses, reviews, categories} from "../config/mongoCollections.js"
+import {businesses, reviews, categories,users} from "../config/mongoCollections.js"
 import { ObjectId } from "mongodb";
+import { compareSync } from "bcrypt";
+import * as userData from "../data/users.js";
+import * as reviewData from "../data/review.js";
+import * as categoryData from "../data/category.js";
+import * as businessData from "../data/business.js";
 
 /*
 business:{
@@ -183,3 +188,64 @@ export const updateGlobalRating = async (businessId) => {
     // }
 }
 
+export const getBusinessRankingList = async (taskInfo) => {
+    const categoryCollection = await categories();
+    const reviewCollection = await reviews();
+    const userCollection = await users();
+    const businessCollection    = await businesses();
+
+    let categoryList = await categoryCollection.find({}).toArray();
+
+    if (taskInfo){}
+    else{throw "No task"}
+
+    if (categoryList.some(category => category.name === taskInfo.category)) {
+        console.log(categoryList)
+    }else{throw""}
+
+    let catInfo=await categoryCollection.findOne({name: taskInfo.category})
+
+    let allSelected=await businessCollection.find({categoryId: catInfo._id}).toArray()
+    let userInfo=await userData.getUserByUsername(taskInfo.username);
+    userInfo=userInfo[0]
+    let busList=[]
+    for (let eachBus of allSelected){
+        let reviews=eachBus.reviews;
+        var reviewList=[]
+        console.log(reviews.length)
+        for (let eachReview of reviews){
+            let eachReviewInfo=await reviewCollection.findOne({_id: eachReview});
+            if (userInfo.following.includes(eachReviewInfo.userId)) {
+            }
+                // if (taskInfo.ageRange.minAge){
+                //     if (userInfo.age>taskInfo.minAge){
+                //         continue;
+                //     }
+                // }
+                // if (taskInfo.ageRange.maxAge){
+                //     if (userInfo.age<taskInfo.maxAge){
+                //         continue;
+                //     }
+                // }
+                // if (taskInfo.gender.male){
+                //     if (!(userInfo.male)){
+                //         continue;
+                //     }
+                // }
+                // if (taskInfo.gender.female){
+                //     if (!(userInfo.female)){
+                //         continue;
+                //     }
+        
+                reviewList.push(eachReviewInfo);
+        let customRating=await reviewData.calculateRating(reviewList)
+        eachBus.vibeRating=customRating
+        busList.push(eachBus)
+        
+        }
+    }
+    busList.sort((a,b)=>{return b.vibeRating-a.vibeRating})
+    return busList;
+}  
+    
+    

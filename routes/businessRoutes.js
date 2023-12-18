@@ -137,5 +137,32 @@ businessRouter
     res.json(businesses);
 });
 
+businessRouter
+.get('/business/:id', async (req, res) => {
+    const business = await businessData.getBusinessById(xss(req.params.id));
+    res.json(business);
+});
+
+businessRouter
+.route("/getBusinessRanking")
+.post(async (req, res) => {
+    // const taskInfo = {
+    //     category: $('#categorySelect').val(),
+    //     gender: {
+    //         male: $('#maleCheckbox').is(':checked'),
+    //         female: $('#femaleCheckbox').is(':checked')
+    //     },
+    //     ageRange: {
+    //         min: $('#minAge').val(),
+    //         max: $('#maxAge').val()
+    //     }
+    // };
+    let taskInfo = req.body;
+    let businessList = await businessData.getBusinessRankingList(taskInfo);
+    return res.json({bList: businessList});
+}
+);
+
+
 
 export default businessRouter;

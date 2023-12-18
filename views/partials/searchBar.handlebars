@@ -1,8 +1,8 @@
 <!-- Search Bar Partial -->
-<div class="container">
-    <div class="row align-items-center">
-        <!-- Dropdown for Search Type -->
-        <div class="col-auto">
+{{!-- <div class="container">
+    <div class="row align-items-center"> --}}
+        
+        {{!-- <div class="col-auto">
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="searchTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Search Type
@@ -47,4 +47,42 @@
             </div>
         </div>
     </div>
+</div> --}}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <form id="searchForm">
+                <!-- Dropdown for Category -->
+                <div class="form-group">
+                    <label for="categorySelect">Category</label>
+                    <select class="form-control" id="categorySelect">
+                        <!-- Options will be populated here -->
+                    </select>
+                </div>
+
+                <!-- Checkboxes for Gender -->
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="maleCheckbox" value="male">
+                    <label class="form-check-label" for="maleCheckbox">Male</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="femaleCheckbox" value="female">
+                    <label class="form-check-label" for="femaleCheckbox">Female</label>
+                </div>
+
+                <!-- Number Fields for Age -->
+                <div class="form-row">
+                    <div class="col">
+                        <input type="number" class="form-control" placeholder="Min Age" id="minAge">
+                    </div>
+                    <div class="col">
+                        <input type="number" class="form-control" placeholder="Max Age" id="maxAge">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3" id="searchButton">SortByRating</button>
+            </form>
+        </div>
+    </div>
 </div>
+

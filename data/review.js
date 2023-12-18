@@ -89,6 +89,7 @@ export const createReview = async (
         { _id: userId },
         { $addToSet: { reviews: newReview.insertedId } }
       );
+      await populateRating(businessId.toString());
     }
     return { insertedReview: newReview.insertedId ? true : false };
   } catch (error) {}
@@ -403,3 +404,73 @@ export const searchReview = async (condition) => {
   allReviewList=await populateReviewWithData(allReviewList);
   return allReviewList;
 }
+
+export const populateRating = async (businessId) => {
+  businessId = new ObjectId(helper.checkObjectId(businessId));
+
+
+  const businessCollection = await businesses();
+  const reviewCollection = await reviews();
+  let reviewList=[]
+  const business = await businessCollection.findOne({ _id: businessId })
+  for (let each of business.reviews) {
+    const review = await reviewCollection.findOne({ _id: each });
+    reviewList.push(review._id);
+  }
+  let ratingVal=await calculateRating(reviewList);
+  try {
+    let updatedBusiness=await businessCollection.updateOne(
+      { _id: businessId },
+      { $set: { averageRating: ratingVal } }
+    );
+    return updatedBusiness
+    
+  } catch (error) {
+    console.log(error);
+    throw error
+  }
+} 
+
+export const getVibeReview = async (userId,businessId) => {
+  userId= new ObjectId(helper.checkObjectId(userId));
+  businessId= new ObjectId(helper.checkObjectId(businessId));
+
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+
+  const user = await userCollection.findOne({ _id: userId });
+  const business = await businessCollection.findOne({ _id: businessId });
+
+
+  let reviewList=[]
+  for (let eachReview of business.reviews) {
+    const review = await reviewCollection.findOne({ _id: eachReview });
+    if (user.following.includes(review.userId)) {
+      reviewList.push(review._id);
+    }
+  }
+  let ratingVal=await calculateRating(reviewList);
+  business.vibeRating=ratingVal;
+  return business
+}
+
+
+
+
+export const calculateRating = async (reviewList) => {
+  let ratingList=[]
+  const reviewCollection = await reviews();
+  for (let each of reviewList) {
+    var reviewId = new ObjectId(each._id);
+    var review = await reviewCollection.findOne({ _id: reviewId });
+    ratingList.push(review.rating);
+
+  }
+  const sum = ratingList.reduce((a, b) => a + b, 0);
+  const avg = (sum / ratingList.length) || 0;
+  let mean=  Number(avg.toFixed(1))
+
+  return mean
+}
+
