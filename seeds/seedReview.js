@@ -16,7 +16,47 @@ export const seedAllReview = async () => {
       businessId,
       userId,
       categoryId,
+      5,
+      "The ambience of Napoli's pizzeria was amazing and food was delightful as well. A must visit resto",
+      null
+    );
+  } catch (error) {
+    throw error;
+  }
+  try {
+    const business = await businessFunctions.getBusinessByName(
+      "Napoli's Pizzeria"
+    );
+    const businessId = business._id.toString();
+    const categoryId = business.categoryId.toString();
+    const user = await userFunctions.getUserByUsername("harvishJ");
+    const userId = user[0]._id.toString();
+
+    const review = await reviewFunctions.createReview(
+      businessId,
+      userId,
+      categoryId,
       4,
+      "The ambience of Napoli's pizzeria was amazing and food was delightful as well. A must visit resto",
+      null
+    );
+  } catch (error) {
+    throw error;
+  }
+  try {
+    const business = await businessFunctions.getBusinessByName(
+      "Napoli's Pizzeria"
+    );
+    const businessId = business._id.toString();
+    const categoryId = business.categoryId.toString();
+    const user = await userFunctions.getUserByUsername("hitarthpatel");
+    const userId = user[0]._id.toString();
+
+    const review = await reviewFunctions.createReview(
+      businessId,
+      userId,
+      categoryId,
+      1,
       "The ambience of Napoli's pizzeria was amazing and food was delightful as well. A must visit resto",
       null
     );
