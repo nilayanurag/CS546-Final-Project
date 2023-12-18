@@ -3,6 +3,10 @@ import * as business from "./seedBusiness.js";
 import * as user from "./seedUser.js";
 import * as review from "./seedReview.js";
 import * as comment from "./seedComment.js";
+import {dbConnection} from '../config/mongoConnection.js';
+
+const db = await dbConnection();
+await db.dropDatabase();
 
 try {
   await category.seedAllCategory();
