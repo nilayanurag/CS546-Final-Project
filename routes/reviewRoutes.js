@@ -38,7 +38,7 @@ reviewRouter.post(
         2,
         500
       );
-      reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints);
+      reviewInfo.ratingPoints = parseInt(xss(reviewInfo.ratingPoints));
     } catch (error) {
       return res.status(400).json({ errorMessage: error });
     }
@@ -130,7 +130,7 @@ reviewRouter.post(
     reviewId = helper.checkObjectId(reviewId);
     reviewId = xss(reviewId);
     reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints,10);
-    reviewInfo.reviewText = helper.checkString(reviewInfo.reviewText, "Review Text", 2, 500);
+    reviewInfo.reviewText = helper.checkString(xss(reviewInfo.reviewText), "Review Text", 2, 500);
   } catch (error) {
     return res.status(400).json({ errorMessage: error });
   }

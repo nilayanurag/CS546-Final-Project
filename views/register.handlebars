@@ -188,11 +188,12 @@ registration handelbars
 
                 <label for="sexInput">Sex</label>
                 <select id="sexInput" class="form-control" name="sexInput" required>
-                    <option value="{{sexDef}}" selected disabled hidden>{{sexDef}}</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="">Choose here</option>
+                    <option value="male" {% if sexDef == 'male' %}selected{% endif %}>Male</option>
+                    <option value="female" {% if sexDef == 'female' %}selected{% endif %}>Female</option>
+                    <option value="other" {% if sexDef == 'other' %}selected{% endif %}>Other</option>
                 </select>
+
                 {{#if sexErr}}
                     <div id="sexError" class="errorMessage">
                         {{sexErr}}
@@ -300,4 +301,5 @@ registration handelbars
             </p>
         </form>
     </div>
+    <script src="/public/js/registerPageClientValidation.js"></script>
 </main>

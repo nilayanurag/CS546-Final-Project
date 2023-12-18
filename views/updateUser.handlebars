@@ -1,6 +1,6 @@
 
 <main class="container mt-4">
-    <form id="update-form" action="/updateUser" method="post" class="p-4 border rounded">
+    <form id="updateUser-form" action="/updateUser" method="post" class="p-4 border rounded">
         <div class="form-group">
             <label for="firstNameInput">First Name</label>
             <input type="text" class="form-control" id="firstNameInput" name="firstNameInput" value="{{firstNameDef}}" required>
@@ -39,12 +39,13 @@
             {{/if}}
 
             <label for="sexInput">Sex</label>
-            <select id="sexInput" class="form-control" name="sexInput" value="{{sexDef}}" required>
-                <option value="" selected disabled hidden>Choose here</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+            <select id="sexInput" class="form-control" name="sexInput" required>
+                <option value="" disabled hidden>Choose here</option>
+                <option value="male" {% if sexDef == 'male' %}selected{% endif %}>Male</option>
+                <option value="female" {% if sexDef == 'female' %}selected{% endif %}>Female</option>
+                <option value="other" {% if sexDef == 'other' %}selected{% endif %}>Other</option>
             </select>
+
             {{#if sexErr}}
                 <div id="sexError" class="errorMessage">
                     {{sexErr}}
@@ -151,5 +152,6 @@
     <p id="loginLinkForExistingUser" class="text-center">
         <a href="/login">Already have an account? Click here to log-in</a>
     </p>
+    <script src="/public/js/registerPageClientValidation.js"></script>
 </main>
 

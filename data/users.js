@@ -50,9 +50,9 @@ export const createUser = async (
 ) => {
   const userCollection = await users();
 
-  username = helper.checkString(username, "username", 1, 25);
-  firstName = helper.checkString(firstName, "firstName", 1, 25);
-  lastName = helper.checkString(lastName, "lastName", 1, 25);
+  username = await helper.checkUniqueUsername(username);
+  firstName = helper.checkString(firstName, "firstName", 2, 25);
+  lastName = helper.checkString(lastName, "lastName", 2, 25);
   sex = helper.checkSex(sex);
   contactEmail = await helper.checkIfEmailPresent(contactEmail);
   age = helper.checkAge(age, 12, 105);
@@ -104,7 +104,7 @@ export const loginUser = async (contactEmail, password) => {
   try {
     compareToPassword = await bcrypt.compare(password, found.password);
   } catch (e) {
-    //no op
+    throw "password not detected"
   }
   if (compareToPassword) {
     return {
@@ -144,9 +144,9 @@ export const updateUser = async (
   location
 ) => {
     userId = new ObjectId(helper.checkObjectId(userId));
-    username = helper.checkString(username, "username", 1, 25);
-    firstName = helper.checkString(firstName, "firstName", 1, 25);
-    lastName = helper.checkString(lastName, "lastName", 1, 25);
+    username = await helper.checkValidUsername(username);
+    firstName = helper.checkString(firstName, "firstName", 2, 25);
+    lastName = helper.checkString(lastName, "lastName", 2, 25);
     sex = helper.checkSex(sex);
     contactEmail = helper.checkValidEmail(contactEmail);
     age = helper.checkAge(age, 12, 105);
@@ -168,12 +168,10 @@ export const updateUser = async (
 
     if (!userData) throw "User not found";
     let dataPacket = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       sex: sex,
       age: age,
-      contactEmail: contactEmail,
       password: hash,
       following: userData.following,
       followers: userData.followers,

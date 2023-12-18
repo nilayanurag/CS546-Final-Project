@@ -153,3 +153,9 @@ body {
 .bold-text {
     font-weight: bold;
 }
+
+.errorMessage {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+}

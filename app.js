@@ -8,9 +8,7 @@ import exphbs from "express-handlebars";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import path from 'path';
-// app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const staticDir = express.static(__dirname + "/public");
@@ -20,6 +18,7 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
     req.method = req.body._method;
     delete req.body._method;
   }
+  
   next();
 };
 
@@ -32,9 +31,6 @@ app.use(rewriteUnsupportedBrowserMethods);
 app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-
-// Middleware to implement
-
 app.use(
     session({
       name: "AuthState",
@@ -44,9 +40,6 @@ app.use(
     })
   );
 
-  
-
-  
 
   app.use("/login", async (req, res, next) => {
     if (req.session.user) {
@@ -72,14 +65,6 @@ app.use(
     }
   });
 
-  // app.use("/home", async (req, res, next) => {
-  //   if (req.session.user) {
-  //       next();
-  //   } else {
-  //     return res.redirect("/login");
-  //   }
-  // });
-
   app.use("/review/createReview", async (req, res, next) => {
     if (!req.session.user) {
       return res.redirect("/login");
@@ -103,45 +88,31 @@ app.use(
       next();
     }
   });
+
+  app.use("/review/getReview/:id", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
+
+  app.use("/business/createBusiness", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
+
+  app.use("/review/updateReview/:id", async (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    } else {
+      next();
+    }
+  });
   
-
-  // app.use("*", async (req, res, next) => {
-  //   if (req.session.user) {
-  //       next();
-  //   } else {
-  //     return res.redirect("/home");
-  //   }
-  // });
-
-  // app.get('/', (req, res) => {
-  //   let user;
-  //   if (req.session.user) {
-  //   user= req.session.user
-  //   }else{
-  //   user={}
-  //   user.firstName="Guest"
-  //   }
-  //   const data = {
-  //     user: user,
-  //     items: ['Item 1', 'Item 2', 'Item 3'] ,
-  //     reviews:["review1","review2","review3"]
-
-  //   };
-  //   res.render('home',{data});
-  // });
-
-  // app.get('/refresh-content', (req, res) => {
-  //   const data = {
-  //     items: ['Item 1', 'Item 2', 'Item 3'] // Sample data
-  //   };
-  //   res.render('partials/followingList', data, (err, html) => {
-  //     res.send(html);
-  //   });
-  //   // res.render('followingList', data);
-  // });
-
-
-
 configRoutes(app);
 
 app.listen(3000, () => {
