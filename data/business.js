@@ -206,38 +206,42 @@ export const getBusinessRankingList = async (taskInfo) => {
     let catInfo=await categoryCollection.findOne({name: taskInfo.category})
 
     let allSelected=await businessCollection.find({categoryId: catInfo._id}).toArray()
-    let userInfo=await userData.getUserByUsername(taskInfo.username);
+    let userInfo=   await userData.getUserByUsername(taskInfo.username);
     userInfo=userInfo[0]
     let busList=[]
+    // userInfo.following=userInfo.following.map(id => id.toString())
     for (let eachBus of allSelected){
         let reviews=eachBus.reviews;
         var reviewList=[]
         console.log(reviews.length)
         for (let eachReview of reviews){
             let eachReviewInfo=await reviewCollection.findOne({_id: eachReview});
-            if (userInfo.following.includes(eachReviewInfo.userId)) {
-            }
-                // if (taskInfo.ageRange.minAge){
-                //     if (userInfo.age>taskInfo.minAge){
+            if (userInfo.following.map(id => id.toString()).includes(eachReviewInfo.userId.toString())) {
+            
+                // if (taskInfo.min){
+                //     if (userInfo.age>taskInfo.min){
                 //         continue;
                 //     }
                 // }
-                // if (taskInfo.ageRange.maxAge){
-                //     if (userInfo.age<taskInfo.maxAge){
+                // if (taskInfo.max){
+                //     if (userInfo.age<taskInfo.max){
                 //         continue;
                 //     }
                 // }
-                // if (taskInfo.gender.male){
-                //     if (!(userInfo.male)){
+                // if (taskInfo.male){
+                //     if (!(userInfo.male=="male")){
                 //         continue;
                 //     }
                 // }
-                // if (taskInfo.gender.female){
-                //     if (!(userInfo.female)){
+                // if (taskInfo.female){
+                //     if (!(userInfo.female==="female")){
                 //         continue;
                 //     }
-        
+                // }
+                eachReviewInfo._id=eachReviewInfo._id.toString()
                 reviewList.push(eachReviewInfo);
+            }
+                
         let customRating=await reviewData.calculateRating(reviewList)
         eachBus.vibeRating=customRating
         busList.push(eachBus)

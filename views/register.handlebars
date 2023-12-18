@@ -187,8 +187,8 @@ registration handelbars
                 {{/if}}
 
                 <label for="sexInput">Sex</label>
-                <select id="sexInput" class="form-control" name="sexInput" value="{{sexDef}}" required>
-                    <option value="" selected disabled hidden>Choose here</option>
+                <select id="sexInput" class="form-control" name="sexInput" required>
+                    <option value="{{sexDef}}" selected disabled hidden>{{sexDef}}</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
