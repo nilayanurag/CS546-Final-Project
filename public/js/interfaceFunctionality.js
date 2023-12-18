@@ -311,7 +311,7 @@ $(document).ready(function() {
     }
     
     $.ajax({
-        url: '/categories/getAll',
+        url: '/categories/getAllCatgoriesH',
         method: 'GET',
         success: function(categories) {
             categories.forEach(function(category) {

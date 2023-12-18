@@ -89,7 +89,6 @@ export const createReview = async (
         { _id: userId },
         { $addToSet: { reviews: newReview.insertedId } }
       );
-      await populateRating(businessId.toString());
     }
     return { insertedReview: newReview.insertedId ? true : false };
   } catch (error) {}

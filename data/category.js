@@ -51,7 +51,8 @@ export const getCategoryByName = async (categoryName) => {
 
 
 // Route: GET /categories/getAll
-export const getAllCategory = async () => {
+export const 
+getAllCategory = async () => {
    
         const categoryCollection = await categories();
         const category = await categoryCollection.find({}).toArray();
