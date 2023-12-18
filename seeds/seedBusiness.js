@@ -135,7 +135,7 @@ export const seedAllBuisness = async () => {
     }
     try {
     
-        let category = await categoryFunctions.getCategoryByName("Restraunt");
+        let category = await categoryFunctions.getCategoryByName("Restaurant");
         const buisness1 = await businessFunction.createBusiness("Chipotle", category._id.toString(), {
             firstLine: "229",
             lastLine: "Washington Street",

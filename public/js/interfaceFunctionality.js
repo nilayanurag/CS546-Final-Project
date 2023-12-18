@@ -18,23 +18,32 @@ $(document).ready(function() {
         return username;
     }
     
+    function populateUserFollowingList(username){
+
+        $.ajax({
+            url: `/getFollowing/${username}`,
+            type: 'GET',
+            success: function(followingUsers) {
+                followingUsers.forEach(function(user) {
+                    // $('.following-list .list-group').append('<li class="list-group-item">' + user.firstName +" "+user.lastName+ '</li>');
+                    $('.following-list .list-group').append(
+                        '<li class="list-group-item">' +
+                        '<a class =".no-highlight-link" href="/getUserProfilePage/' + encodeURIComponent(user.username) + '">' +
+                        user.firstName + " " + user.lastName +
+                        '</a></li>'
+                    );
+                });
+            },
+            error: function(error) {
+                // Handle error
+                console.error(error);
+            }
+        });
+    }
+
     
 
-    $.ajax({
-        url: '/getAllUsers',
-        type: 'GET',
-        success: function(followingUsers) {
-            followingUsers.forEach(function(user) {
-                $('.following-list .list-group').append('<li class="list-group-item">' + user.firstName +" "+user.lastName+ '</li>');
-            });
-        },
-        error: function(error) {
-            // Handle error
-            console.error(error);
-        }
-    });
-
-    $("#search-button").click(function(event) {
+    $("#searchButton").click(function(event) {
         event.preventDefault();
         var searchType = $("#searchTypeDropdown").text().trim();
         var searchTerm = $('#searchInput').val();
@@ -43,22 +52,25 @@ $(document).ready(function() {
             option2: $('#option2').is(':checked')
         };
         $.ajax({
-            url: "/search",
+            url: "review/searchReview",
             type: "POST",
             data: {
                 searchType: searchType,
                 searchTerm: searchTerm,
                 options: options
             },
-            success: function(data) {
-                console.log(data);
-                const searchHtml = Handlebars.partials['search']({ searchResults: data });
-                $('#search-results').html(searchHtml);
+            success: function(reviews) {
+                $('#reviewsFeed').html('');
+                let rankNumber = 0;
+                reviews.forEach(function(review,rankNumber) {
+                    var reviewHtml = createReviewHtml(review,true,rankNumber+1);
+                    $('#reviewsFeed').append(reviewHtml);
+                });
             },
             error: function(error) {
                 console.log(error);
             }
-        });
+        }); 
     }
     );
 
@@ -168,11 +180,12 @@ $(document).ready(function() {
     }
     
 
-    function fetchReviews() {
+    function fetchReviews(username) {
         $.ajax({
-            url: '/getAllReviews', // Your API endpoint
+            url: `/review/getFeed/${username}`, // Your API endpoint
             type: 'GET',
             success: function(reviews) {
+                $('#reviewsFeed').html('');
                 reviews.forEach(function(review) {
                     var reviewHtml = createReviewHtml(review);
                     $('#reviewsFeed').append(reviewHtml);
@@ -185,43 +198,180 @@ $(document).ready(function() {
     }
     
 
-    function createReviewHtml(review) {
+    // function createReviewHtml(review) {
+    //     return `
+    //         <div class="review-item mb-3">
+    //             <div class="card">
+    //                 <div class="card-body">
+    //                     <a href="/review/getReview/${review._id}">
+    //                     <h5 class="card-title">${review.name}</h5>
+    //                     <p class="card-text">${review.reviewText}</p>
+    //                     <p class="card-text"><strong>Rating:</strong> ${review.rating}/5</p>
+    //                 </div>
+    //                 <div class="card-footer d-flex justify-content-between align-items-center">
+    //                     ${review.image ? `<img src="${review.image}" alt="Review image" class="img-fluid">` : ''}
+    //                     <div>
+    //                         <input type="text" class="form-control comment-input mb-2" placeholder="Add a comment...">
+    //                         <button class="btn btn-primary add-comment-btn mb-2" data-review-id="${review.id}">Post Comment</button>
+    //                         <div>
+    //                             <button class="btn btn-outline-success btn-sm mr-2 thumbs-up" data-review-id="${review.id}">
+    //                                 <i class="fa fa-thumbs-up"></i>
+    //                             </button>
+    //                             <button class="btn btn-outline-danger btn-sm thumbs-down" data-review-id="${review.id}">
+    //                                 <i class="fa fa-thumbs-down"></i>
+    //                             </button>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>`;
+    // }
+    // 
+    function createReviewHtml(review, ranked, rankNumber) {
+        const placeholderImage = "/images/imageNotFound.jpg"; 
+        const starIconFilled = "images/starfilled.png"; 
+        const starIconEmpty = "images/emptystar.png";
+    
+        const totalStars = 5;
+        let starsHtml = '';
+        for (let i = 0; i < totalStars; i++) {
+            starsHtml += `<img src="${i < review.rating ? starIconFilled : starIconEmpty}" alt="Star" class="star-icon">`;
+        }
+    
         return `
             <div class="review-item mb-3">
                 <div class="card">
                     <div class="card-body">
-                        <a href="/review/getReview/${review._id}">
-                        <h5 class="card-title">${review.name}</h5>
-                        <p class="card-text">${review.reviewText}</p>
-                        <p class="card-text"><strong>Rating:</strong> ${review.rating}/5</p>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        ${review.image ? `<img src="${review.image}" alt="Review image" class="img-fluid">` : ''}
-                        <div>
-                            <input type="text" class="form-control comment-input mb-2" placeholder="Add a comment...">
-                            <button class="btn btn-primary add-comment-btn mb-2" data-review-id="${review.id}">Post Comment</button>
-                            <div>
-                                <button class="btn btn-outline-success btn-sm mr-2 thumbs-up" data-review-id="${review.id}">
-                                    <i class="fa fa-thumbs-up"></i>
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm thumbs-down" data-review-id="${review.id}">
-                                    <i class="fa fa-thumbs-down"></i>
-                                </button>
+                    ${ranked ? `<span class="badge badge-secondary mr-2">${rankNumber}</span>` : ''}
+                    <a href="/review/getReview/${review._id}" class="no-highlight-link">
+                        <h5 class="card-title">${review.businessName}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${review.categoryName}</h6>
+                        <p>Review by: <em>${review.userName}</em></p>
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="card-text">${review.reviewText}</p>
+                                <p class="card-text bold-text">Rating:${review.rating}/5</p>
+                                <p class="card-text">${starsHtml}</p>
+                                <p class="card-text">👍 ${review.thumsUp.length} 👎 ${review.thumsDown.length}</p>
                             </div>
+                            
                         </div>
+                    </a>
                     </div>
                 </div>
             </div>`;
     }
+    // <div>
+    //                             <img src="${review.image ? review.image : placeholderImage}" alt="Review image" class="img-fluid rounded">
+    //                         </div>
     
-    try {
-        fetchReviews();
-    } catch (error) {
-      console.error(error);
+    function createBusinessCardHtml(business) {
+        let starsHtml = generateStarsHtml(business.averageRating);
+        // Optional vibe rating
+        let vibeRatingHtml = business.vibeRating ? 
+            `<p class="card-text">Vibe Rating: ${business.vibeRating}/5 ${generateStarsHtml(business.vibeRating)}</p>` : '';
+    
+        return `
+            <div class="business-item mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${business.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${business.categoryName}</h6>
+                        <p class="card-text">Average Rating: ${business.averageRating}/5</p>
+                        <p class="card-text">${starsHtml}</p>
+                        ${vibeRatingHtml}
+                    </div>
+                </div>
+            </div>`;
+
     }
+
+        
+    function generateStarsHtml(rating) {
+        const starIconFilled = "images/starfilled.png";
+        const starIconHalf = "images/starhalf.png";
+        const starIconEmpty = "images/emptystar.png";
+        const totalStars = 5;
+        let starsHtml = '';
+    
+        for (let i = 0; i < totalStars; i++) {
+            if (i < Math.floor(rating)) {
+                // Full star
+                starsHtml += `<img src="${starIconFilled}" alt="Star" class="star-icon">`;
+            } else if (i < Math.ceil(rating) && i === Math.floor(rating)) {
+                // Half star for decimal part
+                starsHtml += `<img src="${starIconHalf}" alt="Star" class="star-icon">`;
+            } else {
+                // Empty star
+                starsHtml += `<img src="${starIconEmpty}" alt="Star" class="star-icon">`;
+            }
+        }
+    
+        return starsHtml;
+    }
+    
+    $.ajax({
+        url: '/categories/getAll',
+        method: 'GET',
+        success: function(categories) {
+            categories.forEach(function(category) {
+                $('#categorySelect').append(new Option(category.name, category.id));
+            });
+        },
+        error: function(error) {
+            // Handle error
+            console.error(error);
+        }
+    });
+    
+    // $('#searchButton').click(function(e) {
+    //     e.preventDefault();
+
+    //     const data = {
+    //         category: $('#categorySelect').val(),
+    //         gender: {
+    //             male: $('#maleCheckbox').is(':checked'),
+    //             female: $('#femaleCheckbox').is(':checked')
+    //         },
+    //         ageRange: {
+    //             min: $('#minAge').val(),
+    //             max: $('#maxAge').val()
+    //         },
+    //         username: getUsernameFromCookie()
+    //     };
+
+    //     $.ajax({
+    //         url: '/getBusinessRanking',
+    //         method: 'POST',
+    //         contentType: 'application/json',
+    //         data: JSON.stringify(data),
+    //         success: function(busData) {
+    //             console.log(busData.blist)
+    //             console.log(busData.bList.length);
+    //         },
+    //         success: function(reviews) {
+    //             $('#reviewsFeed').html('');
+    //             reviews.forEach(function(review) {
+    //                 var reviewHtml = createBusinessCardHtml(review);
+    //                 $('#reviewsFeed').append(reviewHtml);
+    //             });
+    //         },
+    //         error: function(jqXHR, textStatus, errorThrown) {
+    //             console.log('AJAX error:', textStatus, errorThrown);
+    //         }
+    //     });
+    // });
+     
+    
     // loadAllReviews();
     const username = getUsernameFromCookie();
     console.log('Logged in as:', username);
+    try {
+        fetchReviews(username);
+    } catch (error) {
+      console.error(error);
+    }
+    populateUserFollowingList(username)
     getAndDisplayUserProfile(username);
     
 });

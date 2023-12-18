@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{{{title}}}</title>
+    <title>ReviewSphere</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -37,9 +37,9 @@
                         <a class="nav-link" href="/review/getMyReview">MyReviews<span class="sr-only">(current)</span></a>
                     </li>
                     
-                    <li class="nav-item">
+                    {{!-- <li class="nav-item">
                         <a class="nav-link" href="#">About Us</a>
-                    </li>
+                    </li> --}}
                 </ul>
                 {{!-- <form class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search reviews" aria-label="Search">
@@ -51,9 +51,9 @@
                             My Account
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="#">Profile</a>
-                            <a class="dropdown-item" href="#">Settings</a>
-                            <a class="dropdown-item" href="#">Logout</a>
+                            <a class="dropdown-item" href="/updateUser/{{user.userId}}">Update Profile</a>
+                            {{!-- <a class="dropdown-item" href="#">Settings</a> --}}
+                            <a class="dropdown-item" href="/logout">Logout</a>
                         </div>
                     </li>
                 </ul>
@@ -61,18 +61,18 @@
         </nav>
     </header>
 
-    <h1>{{{heading1}}}</h1>
+    {{!-- <h1>{{{heading1}}}</h1> --}}
         {{{body}}}  
-    <footer>
-        <footer class="bg-light text-center text-lg-start">
-            <div class="text-center p-3 footer-text" style="background-color: rgba(0, 0, 0, 0.2);">
-                © 2023 ReviewSphere:
-                <a class="text-dark" href="#">Privacy Policy</a> | 
-                <a class="text-dark" href="#">Terms of Use</a> | 
-                <a class="text-dark" href="#">Contact Us</a>
-            </div>
-        </footer>
+    
+    <footer class="bg-light text-center text-lg-start">
+        <div class="text-center p-3 footer-text" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2023 ReviewSphere:
+            <a class="text-dark" href="#">Privacy Policy</a> | 
+            <a class="text-dark" href="#">Terms of Use</a> | 
+            <a class="text-dark" href="#">Contact Us</a>
+        </div>
     </footer>
+    
 
     <script src="/public/js/basicfunctionality.js"></script>
     <script src="/public/js/interfaceFunctionality.js"></script>

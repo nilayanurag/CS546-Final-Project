@@ -212,19 +212,23 @@ export const deleteUser = async (userId) => {
   }
 };
 
+export const getFollowing = async (userId) => {
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: userId }) ;
+    if (!user) throw "User not found";
+    var followingList=[];
+    for (let each of user.following) {
+      var stringId=each.toString();
+      var userObject=await getUserById(stringId);
+      followingList.push(userObject);
+    }
+    return followingList;
+};
+
 //--------------- NO NEED FOR THIS (THE ABOVE FUNCTION IS ENOUGH) -----------------------
 
-// export const getFollowing = async (userId) => {
-//   try {
-//     userId = helper.checkObjectId(userId);
-//     const userCollection = await users();
-//     const user = await userCollection.findOne({ _id: userId });
-//     if (!user) throw "User not found";
-//     return user.following;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+
 
 // export const getFollowers = async (userId) => {
 //   try {
@@ -314,6 +318,23 @@ export const addFollowerByUserName = async (mainUsername, followerUsername) => {
   return addedFollower && addedFollowing;
 };
 
+export const removeFollowerByUsername = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  let removedFollower=await removeFollower(mainUserId,followerUserId);
+  let removedFollowing=await removeFollowing(followerUserId,mainUserId);
+  return removedFollower && removedFollowing  ;
+};
+
+export const checkFollowerByUsername = async (mainUsername, followerUsername) => {
+  let mainUser= await getUserByUsername(mainUsername);
+  let followerUser= await getUserByUsername(followerUsername);
+  let mainUserId=mainUser[0]._id.toString();
+  let followerUserId=followerUser[0]._id.toString();
+  return (await isFollower(mainUserId,followerUserId));
+};
 
 export const addFollower = async (userId, followerId) => {
   try {
@@ -358,6 +379,25 @@ export const removeFollower = async (userId, followerId) => {
   }
 };
 
+
+export const isFollower = async (userId, followerId) => {
+
+    userId = new ObjectId(await helper.checkObjectId(userId));
+    followerId = new ObjectId(await helper.checkObjectId(followerId));
+
+   
+    const userCollection = await users();
+
+  
+    const user = await userCollection.findOne({ _id: userId });
+    if (!user) throw "User not found";
+
+    
+    // const isFollower = user.followers.includes(followerId);
+    const isFollower = user.followers.map(id => id.toString()).includes(followerId.toString());
+
+    return isFollower;
+};
 // Route has been linked to this function
 export const addTags = async (userId, tags) => {
   try {
@@ -490,16 +530,12 @@ export const deleteComment = async (userId, commentId) => {
 
 // Route has been linked to this function
 export const getUserByUsername = async (username) => {
-  try {
-    username = helper.checkString(username, "username", 1, 50);
+    username = await helper.checkValidUsername(username);
     const userCollection = await users();
     const user = await userCollection
-      .find({ username: { $regex: username, $options: "i" } })
+      .find({ username:username })
       .toArray();
     return user;
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const getUserByEmailAddress = async (contactEmail) => {
@@ -545,7 +581,8 @@ export const getHomePageDetails = async (userId) => {
   let followingUserIds = await getUserById(userId);
   const username = followingUserIds.username;
 
-  followingUserIds = followingUserIds.following;
+  followingUserIds= followingUserIds.following;
+
   if (followingUserIds.length === 0) {
     return {
       reviewsByFollowing: [],
@@ -554,6 +591,7 @@ export const getHomePageDetails = async (userId) => {
   }
 
   let followingUsername = [];
+
   for (let i = 0; i < followingUserIds.length; i++) {
     const followingUser = await getUserById(followingUserIds[i].toString());
     followingUserIds[i] = new ObjectId(followingUserIds[i]);

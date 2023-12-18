@@ -7,6 +7,7 @@ import {
   comments,
 } from "../config/mongoCollections.js";
 import fs from "fs";
+import * as userData from "../data/users.js";
 import { Binary, ObjectId } from "mongodb";
 
 /*
@@ -88,20 +89,28 @@ export const createReview = async (
         { _id: userId },
         { $addToSet: { reviews: newReview.insertedId } }
       );
+      await populateRating(businessId.toString());
     }
     return { insertedReview: newReview.insertedId ? true : false };
   } catch (error) {}
 };
 
-// MOST IMP: You are deleting any review, make sure to FIRST delete all the comments associated with it
-// as well as remove the review from the business document and user document
-// Route linked to this function: DELETE /review/deleteReview/:id
 export const deleteReview = async (reviewId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
     const reviewCollection = await reviews();
     const review = await reviewCollection.findOne({ _id: reviewId });
     if (!review) throw "Review not found";
+    const businessCollection = await businesses();
+    const userCollection = await users();
+    await businessCollection.updateOne(
+      { _id: review.businessId.toString() },
+      { $pull: { reviews: reviewId } }
+    );
+    await userCollection.updateOne(
+      { _id: review.userId.toString() },
+      { $pull: { reviews: reviewId } }
+    );
     const deletionInfo = await reviewCollection.deleteOne({ _id: reviewId });
     if (deletionInfo.deletedCount === 0) throw "Could not delete review";
     return true;
@@ -122,13 +131,13 @@ export const updateReview = async (
     ratingPoints = helper.checkRating(ratingPoints, 1, 5);
     reviewText = helper.checkString(reviewText, "Review Text", 1, 500);
     // validate image if there then insert else null
-    let imageBinary;
-    if (imagePath && imagePath.trim() !== "") {
-      const imageBuffer = fs.readFileSync(imagePath);
-      imageBinary = new Binary(imageBuffer);
-    } else {
-      imageBinary = null;
-    }
+    // let imageBinary;
+    // if (imagePath && imagePath.trim() !== "") {
+    //   const imageBuffer = fs.readFileSync(imagePath);
+    //   imageBinary = new Binary(imageBuffer);
+    // } else {
+    //   imageBinary = null;
+    // }
     const reviewCollection = await reviews();
     const review = await reviewCollection.findOne({ _id: reviewId });
     if (!review) throw "Review not found";
@@ -138,7 +147,7 @@ export const updateReview = async (
         $set: {
           rating: ratingPoints,
           reviewText: reviewText,
-          images: imageBinary,
+          images: imagePath ? imagePath : null,
           updatedAt: new Date(),
         },
       },
@@ -318,6 +327,60 @@ export const getAllReviews = async () => {
   }
 };
 
+export const getFeed = async (userId) => {
+  var totalReviewId=[];
+  const user = await userData.getUserById(userId);
+  totalReviewId=totalReviewId.concat(user.reviews);
+  const following = user.following;
+  for (let each of following) {
+    let stringId=each.toString();
+    const followingUser = await userData.getUserById(stringId);
+    totalReviewId=totalReviewId.concat(followingUser.reviews);
+  }
+
+  let allReviews= getAllReviewPlusName(totalReviewId);
+
+  return allReviews;
+}
+
+export const getAllReviewPlusName = async (totalReviewId) => {
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+  const categoryCollection = await categories();
+  const allReviews = await reviewCollection
+    .find({ _id: { $in: totalReviewId } })
+    .sort({ updatedAt: -1 }) // -1 for descending order
+    .toArray();
+  for (let each of allReviews) {
+    const business = await businessCollection.findOne({ _id: each.businessId });
+    const category = await categoryCollection.findOne({ _id: each.categoryId });
+    const user = await userCollection.findOne({ _id: each.userId });
+    each.businessName = business.name;
+    each.categoryName = category.name;
+    each.userName = user.firstName + " " + user.lastName;
+
+  }
+  return allReviews;
+}
+
+export const populateReviewWithData = async (allReviews) => {
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+  const categoryCollection = await categories();
+  for (let each of allReviews) {
+    const business = await businessCollection.findOne({ _id: each.businessId });
+    const category = await categoryCollection.findOne({ _id: each.categoryId });
+    const user = await userCollection.findOne({ _id: each.userId });
+    each.businessName = business.name;
+    each.categoryName = category.name;
+    each.userName = user.firstName + " " + user.lastName;
+
+  }
+  return allReviews;
+}
+
 export const getReviewsByUserId = async (userId) => {
   try {
     userId = new ObjectId(helper.checkObjectId(userId));
@@ -329,3 +392,94 @@ export const getReviewsByUserId = async (userId) => {
   }
 };
 
+export const searchReview = async (condition) => {
+  const reviewCollection = await reviews();
+  let allReviewList = await reviewCollection
+    .find({})
+    .sort({ rating: -1 })
+    .toArray();
+  allReviewList=await populateReviewWithData(allReviewList);
+  return allReviewList;
+}
+
+export const populateRating = async (businessId) => {
+  businessId = new ObjectId(helper.checkObjectId(businessId));
+
+
+  const businessCollection = await businesses();
+  const reviewCollection = await reviews();
+  let reviewList=[]
+  const business = await businessCollection.findOne({ _id: businessId })
+  for (let each of business.reviews) {
+    const review = await reviewCollection.findOne({ _id: each });
+    reviewList.push(review._id);
+  }
+  let ratingVal=await calculateRating(reviewList);
+  try {
+    let updatedBusiness=await businessCollection.updateOne(
+      { _id: businessId },
+      { $set: { averageRating: ratingVal } }
+    );
+    return updatedBusiness
+    
+  } catch (error) {
+    console.log(error);
+    throw error
+  }
+} 
+
+export const getVibeReview = async (userId,businessId) => {
+  userId= new ObjectId(helper.checkObjectId(userId));
+  businessId= new ObjectId(helper.checkObjectId(businessId));
+
+  const userCollection = await users();
+  const reviewCollection = await reviews();
+  const businessCollection = await businesses();
+
+  const user = await userCollection.findOne({ _id: userId });
+  const business = await businessCollection.findOne({ _id: businessId });
+
+
+  let reviewList=[]
+  for (let eachReview of business.reviews) {
+    const review = await reviewCollection.findOne({ _id: eachReview });
+    if (user.following.includes(review.userId)) {
+      reviewList.push(review._id);
+    }
+  }
+  let ratingVal=await calculateRating(reviewList);
+  business.vibeRating=ratingVal;
+  return business
+}
+
+
+
+
+export const calculateRating = async (reviewList) => {
+  let ratingList=[]
+  const reviewCollection = await reviews();
+  for (let each of reviewList) {
+    var reviewId = new ObjectId(each._id);
+    var review = await reviewCollection.findOne({ _id: reviewId });
+    ratingList.push(review.rating);
+
+  }
+  const sum = ratingList.reduce((a, b) => a + b, 0);
+  const avg = (sum / ratingList.length) || 0;
+  let mean=  Number(avg.toFixed(1))
+
+  return mean
+}
+
+export const checkIfReviewExists = async (businessId, userId) => {
+  try {
+    businessId = new ObjectId(helper.checkObjectId(businessId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ businessId: businessId, userId: userId });
+    if (!review) return false;
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}

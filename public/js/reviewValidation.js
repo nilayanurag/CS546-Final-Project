@@ -3,15 +3,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const businessSelect = document.getElementById("businessSelect");
   const form = document.getElementById("reviewForm");
   loadBusinesses();
+  if (categorySelect) {
+    categorySelect.addEventListener("change", loadBusinesses);
+  }
 
-  // Re-load businesses when the category changes
-  categorySelect.addEventListener("change", loadBusinesses);
-
-  // Function to load businesses based on the selected category
   function loadBusinesses() {
+    if (!categorySelect) {
+      return;
+    }
     const categoryId = categorySelect.value;
-    console.log(categoryId);
-
     // Make an AJAX request to the server
     fetch(`/businesses/${categoryId}`)
       .then((response) => response.json())
@@ -39,47 +39,29 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  
   // Form submission validation
   if (form) {
     form.addEventListener("submit", function (event) {
-      // Validate review text
       const reviewText = document.getElementById("reviewText").value;
-      console.log(reviewText);
-      // if (reviewText.length === 0 || reviewText.length > 500) {
-      //     alert('Review text must be between 1 and 500 characters long.');
-      //     // event.preventDefault(); // Prevent form submission
-      //     return;
-      // }
-
-      // Validate image
       const imageUpload = document.getElementById("imagePath");
-      console.log(imageUpload);
-      console.log(document.getElementById("ratingPoints").value);
-      //   if (imageUpload.files.length > 0) {
-      //       const file = imageUpload.files[0];
-      //       const fileSizeMB = file.size / 1024 / 1024; // Size in MB
-      //       const fileType = file.type;
 
-      //       // Check file size
-      //       if (fileSizeMB > 15) {
-      //           alert('Image size should not exceed 15 MB.');
-      //           // event.preventDefault();
-      //           return;
-      //       }
+      // Validate the length of review text
+      if (reviewText.length < 2 || reviewText.length > 500) {
+        alert("Review text must be between 2 and 500 characters long.");
+        event.preventDefault();
+        return;
+      }
+      // Validate image
+      if (imageUpload.files.length > 0) {
+        const file = imageUpload.files[0];
+        const fileType = file.type.toLowerCase();
+        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
 
-      //       // Check file type
-      //       if (fileType !== 'image/png' && fileType !== 'image/jpeg' && fileType !== 'image/jpg') {
-      //           alert('Only PNG, JPEG, and JPG formats are allowed.');
-      //           // event.preventDefault();
-      //           return;
-      //       }
-      //   }else {
-      //     console.error('Form not found');
-      // }
+        if (!validImageTypes.includes(fileType)) {
+          alert("Only PNG, JPEG, and JPG formats are allowed.");
+          event.preventDefault();
+        }
+      }
     });
-  }else{
-    // Load businesses for the initially selected category
-  
   }
 });

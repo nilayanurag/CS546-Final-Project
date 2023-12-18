@@ -2,7 +2,7 @@ import express from "express";
 import * as userData from "../data/users.js";
 import * as helper from "../helpers/validation.js";
 import * as routeHelper from "../helpers/routeHelper.js";
-
+import xss from "xss";
 const usersRouter = express.Router();
 
 usersRouter
@@ -110,7 +110,7 @@ usersRouter
 
   usersRouter
   .route('/getUser/:id').get(async (req, res) => {
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,req.params.id)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(req.params.id))
       if (userId[1])
         {return res.status(400)
           .json({errorMessage:"Invalid ObjectId"})} 
@@ -125,7 +125,7 @@ usersRouter
 
     usersRouter
   .route('/deleteUser/:id').get(async (req, res) => {
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,req.params.id)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(req.params.id))
       if (userId[1])
         {return res.status(400)
           .json({errorMessage:"Invalid ObjectId"})} 
@@ -317,6 +317,29 @@ usersRouter
   //     return res.status(400).json({errorMessage:"Cannot remove following"})
   //   }
   // })
+
+  usersRouter
+  .route("/getFollowing/:username")
+  .get(async (req, res) => {
+    let username=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(req.params.username))
+    if (username[1]){
+      return res.status(400)
+      .json({errorMessage:"Invalid ObjectId"})
+    }
+    try {
+      let userId=await userData.getUserByUsername(username[0])
+      let stringId=userId[0]._id.toString()
+      let getFollowingInfo=await userData.getFollowing(stringId)
+
+      return res.json(getFollowingInfo)
+    } catch (error) {
+      console.log(error)
+      return res.status(400)
+      .json({errorMessage:"User Not Found"})
+    }
+  }
+  );
+
   usersRouter
   .route("/addFollowerByUsername").post(async (req, res) => {
 
@@ -326,12 +349,18 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
       }
-    let username=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.userUsername,"username",1,25)
-    let followerUsername=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.adminUsername,"adminUsername",1,25)
-    
+      let username;
+    let followerUsername;
+      try{
+      username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
+      followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+      }catch(error){
+        return res.status(400).json({errorMessage:"Invalid Username"})
+      }
+      
     let errorCode=undefined
 
-    if (username[1]||followerUsername[1]){
+    if (username[1]||followerUsername[1]||username[0]===followerUsername[0]){
       errorCode=400
       return res.status(400).json({errorMessage:"Invalid Username"})
     }
@@ -349,6 +378,75 @@ usersRouter
     }
   }
   );
+
+  usersRouter
+  .route("/removeFollowerByUsername").post(async (req, res) => {
+
+    let taskInfo=req.body;
+    if (!taskInfo || Object.keys(taskInfo).length === 0) {
+      return res
+        .status(400)
+        .json({error: 'There are no fields in the request body'});
+      }
+
+      let username;
+    let followerUsername;
+    try{
+    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
+    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+    }catch(error){
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
+    
+    let errorCode=undefined
+
+    if (username[1]||followerUsername[1]||username[0]===followerUsername[0]){
+      errorCode=400
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
+
+    try {
+      let deletedFollower=await userData.removeFollowerByUsername(username[0],followerUsername[0])
+      // let addedFollowing=await userData.addFollowingByUserName(followerUsername[0],username[0])
+      if (deletedFollower){//&&addedFollowing.modifiedCount){ 
+        return res.json({deletedFollower})
+      }else{
+        return res.status(500).json({errorMessage:"Internal Server Error"})
+      }
+    }catch (error) {
+      return res.status(400).json({errorMessage:"Cannot remove follower"})
+    }
+  }
+  );
+  usersRouter
+  .route("/checkIfFollower").post(async (req, res) => {
+    let taskInfo=req.body;
+    if (!taskInfo || Object.keys(taskInfo).length === 0) {
+      return res
+        .status(400)
+        .json({error: 'There are no fields in the request body'});
+      }
+    let username;
+    let followerUsername;
+    try{
+    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
+    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+    }catch(error){
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
+    
+    let errorCode=undefined
+
+    if (username[1]||followerUsername[1]||username[0]===followerUsername[0]){
+      errorCode=400
+      return res.status(400).json({errorMessage:"Invalid Username"})
+    }
+
+    let boolVal=await userData.checkFollowerByUsername(username[0],followerUsername[0])
+    return res.json({boolVal})
+
+  })
+
 
   usersRouter
   .route("/addFollower").post(async (req, res) => {
@@ -618,7 +716,7 @@ usersRouter
     usersRouter
     .route("/getUserDetails/:username")
     .get(async (req, res) => {
-      let username = req.params.username;
+      let username = xss(req.params.username);
       let errorCode=undefined;
       username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
       if (username[1]){
@@ -644,7 +742,7 @@ usersRouter
   usersRouter
     .route("/renderUserDetails/:username")
     .get(async (req, res) => {
-      let username = req.params.username;
+      let username = xss(req.params.username);
       let errorCode=undefined;
       username=await routeHelper.routeValidationHelper(helper.checkString,username, "Username", 1, 50);
       if (username[1]){
@@ -750,7 +848,7 @@ usersRouter
     //   errorCode=400
     //   return res.status(400).json({errorMessage:"Invalid ObjectId"})
     // }
-    const username= req.params.username;
+    const username= xss(req.params.username);
     
     try {
       let existingUserId=undefined;
@@ -786,4 +884,8 @@ usersRouter
   
   });
 
+  usersRouter.route('/').get(async (req, res) => {
+    res.redirect("login")
+  });
 export default usersRouter;
+

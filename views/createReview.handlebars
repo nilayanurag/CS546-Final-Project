@@ -1,6 +1,7 @@
 <div class="container mt-4">
-    <form action="/review/createReview" method="POST" name="reviewForm" id="reviewForm" class="p-4 border rounded">
-        
+    <form action="/review/createReview" method="POST" name="reviewForm" id="reviewForm" class="p-4 border rounded"
+        enctype="multipart/form-data">
+
         <!-- Categories Dropdown -->
         <div class="form-group">
             <label for="categorySelect">Select Category:</label>
@@ -25,8 +26,14 @@
         <!-- Review Text -->
         <div class="form-group">
             <label for="reviewText">Write your review:</label>
-            <textarea name="reviewText" class="form-control" id="reviewText" placeholder="Write your review..."></textarea>
+            <textarea name="reviewText" class="form-control" id="reviewText"
+                placeholder="Write your review..."></textarea>
         </div>
+        {{#if CannotAdd}}
+        <div class="alert alert-warning">
+            You cannot add another review for the same business. Modify your existing review instead.
+        </div>
+        {{/if}}
 
         <!-- Rating Dropdown -->
         <div class="form-group">
@@ -49,4 +56,3 @@
         <button type="submit" class="btn btn-primary">Submit Review</button>
     </form>
 </div>
-
