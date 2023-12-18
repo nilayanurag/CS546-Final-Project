@@ -20,11 +20,6 @@ export const seedAllReview = async () => {
       "The ambience of Napoli's pizzeria was amazing and food was delightful as well. A must visit resto",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     throw error;
   }
@@ -45,11 +40,6 @@ export const seedAllReview = async () => {
       "The Shopping experience of Indian groceries. A must visit grocery shop",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     throw error;
   }
@@ -67,11 +57,6 @@ export const seedAllReview = async () => {
       4,
       "The tatse of the restraunt was fabulous specially the burrito bowl.",
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     throw error;
   }
@@ -90,11 +75,6 @@ export const seedAllReview = async () => {
       "The Movie Experience was amazing in heart of manhattan",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     throw error;
   }
@@ -113,11 +93,6 @@ export const seedAllReview = async () => {
       "The Movie Experience was amazing in heart of manhattan. New York Vibes",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     throw error;
   }
@@ -136,11 +111,6 @@ export const seedAllReview = async () => {
       "Too costly but the gym is amazing. The trainers are very helpful and the equipments are very good. A must visit gym",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     throw error;
   }
@@ -160,11 +130,6 @@ export const seedAllReview = async () => {
       "I would not recommend this gym to anyone. The trainers are not helpful and the equipments are not good. A must not visit gym",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     console.log(error);
   }
@@ -183,11 +148,6 @@ export const seedAllReview = async () => {
       "It is a very good park. The park is very clean and the equipments are very good. A must visit park",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     console.log(error);
   }
@@ -206,11 +166,6 @@ export const seedAllReview = async () => {
       "The salon is not good. The staff is not good and the equipments are not good. A must not visit salon",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     console.log(error);
   }
@@ -229,11 +184,6 @@ export const seedAllReview = async () => {
       "The food is very good. The staff is very good and the equipments are very good. A must visit restaurant",
       null
       );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     console.log(error);
   }
@@ -252,11 +202,6 @@ export const seedAllReview = async () => {
       "The park is very good. The park is very clean and the equipments are very good. A must visit park",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     console.log(error);
   }
@@ -275,11 +220,6 @@ export const seedAllReview = async () => {
       "Best burrito bowl in town. The staff is very good and the equipments are very good. A must visit restaurant",
       null
     );
-    if (review) {
-      console.log("Review seeded");
-    } else {
-      console.log("Review not seeded");
-    }
   } catch (error) {
     console.log(error);
   }
