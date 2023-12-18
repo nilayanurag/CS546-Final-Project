@@ -41,5 +41,3 @@ Proper validation (clientside, routeside and data function) have been implemente
 
 8.  Update your profile: User can update their existing profile.
 
-9.  User can delete their account.
-
