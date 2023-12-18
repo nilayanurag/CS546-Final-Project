@@ -2,7 +2,6 @@
     <form action="/review/createReview" method="POST" name="reviewForm" id="reviewForm" class="p-4 border rounded"
         enctype="multipart/form-data">
 
-        <!-- Categories Dropdown -->
         <div class="form-group">
             <label for="categorySelect">Select Category:</label>
             <select name="categoryId" id="categorySelect" class="form-control" onchange="loadBusinesses()">
@@ -12,18 +11,14 @@
             </select>
         </div>
 
-        <!-- Businesses Dropdown -->
         <div class="form-group">
             <label for="businessSelect">Select Business:</label>
             <select name="businessId" id="businessSelect" class="form-control">
-                <!-- Businesses will be loaded based on selected category -->
             </select>
         </div>
 
-        <!-- Link to Add Business Page -->
         <p>Business not found? <a href="/business/createBusiness">Add one</a></p>
 
-        <!-- Review Text -->
         <div class="form-group">
             <label for="reviewText">Write your review:</label>
             <textarea name="reviewText" class="form-control" id="reviewText"
@@ -35,7 +30,6 @@
         </div>
         {{/if}}
 
-        <!-- Rating Dropdown -->
         <div class="form-group">
             <label for="ratingPoints">Select rating out of 5:</label>
             <select name="ratingPoints" id="ratingPoints" class="form-control">
@@ -47,7 +41,6 @@
             </select>
         </div>
 
-        <!-- Image Upload -->
         <div class="form-group">
             <label for="imagePath">Wanna upload the image?</label>
             <input type="file" name="imagePath" id="imagePath" class="form-control-file">
@@ -56,3 +49,65 @@
         <button type="submit" class="btn btn-primary">Submit Review</button>
     </form>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+  const categorySelect = document.getElementById("categorySelect");
+  const businessSelect = document.getElementById("businessSelect");
+  const form = document.getElementById("reviewForm");
+  loadBusinesses();
+  if (categorySelect) {
+    categorySelect.addEventListener("change", loadBusinesses);
+  }
+
+  function loadBusinesses() {
+    if (!categorySelect) {
+      return;
+    }
+    const categoryId = categorySelect.value;
+    fetch(`/businesses/${categoryId}`)
+      .then((response) => response.json())
+      .then((businesses) => {
+        businessSelect.innerHTML = "";
+
+        businesses.forEach((business) => {
+          const option = document.createElement("option");
+          option.value = business._id;
+          option.textContent = business.name;
+          businessSelect.appendChild(option);
+        });
+
+        if (businesses.length === 0) {
+          const option = document.createElement("option");
+          option.textContent = "No businesses found";
+          businessSelect.appendChild(option);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching businesses:", error);
+      });
+  }
+
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      const reviewText = document.getElementById("reviewText").value;
+      const imageUpload = document.getElementById("imagePath");
+      if (reviewText.length < 2 || reviewText.length > 500) {
+        alert("Review text must be between 2 and 500 characters long.");
+        event.preventDefault();
+        return;
+      }
+      if (imageUpload.files.length > 0) {
+        const file = imageUpload.files[0];
+        const fileType = file.type.toLowerCase();
+        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+        if (!validImageTypes.includes(fileType)) {
+          alert("Only PNG, JPEG, and JPG formats are allowed.");
+          event.preventDefault();
+        }
+      }
+    });
+  }
+});
+
+</script>

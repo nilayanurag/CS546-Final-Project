@@ -1,7 +1,6 @@
 <div class="container mt-4">
     <form action="/review/updateReview/{{review._id}}" method="POST" enctype="multipart/form-data"
         name="reviewForm" class="p-4 border rounded" id="reviewForm">
-        <!-- Non-editable Business and Category -->
         <div class="form-group">
             <label>Business:</label>
             <input type="text" class="form-control" value="{{businessName}}" readonly>
@@ -11,7 +10,6 @@
             <input type="text" class="form-control" value="{{categoryName}}" readonly>
         </div>
 
-        <!-- Editable Rating, Image, and Description -->
         <div class="form-group">
             <label for="ratingPoints">Select rating out of 5:</label>
             <select name="ratingPoints" id="ratingPoints" class="form-control">
@@ -37,3 +35,25 @@
         <button type="submit" class="btn btn-primary">Update Review</button>
     </form>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('reviewForm').addEventListener('submit', function(event) {
+        const reviewText = document.getElementById('reviewText').value.trim();
+        const imageUpload = document.getElementById("imagePath");
+        if (reviewText.length < 2 || reviewText.length > 500) {
+            alert('Review description must be between 2 and 500 characters.');
+            event.preventDefault(); 
+        }
+        if (imageUpload.files.length > 0) {
+        const file = imageUpload.files[0];
+        const fileType = file.type.toLowerCase();
+        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+        if (!validImageTypes.includes(fileType)) {
+          alert("Only PNG, JPEG, and JPG formats are allowed.");
+          event.preventDefault();
+        }
+      }
+    });
+});
+</script>
