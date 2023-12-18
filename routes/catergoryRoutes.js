@@ -12,6 +12,7 @@ categoryRouter
         const categories = await categoryData.getAll();
         res.json(categories);
     } catch (e) {
+        console.log(e);
         res.status(500).json({ errorMessage:"Internal Server Error" });
     }
     });
