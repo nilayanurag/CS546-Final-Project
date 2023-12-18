@@ -212,7 +212,7 @@ export function checkAddress(addressObject) {
     addressObject.state = state
     let zip = checkString(xss(addressObject.zip), "Zip", 5)
     if (zip.length != 5) throw "invalid"
-    zip=checkWholeNumber(Number(checkStringIsNum(zip)))
+    checkWholeNumber(Number(checkStringIsNum(zip)))
     addressObject.zip = zip
 
     return addressObject
