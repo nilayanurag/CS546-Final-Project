@@ -59,6 +59,7 @@ reviewRouter.post(
         reviewInfo.reviewText,
         imagePathVal
       );
+      console.log(review);
       if (review) {
         return res.redirect("/review/getMyReview");
       }
