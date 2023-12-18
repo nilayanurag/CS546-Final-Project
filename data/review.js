@@ -95,9 +95,6 @@ export const createReview = async (
   } catch (error) {}
 };
 
-// MOST IMP: You are deleting any review, make sure to FIRST delete all the comments associated with it
-// as well as remove the review from the business document and user document
-// Route linked to this function: DELETE /review/deleteReview/:id
 export const deleteReview = async (reviewId) => {
   try {
     reviewId = new ObjectId(helper.checkObjectId(reviewId));
@@ -134,13 +131,13 @@ export const updateReview = async (
     ratingPoints = helper.checkRating(ratingPoints, 1, 5);
     reviewText = helper.checkString(reviewText, "Review Text", 1, 500);
     // validate image if there then insert else null
-    let imageBinary;
-    if (imagePath && imagePath.trim() !== "") {
-      const imageBuffer = fs.readFileSync(imagePath);
-      imageBinary = new Binary(imageBuffer);
-    } else {
-      imageBinary = null;
-    }
+    // let imageBinary;
+    // if (imagePath && imagePath.trim() !== "") {
+    //   const imageBuffer = fs.readFileSync(imagePath);
+    //   imageBinary = new Binary(imageBuffer);
+    // } else {
+    //   imageBinary = null;
+    // }
     const reviewCollection = await reviews();
     const review = await reviewCollection.findOne({ _id: reviewId });
     if (!review) throw "Review not found";
@@ -150,7 +147,7 @@ export const updateReview = async (
         $set: {
           rating: ratingPoints,
           reviewText: reviewText,
-          images: imageBinary,
+          images: imagePath ? imagePath : null,
           updatedAt: new Date(),
         },
       },
@@ -474,3 +471,15 @@ export const calculateRating = async (reviewList) => {
   return mean
 }
 
+export const checkIfReviewExists = async (businessId, userId) => {
+  try {
+    businessId = new ObjectId(helper.checkObjectId(businessId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ businessId: businessId, userId: userId });
+    if (!review) return false;
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}

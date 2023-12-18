@@ -84,7 +84,7 @@
             {{/if}}
         </div>
         <div class="card-footer">
-            <!-- Like and Dislike Buttons -->
+            <div class="text-muted text-left small mb-2">Double click to like/dislike</div>
             <button onclick="updateLikeDislike('{{review._id}}', 'like')" class="btn btn-success btn-sm">Like</button>
             <span id="like-count-{{review._id}}">{{likes}}</span>
 
@@ -92,6 +92,7 @@
                 class="btn btn-danger btn-sm">Dislike</button>
             <span id="dislike-count-{{review._id}}">{{dislikes}}</span>
         </div>
+
     </div>
 
     <!-- Comments Section -->

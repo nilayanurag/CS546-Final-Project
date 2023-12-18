@@ -42,13 +42,26 @@ document.addEventListener("DOMContentLoaded", function () {
   // Form submission validation
   if (form) {
     form.addEventListener("submit", function (event) {
-      // Validate review text
       const reviewText = document.getElementById("reviewText").value;
-      console.log(reviewText);
-      // Validate image
       const imageUpload = document.getElementById("imagePath");
-      console.log(imageUpload);
-      console.log(document.getElementById("ratingPoints").value);
+
+      // Validate the length of review text
+      if (reviewText.length < 2 || reviewText.length > 500) {
+        alert("Review text must be between 2 and 500 characters long.");
+        event.preventDefault();
+        return;
+      }
+      // Validate image
+      if (imageUpload.files.length > 0) {
+        const file = imageUpload.files[0];
+        const fileType = file.type.toLowerCase();
+        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+        if (!validImageTypes.includes(fileType)) {
+          alert("Only PNG, JPEG, and JPG formats are allowed.");
+          event.preventDefault();
+        }
+      }
     });
-  } 
+  }
 });

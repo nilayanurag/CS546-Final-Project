@@ -7,96 +7,77 @@ import * as businessData from "../data/business.js";
 import * as commentData from "../data/comments.js";
 import * as userData from "../data/users.js";
 import xss from "xss";
-import multer from 'multer';
-import fs from 'fs';
+import multer from "multer";
+import fs from "fs";
 
 const reviewRouter = express.Router();
-const upload = multer({ dest: 'uploads/' });
-
+const upload = multer({ dest: "uploads/" });
 
 reviewRouter.get("/review/createReview", async (req, res) => {
-  // DO NOT REMOVE THIS (to populate the categories in create review page)
   const categories = await categoryData.getAllCategory();
-  return res.render("createReview", { categories: categories });
+  return res.render("createReview", {
+    categories: categories,
+    CannotAdd: req.query.CannotAdd,
+  });
 });
 
-reviewRouter.post("/review/createReview", upload.single('imagePath'), async (req, res) => {
-    // MADE some changes here to make it work with the new createReview.handlebars
+reviewRouter.post(
+  "/review/createReview",
+  upload.single("imagePath"),
+  async (req, res) => {
     let reviewInfo = req.body;
-    let businessIdVal = await routeHelper.routeValidationHelper(
-      helper.checkObjectId,
-      reviewInfo.businessId
-    );
-    let userIdVal = await routeHelper.routeValidationHelper(
-      helper.checkObjectId,
-      req.session.user.userId
-    );
-    reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints);
-    let ratingPointsVal = await routeHelper.routeValidationHelper(
-      helper.checkRating,
-      reviewInfo.ratingPoints,
-      1,
-      5
-    );
-    let categoryIdVal = await routeHelper.routeValidationHelper(
-      helper.checkObjectId,
-      reviewInfo.categoryId
-    );
-    let reviewTextVal = await routeHelper.routeValidationHelper(
-      helper.checkString,
-      reviewInfo.reviewText,
-      "Review Text",
-      1,
-      500
-    );
     let fileType = req.file ? req.file.mimetype.split("/")[1] : null;
     let imagePathVal = req.file ? req.file.path + "." + fileType : null;
     imagePathVal = req.file ? req.file.path.replace(/\\/g, "/") : null;
-    console.log("from routes: ", imagePathVal);
-    let errorCode = undefined;
-
-    let dataToRender = {
-      reviewTextDef: reviewTextVal[0],
-      reviewTextErr: reviewTextVal[1],
-    };
-    if (reviewTextVal[1]) {
-      errorCode = 400;
-      return res.status(errorCode).render("createReview", dataToRender);
+    try {
+      reviewInfo.categoryId = helper.checkObjectId(reviewInfo.categoryId);
+      reviewInfo.businessId = helper.checkObjectId(reviewInfo.businessId);
+      reviewInfo.reviewText = helper.checkString(
+        reviewInfo.reviewText,
+        "Review Text",
+        2,
+        500
+      );
+      reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints);
+    } catch (error) {
+      return res.status(400).json({ errorMessage: error });
     }
 
     try {
+      let reviewExists = await reviewData.checkIfReviewExists(
+        reviewInfo.businessId,
+        req.session.user.userId
+      );
+      if (reviewExists) {
+        return res.redirect("/review/createReview?CannotAdd=true");
+      }
       let review = await reviewData.createReview(
-        businessIdVal[0],
-        userIdVal[0],
-        categoryIdVal[0],
-        ratingPointsVal[0],
-        reviewTextVal[0],
+        reviewInfo.businessId,
+        req.session.user.userId,
+        reviewInfo.categoryId,
+        reviewInfo.ratingPoints,
+        reviewInfo.reviewText,
         imagePathVal
       );
       if (review) {
         return res.redirect("/review/getMyReview");
-      } else {
-        errorCode = 500;
-        return res.status(errorCode).render("createReview", dataToRender);
       }
     } catch (error) {
-      errorCode = 500;
-      return res.status(errorCode).render("createReview", dataToRender);
+      return res.status(404).json({ errorMessage: error });
     }
-  });
-  
+  }
+);
+
 reviewRouter.route("/review/deleteReview/:id").post(async (req, res) => {
-  let reviewIdVal = await routeHelper.routeValidationHelper(
-    helper.checkObjectId,
-    xss(req.params.id)
-  );
-  let errorCode = undefined;
-  if (reviewIdVal[1]) {
-    errorCode = 400;
-    return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
+  let reviewIdVal = req.params.id;
+  try {
+    reviewIdVal = helper.checkObjectId(reviewIdVal);
+    reviewIdVal = xss(reviewIdVal);
+  } catch (error) {
+    return res.status(400).json({ errorMessage: error });
   }
   try {
-    let deleted = await reviewData.deleteReview(reviewIdVal[0]);
+    let deleted = await reviewData.deleteReview(reviewIdVal);
     if (deleted) {
       return res.redirect("/review/getMyReview");
     } else {
@@ -111,57 +92,63 @@ reviewRouter.route("/review/deleteReview/:id").post(async (req, res) => {
   }
 });
 
-reviewRouter.route("/review/updateReview").post(async (req, res) => {
-  let reviewInfo = req.body;
-  let reviewIdVal = await routeHelper.routeValidationHelper(
-    helper.checkObjectId,
-    reviewInfo.reviewId
-  );
-  let ratingPointsVal = await routeHelper.routeValidationHelper(
-    helper.checkRating,
-    reviewInfo.ratingPoints,
-    1,
-    5
-  );
-  let reviewTextVal = await routeHelper.routeValidationHelper(
-    helper.checkString,
-    reviewInfo.reviewText,
-    "Review Text",
-    1,
-    500
-  );
-  let imagePathVal = reviewInfo.imagePath;
 
-  let errorCode = undefined;
 
-  let dataToRender = {
-    reviewTextDef: reviewTextVal[0],
-    reviewTextErr: reviewTextVal[1],
-  };
-
-  if (reviewTextVal[1]) {
-    errorCode = 400;
-    return res.status(errorCode).render("updateReview", dataToRender);
-  }
-
+reviewRouter.route("/review/updateReview/:id").get(async (req, res) => {
+  const reviewId = req.params.id;
   try {
-    let updatedReview = await reviewData.updateReview(
-      reviewIdVal[0],
-      ratingPointsVal[0],
-      reviewTextVal[0],
+    const review = await reviewData.getReviewById(reviewId);
+    const business = await businessData.getBusinessById(
+      review.businessId.toString()
+    );
+    const category = await categoryData.getCategoryById(
+      review.categoryId.toString()
+    );
+    res.render("updateReview", {
+      review: review,
+      businessName: business.name,
+      categoryName: category.name,
+    });
+  } catch (error) {
+    res.status(500).render("error", { errorMessage: "Internal Server Error" });
+  }
+});
+
+reviewRouter.post(
+  "/review/updateReview/:id",
+  upload.single("imagePath"),
+  async (req, res) => {
+  let reviewId = req.params.id;
+  let reviewInfo = req.body;
+  reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints,10);
+
+  let fileType = req.file ? req.file.mimetype.split("/")[1] : null;
+  let imagePathVal = req.file ? req.file.path + "." + fileType : null;
+  imagePathVal = req.file ? req.file.path.replace(/\\/g, "/") : null;
+  try {
+    reviewId = helper.checkObjectId(reviewId);
+    reviewId = xss(reviewId);
+    reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints,10);
+    reviewInfo.reviewText = helper.checkString(reviewInfo.reviewText, "Review Text", 2, 500);
+  } catch (error) {
+    return res.status(400).json({ errorMessage: error });
+  }
+  try {
+    
+    let review = await reviewData.updateReview(
+      reviewId,
+      reviewInfo.ratingPoints,
+      reviewInfo.reviewText,
       imagePathVal
     );
-    if (updatedReview) {
-      return res.redirect("/review/getReview/" + review._id);
+    if (review) {
+      return res.redirect("/review/getMyReview");
     } else {
       errorCode = 404;
       return res.status(errorCode).json({ errorMessage: "Review not found" });
     }
   } catch (error) {
-    errorCode = 500;
-    return res
-      .status(errorCode)
-      .json({ errorMessage: "Internal Server Error" });
+    return res.status(500).json({ errorMessage: error });
   }
 });
 
@@ -199,7 +186,7 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
         businessName: businessinfo.name,
         commentData: commentInfo,
         likes: reviewInfo.thumsUp.length,
-        dislikes: reviewInfo.thumsDown.length
+        dislikes: reviewInfo.thumsDown.length,
       });
     } else {
       errorCode = 404;
@@ -214,28 +201,28 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
 });
 
 reviewRouter.route("/review/like/:id").post(async (req, res) => {
-    let reviewId = await routeHelper.routeValidationHelper(
-      helper.checkObjectId,
-      req.params.id
-    );
-    let errorCode = undefined;
-    if (reviewId[1]) {
-      errorCode = 400;
-      return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
-    }
-    try{
+  let reviewId = await routeHelper.routeValidationHelper(
+    helper.checkObjectId,
+    req.params.id
+  );
+  let errorCode = undefined;
+  if (reviewId[1]) {
+    errorCode = 400;
+    return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
+  }
+  try {
+    reviewData.addThumbsUp(reviewId[0], req.session.user.userId);
+    let reviewInfo = await reviewData.getReviewById(reviewId[0]);
+    const likes = reviewInfo.thumsUp.length;
+    const dislikes = reviewInfo.thumsDown.length;
 
-      reviewData.addThumbsUp(reviewId[0], req.session.user.userId);
-      let reviewInfo = await reviewData.getReviewById(reviewId[0]);
-      const likes = reviewInfo.thumsUp.length;
-        const dislikes = reviewInfo.thumsDown.length;
-
-      res.json({ success: true, likes, dislikes });
-
-    }catch(error){
-      errorCode = 500;
-      return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
-    }
+    res.json({ success: true, likes, dislikes });
+  } catch (error) {
+    errorCode = 500;
+    return res
+      .status(errorCode)
+      .json({ errorMessage: "Internal Server Error" });
+  }
 });
 
 reviewRouter.route("/review/dislike/:id").post(async (req, res) => {
@@ -248,18 +235,18 @@ reviewRouter.route("/review/dislike/:id").post(async (req, res) => {
     errorCode = 400;
     return res.status(errorCode).json({ errorMessage: "Invalid ObjectId" });
   }
-  try{
-
+  try {
     reviewData.addThumbsDown(reviewId[0], req.session.user.userId);
     let reviewInfo = await reviewData.getReviewById(reviewId[0]);
     const likes = reviewInfo.thumsUp.length;
     const dislikes = reviewInfo.thumsDown.length;
 
     res.json({ success: true, likes, dislikes });
-
-  }catch(error){
+  } catch (error) {
     errorCode = 500;
-    return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
+    return res
+      .status(errorCode)
+      .json({ errorMessage: "Internal Server Error" });
   }
 });
 
@@ -268,7 +255,7 @@ reviewRouter.route("/getAllReviews").get(async (req, res) => {
 
   try {
     let reviewList = await reviewData.getAllReviews();
-    
+
     if (reviewList) {
       return res.json(reviewList);
     } else {
@@ -284,11 +271,11 @@ reviewRouter.route("/getAllReviews").get(async (req, res) => {
 });
 
 reviewRouter.route("/review/getFeed/:username").get(async (req, res) => {
-  let username=xss(req.params.username);
+  let username = xss(req.params.username);
   let errorCode = undefined;
   try {
-    let user=await userData.getUserByUsername(username);
-    let userId=user[0]._id.toString() ;
+    let user = await userData.getUserByUsername(username);
+    let userId = user[0]._id.toString();
     let reviewList = await reviewData.getFeed(userId);
     if (reviewList) {
       return res.json(reviewList);
@@ -303,8 +290,7 @@ reviewRouter.route("/review/getFeed/:username").get(async (req, res) => {
       .status(errorCode)
       .json({ errorMessage: "Internal Server Error" });
   }
-}
-);
+});
 
 reviewRouter.route("/review/addThumbsUp").post(async (req, res) => {
   let taskInfo = req.body;
@@ -467,7 +453,7 @@ reviewRouter.route("/review/addComment").post(async (req, res) => {
     helper.checkString,
     taskInfo.commentTextInput,
     "Comment Text",
-    1,
+    2,
     500
   );
 
@@ -566,18 +552,16 @@ reviewRouter.route("/review/getMyReview").get(async (req, res) => {
   }
 });
 
-reviewRouter
-.route("/review/searchReview")
-.post(async (req, res) => {
+reviewRouter.route("/review/searchReview").post(async (req, res) => {
   let taskInfo = req.body;
-  
+
   if (!taskInfo || Object.keys(taskInfo).length === 0) {
     return res
       .status(400)
       .json({ error: "There are no fields in the request body" });
   }
-  let errorCode=undefined;
-  try {    
+  let errorCode = undefined;
+  try {
     //valdiation function
     // let searchVal = await routeHelper.routeValidationHelper(
     //   helper.checkString,
@@ -590,23 +574,22 @@ reviewRouter
     errorCode = 400;
     return res.status(errorCode).json({ errorMessage: "Incorrect Details" });
   }
-  try{
+  try {
     let searchResult = await reviewData.searchReview();
-    if(searchResult){
+    if (searchResult) {
       return res.json(searchResult);
-    }else{
+    } else {
       errorCode = 404;
       return res.status(errorCode).json({ errorMessage: "Reviews not found" });
     }
-  }
-  catch(error){
+  } catch (error) {
     console.log(error);
     errorCode = 500;
-    return res.status(errorCode).json({ errorMessage: "Internal Server Error" });
+    return res
+      .status(errorCode)
+      .json({ errorMessage: "Internal Server Error" });
   }
-
-
-})  
+});
 
 
 

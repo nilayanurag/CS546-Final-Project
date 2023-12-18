@@ -18,7 +18,6 @@ export const seedAllReview = async () => {
       categoryId,
       4,
       "The ambience of Napoli's pizzeria was amazing and food was delightful as well. A must visit resto",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -43,7 +42,6 @@ export const seedAllReview = async () => {
       categoryId,
       5,
       "The Shopping experience of Indian groceries. A must visit grocery shop",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -66,7 +64,6 @@ export const seedAllReview = async () => {
       categoryId,
       4,
       "The tatse of the restraunt was fabulous specially the burrito bowl.",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -89,7 +86,6 @@ export const seedAllReview = async () => {
       categoryId,
       5,
       "The Movie Experience was amazing in heart of manhattan",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -112,7 +108,6 @@ export const seedAllReview = async () => {
       categoryId,
       5,
       "The Movie Experience was amazing in heart of manhattan. New York Vibes",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -135,7 +130,6 @@ export const seedAllReview = async () => {
       categoryId,
       4,
       "Too costly but the gym is amazing. The trainers are very helpful and the equipments are very good. A must visit gym",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -159,7 +153,6 @@ export const seedAllReview = async () => {
       categoryId,
       1,
       "I would not recommend this gym to anyone. The trainers are not helpful and the equipments are not good. A must not visit gym",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -182,7 +175,6 @@ export const seedAllReview = async () => {
       categoryId,
       4,
       "It is a very good park. The park is very clean and the equipments are very good. A must visit park",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -205,7 +197,6 @@ export const seedAllReview = async () => {
       categoryId,
       2,
       "The salon is not good. The staff is not good and the equipments are not good. A must not visit salon",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -228,7 +219,6 @@ export const seedAllReview = async () => {
       categoryId,
       4,
       "The food is very good. The staff is very good and the equipments are very good. A must visit restaurant",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -251,7 +241,6 @@ export const seedAllReview = async () => {
       categoryId,
       3,
       "The park is very good. The park is very clean and the equipments are very good. A must visit park",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");
@@ -274,7 +263,6 @@ export const seedAllReview = async () => {
       categoryId,
       5,
       "Best burrito bowl in town. The staff is very good and the equipments are very good. A must visit restaurant",
-      "./public/images/testImage.png"
     );
     if (review.insertedReview) {
       console.log("Review seeded");

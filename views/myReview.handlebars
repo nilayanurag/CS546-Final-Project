@@ -5,10 +5,14 @@
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h5 mb-0">{{this.businessName}}</h2>
-            <!-- Delete Button -->
-            <form action="/review/deleteReview/{{this._id}}" method="POST">
-                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-            </form>
+            <div>
+                <!-- Update Button -->
+                <a href="/review/updateReview/{{this._id}}" class="btn btn-primary btn-sm">Update</a>
+                <!-- Delete Button -->
+                <form action="/review/deleteReview/{{this._id}}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </div>
         </div>
         <div class="card-body">
             <h4 class="h6">Ratings: {{this.rating}}</h4>
@@ -16,8 +20,18 @@
             {{#if this.image}}
             <img src="/{{this.image}}" alt="Review Image" class="img-fluid">
             {{/if}}
+            <!-- Thumbs Up and Thumbs Down Count -->
+            {{!-- <div class="mt-2">
+                <button type="button" class="btn btn-success btn-sm">
+                    <i class="fa fa-thumbs-up"></i> {{this.thumsUp.length}}
+                </button>
+                <button type="button" class="btn btn-danger btn-sm">
+                    <i class="fa fa-thumbs-down"></i> {{this.thumsDown.length}}
+                </button>
+            </div> --}}
         </div>
         <ul class="list-group list-group-flush">
+            Comments:
             {{#each commentData}}
             <li class="list-group-item">
                 {{this.commentDescription}}, Posted by: {{this.username}}
