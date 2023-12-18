@@ -20,6 +20,15 @@ if(businessForm){
     });
 }
 
+function checkStringHelper(strVal, varName) {
+    if (!varName) varName = "Value"
+    if (!strVal) throw `Error: You must supply a ${varName}!`;
+    if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
+    strVal = strVal.trim();
+    if (strVal.length === 0)
+        throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+    return strVal;
+}
 
 function checkString(strVal, varName, lowerbound, upperbound) {
     strVal = checkStringHelper(strVal, varName)
@@ -36,10 +45,28 @@ function validateName(name) {
     }
 }
 
+function checkStringIsNum(strVal, varName) {
+    strVal = checkString(strVal, varName)
+    if (strVal != Number(strVal)) throw "Not a number"
+    return strVal
+}
+
+function checkWholeNumber(numVal) {
+    numVal = isInteger(numVal)
+    if (numVal < 0) throw "Number is negative"
+    return numVal
+}
+
 function checkAddress(addressObject) {
+    
     if (typeof (addressObject) != "object") throw "Not obj"
     addressObject.firstLine = checkString(addressObject.firstLine, "firstAddressLine", 1, 50)
-    addressObject.lastLine = checkString(addressObject.lastLine, "lastAddressLine", 1, 50)
+    
+    if (!addressObject.lastLine || addressObject.lastLine.trim() === "") {
+        throw "Error: Last address line cannot be empty";
+    } else {
+        addressObject.lastLine = checkString(addressObject.lastLine, "lastAddressLine", 1, 50);
+    }
     addressObject.city = checkString(addressObject.city, "city", 3, 50)
     addressObject.country = checkString(addressObject.country, "country", 2)
     let state = checkString(addressObject.state, "state", 2).toUpperCase()
