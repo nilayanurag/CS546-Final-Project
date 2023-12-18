@@ -11,6 +11,7 @@ try {
   await review.seedAllReview();
   await comment.seedAllComment();
   console.log("All seeded");
+  process.exit(0);
 } catch (error) {
   throw error;
 }

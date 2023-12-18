@@ -1,30 +1,30 @@
 <div id="create-business" class="container mt-4">
-    <form action="/business/createBusiness" method="POST" name="businessForm" id="businessForm" class="p-4 border rounded">
+    <form action="/business/createBusiness" method="POST" name="businessForm" id="businessForm"
+        class="p-4 border rounded">
 
-        <!-- Categories Dropdown -->
         <div class="form-group">
             <label for="categorySelect">Select Category:</label>
-            <select name="categoryId" id="categorySelect" class="form-control" value="{{this._id}}">
+            <select name="categoryId" id="categorySelect" class="form-control">
                 {{#each categories}}
                 <option value="{{this._id}}">{{this.name}}</option>
                 {{/each}}
             </select>
         </div>
 
-        <!-- Name of the Business -->
         <div class="form-group">
             <label for="businessName">Business Name:</label>
             <input type="text" class="form-control" name="businessName" id="businessName" required>
         </div>
 
-        <!-- Location Details -->
         <div class="form-group">
             <label for="firstAddressLine">First Address Line:</label>
-            <input type="text" class="form-control" name="firstAddressLine" id="firstAddressLine" placeholder="First Address Line" required>
+            <input type="text" class="form-control" name="firstAddressLine" id="firstAddressLine"
+                placeholder="First Address Line" required>
         </div>
 
         <div class="form-group">
-            <input type="text" class="form-control" name="lastAddressLine" id="lastAddressLine" placeholder="Last Address Line">
+            <input type="text" class="form-control" name="lastAddressLine" id="lastAddressLine"
+                placeholder="Last Address Line" required>
         </div>
 
         <div class="form-group">
@@ -36,7 +36,8 @@
         </div>
 
         <div class="form-group">
-            <input type="text" class="form-control" name="state" id="state" placeholder="State" required>
+            <input type="text" class="form-control" name="state" id="state" placeholder="State" maxlength="2"
+                pattern="[A-Za-z]{2}" required>
         </div>
 
         <div class="form-group">
@@ -47,3 +48,47 @@
 
     </form>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const validStates = [
+            "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI",
+            "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN",
+            "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH",
+            "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA",
+            "WI", "WV", "WY"
+        ];
+
+        document.getElementById('businessForm').addEventListener('submit', function (event) {
+            const state = document.getElementById('state').value.toUpperCase();
+            const zip = document.getElementById('zip').value;
+            const country = document.getElementById('country').value.toLowerCase();
+            const businessName = document.getElementById('businessName').value;
+            const firstAddressLine = document.getElementById('firstAddressLine').value;
+            const lastAddressLine = document.getElementById('lastAddressLine').value;
+            const city = document.getElementById('city').value;
+
+            if (businessName.length < 2 || firstAddressLine.length < 2 || lastAddressLine.length < 2 || city.length < 2) {
+                alert('Business Name, Address Lines, and City must be at least 2 characters long.');
+                event.preventDefault(); 
+            }
+
+            if (!validStates.includes(state)) {
+                alert('Please enter a valid US state.');
+                event.preventDefault(); 
+            }
+
+            if (!/^\d{5}(-\d{4})?$/.test(zip)) {
+                alert('Please enter a valid US zip code.');
+                event.preventDefault(); 
+            }
+
+            const validCountries = ['us', 'usa', 'united states', 'united states of america'];
+            if (!validCountries.includes(country)) {
+                alert('Please enter a valid country (US, USA, United States, or United States of America).');
+                event.preventDefault(); 
+            }
+        });
+    });
+</script>
