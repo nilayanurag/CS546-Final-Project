@@ -22,6 +22,7 @@ businessRouter
       zip: xss(businessInfo.zip),
       country: xss(businessInfo.country),
     };
+    let errorCode = undefined;
     try {
         businessInfo.businessName = helper.checkString(businessInfo.businessName, "Business Name", 2, 100);
         businessInfo.categoryId = helper.checkObjectId(businessInfo.categoryId);
