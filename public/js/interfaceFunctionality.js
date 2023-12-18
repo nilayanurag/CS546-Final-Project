@@ -43,36 +43,36 @@ $(document).ready(function() {
 
     
 
-    $("#searchButton").click(function(event) {
-        event.preventDefault();
-        var searchType = $("#searchTypeDropdown").text().trim();
-        var searchTerm = $('#searchInput').val();
-        var options = {
-            option1: $('#option1').is(':checked'),
-            option2: $('#option2').is(':checked')
-        };
-        $.ajax({
-            url: "review/searchReview",
-            type: "POST",
-            data: {
-                searchType: searchType,
-                searchTerm: searchTerm,
-                options: options
-            },
-            success: function(reviews) {
-                $('#reviewsFeed').html('');
-                let rankNumber = 0;
-                reviews.forEach(function(review,rankNumber) {
-                    var reviewHtml = createReviewHtml(review,true,rankNumber+1);
-                    $('#reviewsFeed').append(reviewHtml);
-                });
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        }); 
-    }
-    );
+    // $("#searchButton").click(function(event) {
+    //     event.preventDefault();
+    //     var searchType = $("#searchTypeDropdown").text().trim();
+    //     var searchTerm = $('#searchInput').val();
+    //     var options = {
+    //         option1: $('#option1').is(':checked'),
+    //         option2: $('#option2').is(':checked')
+    //     };
+    //     $.ajax({
+    //         url: "review/searchReview",
+    //         type: "POST",
+    //         data: {
+    //             searchType: searchType,
+    //             searchTerm: searchTerm,
+    //             options: options
+    //         },
+    //         success: function(reviews) {
+    //             $('#reviewsFeed').html('');
+    //             let rankNumber = 0;
+    //             reviews.forEach(function(review,rankNumber) {
+    //                 var reviewHtml = createReviewHtml(review,true,rankNumber+1);
+    //                 $('#reviewsFeed').append(reviewHtml);
+    //             });
+    //         },
+    //         error: function(error) {
+    //             console.log(error);
+    //         }
+    //     }); 
+    // }
+    // );
 
     $("#add-following-button").click(function(event) {
         event.preventDefault();
@@ -311,11 +311,11 @@ $(document).ready(function() {
     }
     
     $.ajax({
-        url: '/categories/getAll',
+        url: '/categories/getAllCatgoriesH',
         method: 'GET',
         success: function(categories) {
             categories.forEach(function(category) {
-                $('#categorySelect').append(new Option(category.name, category.id));
+                $('#categorySelect1').append(new Option(category.name, category.id));
             });
         },
         error: function(error) {
@@ -324,43 +324,40 @@ $(document).ready(function() {
         }
     });
     
-    // $('#searchButton').click(function(e) {
-    //     e.preventDefault();
+    $('#searchButton').click(function(e) {
+        e.preventDefault();
 
-    //     const data = {
-    //         category: $('#categorySelect').val(),
-    //         gender: {
-    //             male: $('#maleCheckbox').is(':checked'),
-    //             female: $('#femaleCheckbox').is(':checked')
-    //         },
-    //         ageRange: {
-    //             min: $('#minAge').val(),
-    //             max: $('#maxAge').val()
-    //         },
-    //         username: getUsernameFromCookie()
-    //     };
+        const data = {
+            category: $('#categorySelect').val(),
+            male: $('#maleCheckbox').is(':checked'),
+            female: $('#femaleCheckbox').is(':checked'),
+            min: $('#minAge').val(),
+            max: $('#maxAge').val(),
+            username: getUsernameFromCookie()
+        };
 
-    //     $.ajax({
-    //         url: '/getBusinessRanking',
-    //         method: 'POST',
-    //         contentType: 'application/json',
-    //         data: JSON.stringify(data),
-    //         success: function(busData) {
-    //             console.log(busData.blist)
-    //             console.log(busData.bList.length);
-    //         },
-    //         success: function(reviews) {
-    //             $('#reviewsFeed').html('');
-    //             reviews.forEach(function(review) {
-    //                 var reviewHtml = createBusinessCardHtml(review);
-    //                 $('#reviewsFeed').append(reviewHtml);
-    //             });
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             console.log('AJAX error:', textStatus, errorThrown);
-    //         }
-    //     });
-    // });
+        $.ajax({
+            url: '/getBusinessRanking',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(busData) {
+                console.log(busData.blist)
+                console.log(busData.bList.length);
+            },
+            success: function(reviews) {
+                $('#reviewsFeed').html('');
+                reviews.bList.forEach(function(review) {
+                    console.log(review)
+                    var reviewHtml = createBusinessCardHtml(review);
+                    $('#reviewsFeed').append(reviewHtml);
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error:', textStatus, errorThrown);
+            }
+        });
+    });
      
     
     // loadAllReviews();

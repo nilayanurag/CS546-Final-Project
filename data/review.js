@@ -56,16 +56,6 @@ export const createReview = async (
     const category = await categoryCollection.findOne({ _id: categoryId });
     if (!category) throw "Category not found";
 
-    // validate image if there then insert else null
-    // let imageBinary;
-    // console.log(imagePath);
-    // if (imagePath && imagePath.trim() !== "") {
-    //   const imageBuffer = fs.readFileSync(imagePath);
-    //   imageBinary = new Binary(imageBuffer);
-    // } else {
-    //   imageBinary = null;
-    // }
-
     const reviewCollection = await reviews();
     const newReview = await reviewCollection.insertOne({
       businessId: businessId,
@@ -89,7 +79,6 @@ export const createReview = async (
         { _id: userId },
         { $addToSet: { reviews: newReview.insertedId } }
       );
-      await populateRating(businessId.toString());
     }
     return { insertedReview: newReview.insertedId ? true : false };
   } catch (error) {}

@@ -18,15 +18,15 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
-    let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
-    let usernameVal = await routeHelper.routeValidationHelper(helper.checkString,userInfo.usernameInput,"username",1,25)
-    let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,userInfo.sexInput,"sex")
-    let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkIfEmailPresent,userInfo.contactEmailInput)
-    let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,userInfo.ageInput,12,105)
-    let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
-    let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,userInfo.passwordInput,userInfo.confirmPasswordInput)
-    let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,userInfo.locationInput)
+    let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.firstNameInput),"firstName",1,25)
+    let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.lastNameInput),"lastName",1,25)
+    let usernameVal = await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.usernameInput),"username",1,25)
+    let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,xss(userInfo.sexInput),"sex")
+    let contactEmailVal=await routeHelper.routeValidationHelper(helper.xss(checkIfEmailPresent),userInfo.contactEmailInput)
+    let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,xss(userInfo.ageInput),12,105)
+    let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,xss(userInfo.passwordInput))
+    let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,xss(userInfo.passwordInput),userInfo.confirmPasswordInput)
+    let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,xss(userInfo.locationInput))
 
 
     let errorCode=undefined
@@ -82,8 +82,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,userInfo.contactEmailInput)
-    let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
+    let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,xss(userInfo.contactEmailInput))
+    let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,xss(userInfo.passwordInput))
     let dataToRender={
       contactEmailDef:contactEmailVal[0],
       contactEmailErr:contactEmailVal[1],
@@ -183,15 +183,15 @@ usersRouter
 
 
       let userId=req.session.user.userId
-      let username = await routeHelper.routeValidationHelper(helper.checkString,userInfo.usernameInput,"username",1,25)
-      let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,userInfo.firstNameInput,"firstName",1,25)
-      let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,userInfo.lastNameInput,"lastName",1,25)
-      let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,userInfo.sexInput,"sex")
-      let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,userInfo.contactEmailInput)
-      let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,userInfo.ageInput,12,105)
-      let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,userInfo.passwordInput)
-      let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,userInfo.passwordInput,userInfo.confirmPasswordInput)
-      let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,userInfo.locationInput)
+      let username = await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.usernameInput),"username",1,25)
+      let firstNameVal= await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.firstNameInput),"firstName",1,25)
+      let lastNameVal=await routeHelper.routeValidationHelper(helper.checkString,xss(userInfo.lastNameInput),"lastName",1,25)
+      let sexVal=await routeHelper.routeValidationHelper(helper.checkSex,xss(userInfo.sexInput),"sex")
+      let contactEmailVal=await routeHelper.routeValidationHelper(helper.checkValidEmail,xss(userInfo.contactEmailInput))
+      let ageVal=await routeHelper.routeValidationHelper(helper.checkAge,xss(userInfo.ageInput),12,105)
+      let passwordVal=await routeHelper.routeValidationHelper(helper.checkPass,xss(userInfo.passwordInput))
+      let confirmedPasswordVal=await routeHelper.routeValidationHelper(helper.checkSamePass,xss(userInfo.passwordInput),xss(userInfo.confirmPasswordInput))
+      let locationVal=await routeHelper.routeValidationHelper(helper.checkAddress,xss(userInfo.locationInput))
 
       let errorCode=undefined
       
@@ -352,8 +352,8 @@ usersRouter
       let username;
     let followerUsername;
       try{
-      username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
-      followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+      username=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(taskInfo.userUsername))
+      followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(taskInfo.adminUsername))
       }catch(error){
         return res.status(400).json({errorMessage:"Invalid Username"})
       }
@@ -392,8 +392,8 @@ usersRouter
       let username;
     let followerUsername;
     try{
-    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
-    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(taskInfo.userUsername))
+    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(taskInfo.adminUsername))
     }catch(error){
       return res.status(400).json({errorMessage:"Invalid Username"})
     }
@@ -429,8 +429,8 @@ usersRouter
     let username;
     let followerUsername;
     try{
-    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.userUsername)
-    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,taskInfo.adminUsername)
+    username=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(taskInfo.userUsername))
+    followerUsername=await routeHelper.routeValidationHelper(helper.checkValidUsername,xss(taskInfo.adminUsername))
     }catch(error){
       return res.status(400).json({errorMessage:"Invalid Username"})
     }
@@ -457,8 +457,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
       }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let followerId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followerIdInput)
+    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+    let followerId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.followerIdInput))
     
     let errorCode=undefined
 
@@ -489,8 +489,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let followerId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.followerIdInput)
+    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+    let followerId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.followerIdInput))
 
     let errorCode=undefined
     
@@ -520,8 +520,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let tag=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.tagInput,"tag",1,25)
+    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+    let tag=await routeHelper.routeValidationHelper(helper.checkString,xss(taskInfo.tagInput),"tag",1,25)
 
     let errorCode=undefined
     
@@ -550,8 +550,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let tag=await routeHelper.routeValidationHelper(helper.checkString,taskInfo.tagInput,"tag",1,25)
+    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+    let tag=await routeHelper.routeValidationHelper(helper.checkString,xss(taskInfo.tagInput),"tag",1,25)
 
     let errorCode=undefined
     
@@ -580,8 +580,8 @@ usersRouter
         .status(400)
         .json({error: 'There are no fields in the request body'});
     }
-    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-    let reviewId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.reviewIdInput)
+    let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+    let reviewId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.reviewIdInput))
 
     let errorCode=undefined
     
@@ -609,8 +609,8 @@ usersRouter
           .status(400)
           .json({error: 'There are no fields in the request body'});
       }
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-      let reviewId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.reviewIdInput)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+      let reviewId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.reviewIdInput))
   
       let errorCode=undefined
       
@@ -638,8 +638,8 @@ usersRouter
           .status(400)
           .json({error: 'There are no fields in the request body'});
       }
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-      let commentId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.commentIdInput)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+      let commentId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.commentIdInput))
   
       let errorCode=undefined
       
@@ -667,8 +667,8 @@ usersRouter
           .status(400)
           .json({error: 'There are no fields in the request body'});
       }
-      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.userIdInput)
-      let commentId=await routeHelper.routeValidationHelper(helper.checkObjectId,taskInfo.commentIdInput)
+      let userId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.userIdInput))
+      let commentId=await routeHelper.routeValidationHelper(helper.checkObjectId,xss(taskInfo.commentIdInput))
   
       let errorCode=undefined
       
@@ -693,7 +693,7 @@ usersRouter
     .get(async (req, res) => {
         let userNamePrefix = req.query.prefix;
         let errorCode=undefined;
-        let prefix=await routeHelper.routeValidationHelper(helper.checkString,userNamePrefix, "Prefix", 1, 50);
+        let prefix=await routeHelper.routeValidationHelper(helper.checkString,xss(userNamePrefix), "Prefix", 1, 50);
         if (prefix[1]){
             errorCode=400;
             return res.status(errorCode).json({errorMessage: "Bad Request"});  

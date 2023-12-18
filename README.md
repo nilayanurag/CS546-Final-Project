@@ -1,19 +1,31 @@
 # CS546-Final-Project
 
-Welcome to our project repository! To ensure a smooth and efficient workflow, please adhere to the following guidelines:
+## How to run the file
+```
+npm install
+npm run dev
+```
 
-Task Selection and Tracking
+After the server is up, the You need to run the seed file 
 
-    Choose a Task: Refer to our Project Tasks Spreadsheet to select a task. Feel free to add new tasks.
-    Task ID: Assign a unique ID to your task and update this in the spreadsheet to avoid overlaps.
+```
+run seedAll.js (The file in seeds directory)
+```
 
-Code Organization
+The data will be populted in your data base
 
-    Common Helper Functions: Use functions from the common helper file for shared functionalities (e.g., checkString).
-    Specific Helper Functions: If you develop unique helper functions for your task, place them in a separate file within the helper folder.
+You can check our functionalitites by either creading an account or login to existing account
 
-Repository Management
+```
+email: nilayanurag@gmail.com
+password: Password@123
+```
 
-    Feature Branches: Do not push changes directly to the main branch. Create a feature branch for your work and submit changes via pull requests.
-    Pull Requests: Ensure that your code is reviewed through pull requests before merging into the main branch.
-    
+### Functionalities
+
+1. Follow/UnFollow: You can add follow or unfollow (try typing names like hitarth or harvish)
+2. Add comments: Click on feed (any review) you can add and delete comment
+3. Create Review or Business
+4. See all your reviews under my My Reviews
+5. Update your profile  
+

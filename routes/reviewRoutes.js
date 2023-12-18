@@ -30,10 +30,10 @@ reviewRouter.post(
     let imagePathVal = req.file ? req.file.path + "." + fileType : null;
     imagePathVal = req.file ? req.file.path.replace(/\\/g, "/") : null;
     try {
-      reviewInfo.categoryId = helper.checkObjectId(reviewInfo.categoryId);
-      reviewInfo.businessId = helper.checkObjectId(reviewInfo.businessId);
+      reviewInfo.categoryId = helper.checkObjectId(xss(reviewInfo.categoryId));
+      reviewInfo.businessId = helper.checkObjectId(xss(reviewInfo.businessId));
       reviewInfo.reviewText = helper.checkString(
-        reviewInfo.reviewText,
+        xss(reviewInfo.reviewText),
         "Review Text",
         2,
         500
@@ -45,20 +45,21 @@ reviewRouter.post(
 
     try {
       let reviewExists = await reviewData.checkIfReviewExists(
-        reviewInfo.businessId,
-        req.session.user.userId
+        xss(reviewInfo.businessId),
+        xss(req.session.user.userId)
       );
       if (reviewExists) {
         return res.redirect("/review/createReview?CannotAdd=true");
       }
       let review = await reviewData.createReview(
-        reviewInfo.businessId,
-        req.session.user.userId,
-        reviewInfo.categoryId,
-        reviewInfo.ratingPoints,
-        reviewInfo.reviewText,
-        imagePathVal
+        xss(reviewInfo.businessId),
+          xss(req.session.user.userId),
+            xss(reviewInfo.categoryId),
+              xss(reviewInfo.ratingPoints),
+                xss(reviewInfo.reviewText),
+                  xss(imagePathVal)
       );
+      console.log(review);
       if (review) {
         return res.redirect("/review/getMyReview");
       }
@@ -71,7 +72,7 @@ reviewRouter.post(
 reviewRouter.route("/review/deleteReview/:id").post(async (req, res) => {
   let reviewIdVal = req.params.id;
   try {
-    reviewIdVal = helper.checkObjectId(reviewIdVal);
+    reviewIdVal = helper.checkObjectId(xss(reviewIdVal));
     reviewIdVal = xss(reviewIdVal);
   } catch (error) {
     return res.status(400).json({ errorMessage: error });
@@ -95,7 +96,7 @@ reviewRouter.route("/review/deleteReview/:id").post(async (req, res) => {
 
 
 reviewRouter.route("/review/updateReview/:id").get(async (req, res) => {
-  const reviewId = req.params.id;
+  const reviewId = xss(req.params.id);
   try {
     const review = await reviewData.getReviewById(reviewId);
     const business = await businessData.getBusinessById(
@@ -118,7 +119,7 @@ reviewRouter.post(
   "/review/updateReview/:id",
   upload.single("imagePath"),
   async (req, res) => {
-  let reviewId = req.params.id;
+  let reviewId = xss(req.params.id);
   let reviewInfo = req.body;
   reviewInfo.ratingPoints = parseInt(reviewInfo.ratingPoints,10);
 
@@ -203,7 +204,7 @@ reviewRouter.route("/review/getReview/:id").get(async (req, res) => {
 reviewRouter.route("/review/like/:id").post(async (req, res) => {
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    req.params.id
+    xss(req.params.id)
   );
   let errorCode = undefined;
   if (reviewId[1]) {
@@ -228,7 +229,7 @@ reviewRouter.route("/review/like/:id").post(async (req, res) => {
 reviewRouter.route("/review/dislike/:id").post(async (req, res) => {
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    req.params.id
+    xss(req.params.id)
   );
   let errorCode = undefined;
   if (reviewId[1]) {
@@ -301,11 +302,11 @@ reviewRouter.route("/review/addThumbsUp").post(async (req, res) => {
   }
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.reviewIdInput
+    xss(taskInfo.reviewIdInput)
   );
   let userId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.userIdInput
+    xss(taskInfo.userIdInput)
   );
 
   let errorCode = undefined;
@@ -336,11 +337,11 @@ reviewRouter.route("/review/removeThumbsUp").post(async (req, res) => {
   }
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.reviewIdInput
+    xss(taskInfo.reviewIdInput)
   );
   let userId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.userIdInput
+    xss(taskInfo.userIdInput)
   );
 
   let errorCode = undefined;
@@ -374,11 +375,11 @@ reviewRouter.route("/review/addThumbsDown").post(async (req, res) => {
   }
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.reviewIdInput
+    xss(taskInfo.reviewIdInput)
   );
   let userId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.userIdInput
+    xss(taskInfo.userIdInput)
   );
 
   let errorCode = undefined;
@@ -409,11 +410,11 @@ reviewRouter.route("/review/removeThumbsDown").post(async (req, res) => {
   }
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.reviewIdInput
+    xss(taskInfo.reviewIdInput)
   );
   let userId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.userIdInput
+    xss(taskInfo.userIdInput)
   );
 
   let errorCode = undefined;
@@ -447,11 +448,11 @@ reviewRouter.route("/review/addComment").post(async (req, res) => {
   }
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.reviewIdInput
+    xss(taskInfo.reviewIdInput)
   );
   let commentText = await routeHelper.routeValidationHelper(
     helper.checkString,
-    taskInfo.commentTextInput,
+    xss(taskInfo.commentTextInput),
     "Comment Text",
     2,
     500
@@ -485,11 +486,11 @@ reviewRouter.route("/review/removeComment").post(async (req, res) => {
   }
   let reviewId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.reviewIdInput
+    xss(taskInfo.reviewIdInput)
   );
   let commentId = await routeHelper.routeValidationHelper(
     helper.checkObjectId,
-    taskInfo.commentIdInput
+    xss(taskInfo.commentIdInput)
   );
 
   let errorCode = undefined;
