@@ -269,8 +269,8 @@ $(document).ready(function() {
     function createBusinessCardHtml(business) {
         let starsHtml = generateStarsHtml(business.averageRating);
         // Optional vibe rating
-        let vibeRatingHtml = business.vibeRating ? 
-            `<p class="card-text">Vibe Rating: ${business.vibeRating}/5 ${generateStarsHtml(business.vibeRating)}</p>` : '';
+        let vibeRatingHtml = business.personalizedRating ? 
+            `<p class="card-text">Vibe Rating: ${business.personalizedRating}/5 ${generateStarsHtml(business.personalizedRating)}</p>` : '';
     
         return `
             <div class="business-item mb-3">
@@ -333,9 +333,10 @@ $(document).ready(function() {
             category: $('#categorySelectSearch').val(),
             male: $('#maleCheckbox').is(':checked'),
             female: $('#femaleCheckbox').is(':checked'),
-            min: $('#minAge').val(),
-            max: $('#maxAge').val(),
-            username: getUsernameFromCookie()
+            minAge: $('#minAge').val(),
+            maxAge: $('#maxAge').val(),
+            username: getUsernameFromCookie(),
+            friends: $('#friendsCheckbox').is(':checked')
         };
 
         $.ajax({

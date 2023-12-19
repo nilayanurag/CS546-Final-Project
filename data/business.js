@@ -310,17 +310,28 @@ export const rateAllBusines = async () => {
   }
 
 
-  export const getBusinessRankingList = async (taskInfo) => {
+  export const getBusinessRankingList = async (categorySelect,username,minAge,maxAge,male,female,friends) => {
     const businessCollection = await businesses();
     const categoryCollection = await categories();
-
-    if (!(taskInfo)) throw "No task"
+    const userCollection = await users();
+    const reviewCollection = await reviews();
+    
     let categoryId=undefined;
     let allBusinessList=[]
     let businessList = await businessCollection.find({}).sort({ averageRating: -1 }).toArray();
-
-
-    if (taskInfo.category && taskInfo.category==="All") {
+    let userInfo=await userData.getUserByUsername(username[0]);
+    let userInfoFollowing=userInfo[0].following.map(id => id.toString())
+    let allCat=await categoryCollection.find({}).toArray()
+    allCat=allCat.map(each=>each.name)
+    if(allCat.includes(categorySelect)){
+        let categoryInfo=await categoryData.getCategoryByName(categorySelect)
+        for (let each of businessList) {
+            if (each.categoryId.toString()===categoryInfo._id.toString()){    
+                each.categoryName=categorySelect
+            allBusinessList.push(each)
+             }
+        }
+    }else {
         
         for (let each of businessList) {
             let categoryData=await categoryCollection.findOne({ _id: each.categoryId })
@@ -328,14 +339,65 @@ export const rateAllBusines = async () => {
             allBusinessList.push(each)
         } 
         console.log(allBusinessList)
-    }else if(taskInfo.category){
-        let categoryInfo=await categoryData.getCategoryByName(taskInfo.category)
-        for (let each of businessList) {
-            if (each.categoryId.toString()===categoryInfo._id.toString()){    
-                each.categoryName=taskInfo.category
-            allBusinessList.push(each)
-             }
-        }
     }
-return allBusinessList;
-}
+    let fineTunedList=[]
+    for (let eachBus of allBusinessList){
+        let reviewList=eachBus.reviews;
+        let selectReviewList=[]
+        for(let eachReview of reviewList){
+            let reviewInfo=await reviewCollection.findOne({_id: eachReview})
+            if (!reviewInfo.userId){
+            
+                continue;
+            }
+            let reviewerInfo=await userData.getUserById(reviewInfo.userId.toString())
+          
+            let valid=true
+            if (friends){
+                if (userInfoFollowing.includes(reviewerInfo._id.toString())){
+                }else{
+                    valid=false
+                }
+            }
+
+            if (female&&male){}
+            else if (!(female||male)){
+
+            }else   if (!female && reviewerInfo.sex=="female"){
+                    valid=false
+                }
+                else if (!male && reviewerInfo.sex=="male"){    
+                    valid=false
+                }
+            if (minAge){
+                if (reviewerInfo.age<minAge){
+                    valid=false
+                }
+            }
+            if (maxAge){
+                if (reviewerInfo.age>maxAge){
+                    valid=false
+                }
+            }
+            if (valid==true){
+                selectReviewList.push(reviewInfo._id.toString())
+            }
+        }
+        let vibeRating=await calculateRating(selectReviewList)
+        eachBus.personalizedRating=vibeRating
+        fineTunedList.push(eachBus)
+        if (fineTunedList.length>=10){
+            break;
+        }
+
+    }
+    if (friends){
+        return fineTunedList.sort((a,b)=>{return b.personalizedRating-a.personalizedRating})
+    }
+    
+    else{
+        return fineTunedList.sort((a,b)=>{return b.averageRating-a.averageRating})
+    }
+    }  
+
+
