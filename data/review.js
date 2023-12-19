@@ -475,15 +475,15 @@ export const getVibeReview = async (userId,businessId) => {
 //   return mean
 // }
 
-// export const checkIfReviewExists = async (businessId, userId) => {
-//   try {
-//     businessId = new ObjectId(helper.checkObjectId(businessId));
-//     userId = new ObjectId(helper.checkObjectId(userId));
-//     const reviewCollection = await reviews();
-//     const review = await reviewCollection.findOne({ businessId: businessId, userId: userId });
-//     if (!review) return false;
-//     return true;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
+export const checkIfReviewExists = async (businessId, userId) => {
+  try {
+    businessId = new ObjectId(helper.checkObjectId(businessId));
+    userId = new ObjectId(helper.checkObjectId(userId));
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ businessId: businessId, userId: userId });
+    if (!review) return false;
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}

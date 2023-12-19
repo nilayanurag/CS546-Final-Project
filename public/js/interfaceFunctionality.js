@@ -186,6 +186,7 @@ $(document).ready(function() {
             type: 'GET',
             success: function(reviews) {
                 $('#reviewsFeed').html('');
+                $('#reviewsFeed').append('<h3>User Feed</h3>');
                 reviews.forEach(function(review) {
                     var reviewHtml = createReviewHtml(review);
                     $('#reviewsFeed').append(reviewHtml);
@@ -314,6 +315,7 @@ $(document).ready(function() {
         url: '/categories/getAllCatgories',
         method: 'GET',
         success: function(categories) {
+            $('#categorySelectSearch').append(new Option("All", undefined));
             categories.forEach(function(category) {
                 $('#categorySelectSearch').append(new Option(category.name, category.id));
             });
@@ -341,11 +343,17 @@ $(document).ready(function() {
             method: 'POST',
             data:data,
             success: function(businessData) {
-                console.log(businessData)
+                $('#reviewsFeed').html('');
+                $('#reviewsFeed').append('<h3>Businesses Ranked By Rating</h3>');
+                businessData.businessList.forEach(function(bData) {
+                    console.log(bData)
+                    var bCardHtml = createBusinessCardHtml(bData);
+                    $('#reviewsFeed').append(bCardHtml);
+                });
                
             },
             error: function(error) {
-                alert(error);
+                console.log(error);
 
             }
         });

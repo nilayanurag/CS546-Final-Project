@@ -308,3 +308,34 @@ export const rateAllBusines = async () => {
     console.log(mean)
     return mean
   }
+
+
+  export const getBusinessRankingList = async (taskInfo) => {
+    const businessCollection = await businesses();
+    const categoryCollection = await categories();
+
+    if (!(taskInfo)) throw "No task"
+    let categoryId=undefined;
+    let allBusinessList=[]
+    let businessList = await businessCollection.find({}).sort({ averageRating: -1 }).toArray();
+
+
+    if (taskInfo.category && taskInfo.category==="All") {
+        
+        for (let each of businessList) {
+            let categoryData=await categoryCollection.findOne({ _id: each.categoryId })
+            each.categoryName=categoryData.name
+            allBusinessList.push(each)
+        } 
+        console.log(allBusinessList)
+    }else if(taskInfo.category){
+        let categoryInfo=await categoryData.getCategoryByName(taskInfo.category)
+        for (let each of businessList) {
+            if (each.categoryId.toString()===categoryInfo._id.toString()){    
+                each.categoryName=taskInfo.category
+            allBusinessList.push(each)
+             }
+        }
+    }
+return allBusinessList;
+}

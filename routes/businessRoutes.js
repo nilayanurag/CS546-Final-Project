@@ -215,13 +215,13 @@ businessRouter
 businessRouter
 .route("/customSearch")
 .post(async (req, res) => {
-    searchInfo=req.body;
-    let categorySelect= await routeHelper.routeValidationHelper(helper.checkString,searchInfo.categorySelectSearch,"Category",1,100);
+    let searchInfo=req.body;
+    // let categorySelect= await routeHelper.routeValidationHelper(helper.checkString,searchInfo.categorySelectSearch,"Category",1,100);
 
     const businesses = await businessData.rateAllBusines();
-    const businessList = await businessData.getBusinessRankingList(taskInfo);
+    const businessList = await businessData.getBusinessRankingList(searchInfo);
 
-    res.json({businesses});
+    res.json({businessList:businessList});
 });
 
 
