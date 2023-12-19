@@ -378,7 +378,7 @@ export const rateAllBusines = async () => {
                 selectReviewList.push(reviewInfo._id.toString())
             }
         }
-        let vibeRating=calculateRating(selectReviewList)
+        let vibeRating=await calculateRating(selectReviewList)
         eachBus.personalizedRating=vibeRating
         fineTunedList.push(eachBus)
         if (fineTunedList.length>=10){
@@ -386,7 +386,13 @@ export const rateAllBusines = async () => {
         }
 
     }
-    return fineTunedList.sort((a,b)=>{return b.personalizedRating-a.personalizedRating})
+    if (friends){
+        return fineTunedList.sort((a,b)=>{return b.personalizedRating-a.personalizedRating})
+    }
+    
+    else{
+        return fineTunedList.sort((a,b)=>{return b.averageRating-a.averageRating})
+    }
     }  
 
 
