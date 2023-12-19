@@ -188,68 +188,154 @@ export const updateGlobalRating = async (businessId) => {
     // }
 }
 
-export const getBusinessRankingList = async (taskInfo) => {
-    const categoryCollection = await categories();
-    const reviewCollection = await reviews();
-    const userCollection = await users();
-    const businessCollection    = await businesses();
+// export const getBusinessRankingList = async (taskInfo) => {
+//     const categoryCollection = await categories();
+//     const reviewCollection = await reviews();
+//     const userCollection = await users();
+//     const businessCollection    = await businesses();
 
-    let categoryList = await categoryCollection.find({}).toArray();
+//     let categoryList = await categoryCollection.find({}).toArray();
 
-    if (taskInfo){}
-    else{throw "No task"}
+//     if (taskInfo){}
+//     else{throw "No task"}
 
-    if (categoryList.some(category => category.name === taskInfo.category)) {
-        console.log(categoryList)
-    }else{throw""}
+//     if (categoryList.some(category => category.name === taskInfo.category)) {
+//         console.log(categoryList)
+//     }else{throw""}
 
-    let catInfo=await categoryCollection.findOne({name: taskInfo.category})
+//     let catInfo=await categoryCollection.findOne({name: taskInfo.category})
 
-    let allSelected=await businessCollection.find({categoryId: catInfo._id}).toArray()
-    let userInfo=   await userData.getUserByUsername(taskInfo.username);
-    userInfo=userInfo[0]
-    let busList=[]
-    // userInfo.following=userInfo.following.map(id => id.toString())
-    for (let eachBus of allSelected){
-        let reviews=eachBus.reviews;
-        var reviewList=[]
-        console.log(reviews.length)
-        for (let eachReview of reviews){
-            let eachReviewInfo=await reviewCollection.findOne({_id: eachReview});
-            if (userInfo.following.map(id => id.toString()).includes(eachReviewInfo.userId.toString())) {
+//     let allSelected=await businessCollection.find({categoryId: catInfo._id}).toArray()
+//     let userInfo=   await userData.getUserByUsername(taskInfo.username);
+//     userInfo=userInfo[0]
+//     let busList=[]
+//     // userInfo.following=userInfo.following.map(id => id.toString())
+//     for (let eachBus of allSelected){
+//         let reviews=eachBus.reviews;
+//         var reviewList=[]
+//         console.log(reviews.length)
+//         for (let eachReview of reviews){
+//             let eachReviewInfo=await reviewCollection.findOne({_id: eachReview});
+//             if (userInfo.following.map(id => id.toString()).includes(eachReviewInfo.userId.toString())) {
             
-                // if (taskInfo.min){
-                //     if (userInfo.age>taskInfo.min){
-                //         continue;
-                //     }
-                // }
-                // if (taskInfo.max){
-                //     if (userInfo.age<taskInfo.max){
-                //         continue;
-                //     }
-                // }
-                // if (taskInfo.male){
-                //     if (!(userInfo.male=="male")){
-                //         continue;
-                //     }
-                // }
-                // if (taskInfo.female){
-                //     if (!(userInfo.female==="female")){
-                //         continue;
-                //     }
-                // }
-                eachReviewInfo._id=eachReviewInfo._id.toString()
-                reviewList.push(eachReviewInfo);
-            }
+//                 // if (taskInfo.min){
+//                 //     if (userInfo.age>taskInfo.min){
+//                 //         continue;
+//                 //     }
+//                 // }
+//                 // if (taskInfo.max){
+//                 //     if (userInfo.age<taskInfo.max){
+//                 //         continue;
+//                 //     }
+//                 // }
+//                 // if (taskInfo.male){
+//                 //     if (!(userInfo.male=="male")){
+//                 //         continue;
+//                 //     }
+//                 // }
+//                 // if (taskInfo.female){
+//                 //     if (!(userInfo.female==="female")){
+//                 //         continue;
+//                 //     }
+//                 // }
+//                 eachReviewInfo._id=eachReviewInfo._id.toString()
+//                 reviewList.push(eachReviewInfo);
+//             }
                 
-        let customRating=await reviewData.calculateRating(reviewList)
-        eachBus.vibeRating=customRating
-        busList.push(eachBus)
+//         let customRating=await reviewData.calculateRating(reviewList)
+//         eachBus.vibeRating=customRating
+//         busList.push(eachBus)
         
+//         }
+//     }
+//     busList.sort((a,b)=>{return b.vibeRating-a.vibeRating})
+//     return busList;
+// }  
+
+export const rateAllBusines = async () => {
+    const businessCollection = await businesses();
+    const allBusiness = await businessCollection.find({}).toArray();
+    let allBusinessList=[]
+    try {
+      for (let each of allBusiness) {
+        let updatedBusiness= await populateRating(each._id.toString());
+        allBusinessList.push(updatedBusiness)
+      }
+      
+    } catch (error) {
+      console.log("error in populateAllRating:",error); 
+    }
+  
+}
+  
+  export const populateRating = async (businessId) => {
+    businessId = new ObjectId(helper.checkObjectId(businessId));
+    const businessCollection = await businesses();
+    const reviewCollection = await reviews();
+    
+    const business = await businessCollection.findOne({ _id: businessId });
+    if (!business) throw "Business not found";
+
+    let reviewsListOfOne = business.reviews;
+    let reviewList=[]
+    for (let eachReview of reviewsListOfOne) {
+        
+      let eachReviewInfo = await reviewCollection.findOne({ _id: eachReview });
+      if (!eachReviewInfo) 
+        // throw "Review not found";
+        continue
+      eachReviewInfo._id = eachReviewInfo._id.toString();
+      reviewList.push(eachReviewInfo._id);
+    }
+    let  averageRating = await calculateRating(reviewList);
+    let foundBusiness=await businessCollection.findOneAndUpdate({_id: businessId},{$set: {averageRating: averageRating}})
+    return foundBusiness;
+  }
+    
+
+  export const calculateRating = async (reviewList) => {
+    let ratingList=[]
+    const reviewCollection = await reviews();
+    for (let each of reviewList) {
+      var reviewId = new ObjectId(each);
+      var review = await reviewCollection.findOne({ _id: reviewId });
+      ratingList.push(review.rating||0);
+  
+    }
+    const sum = ratingList.reduce((a, b) => a + b, 0);
+    const avg = (sum / ratingList.length) || 0;
+    let mean=  Number(avg.toFixed(1))
+    console.log(mean)
+    return mean
+  }
+
+
+  export const getBusinessRankingList = async (taskInfo) => {
+    const businessCollection = await businesses();
+    const categoryCollection = await categories();
+
+    if (!(taskInfo)) throw "No task"
+    let categoryId=undefined;
+    let allBusinessList=[]
+    let businessList = await businessCollection.find({}).sort({ averageRating: -1 }).toArray();
+
+
+    if (taskInfo.category && taskInfo.category==="All") {
+        
+        for (let each of businessList) {
+            let categoryData=await categoryCollection.findOne({ _id: each.categoryId })
+            each.categoryName=categoryData.name
+            allBusinessList.push(each)
+        } 
+        console.log(allBusinessList)
+    }else if(taskInfo.category){
+        let categoryInfo=await categoryData.getCategoryByName(taskInfo.category)
+        for (let each of businessList) {
+            if (each.categoryId.toString()===categoryInfo._id.toString()){    
+                each.categoryName=taskInfo.category
+            allBusinessList.push(each)
+             }
         }
     }
-    busList.sort((a,b)=>{return b.vibeRating-a.vibeRating})
-    return busList;
-}  
-    
-    
+return allBusinessList;
+}

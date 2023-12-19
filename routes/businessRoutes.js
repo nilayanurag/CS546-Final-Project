@@ -206,6 +206,24 @@ businessRouter
     return res.json({bList: businessList});
 }
 );
+// businessRouter
+// .route("/getRateAllBusiness")
+// .get(async (req, res) => {
+//     const businesses = await businessData.rateAllBusines();
+//     res.json(businesses);
+// });
+businessRouter
+.route("/customSearch")
+.post(async (req, res) => {
+    let searchInfo=req.body;
+    // let categorySelect= await routeHelper.routeValidationHelper(helper.checkString,searchInfo.categorySelectSearch,"Category",1,100);
+
+    const businesses = await businessData.rateAllBusines();
+    const businessList = await businessData.getBusinessRankingList(searchInfo);
+
+    res.json({businessList:businessList});
+});
+
 
 
 

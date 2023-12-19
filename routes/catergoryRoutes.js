@@ -5,16 +5,16 @@ import * as routeHelper from "../helpers/routeHelper.js";
 import xss from "xss";
 const categoryRouter = express.Router()
 
-// categoryRouter
-// .route("/categories/getAllCatgoriesH")
-// .get(async (req, res) => {  
-//     try {
-//         const categories = await categoryData.getAllCategory();
-//         res.json(categories);
-//     } catch (e) {
-//         res.status(500).json({ errorMessage:"Internal Server Error" });
-//     }
-//     });
+categoryRouter
+.route("/categories/getAllCatgories")
+.get(async (req, res) => {  
+    try {
+        const categories = await categoryData.getAllCategory();
+        res.json(categories);
+    } catch (e) {
+        res.status(500).json({ errorMessage:"Internal Server Error" });
+    }
+    });
 
 categoryRouter
 .route("/categories/:id")

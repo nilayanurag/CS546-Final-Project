@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#registration-form').submit(function(event) {
+    $('#updateUser-form').submit(function(event) {
         
         var isValid = true;
         
