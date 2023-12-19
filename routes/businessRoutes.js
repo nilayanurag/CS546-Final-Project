@@ -188,24 +188,24 @@ businessRouter
 });
 
 businessRouter
-.route("/getBusinessRanking")
-.post(async (req, res) => {
-    // const taskInfo = {
-    //     category: $('#categorySelect').val(),
-    //     gender: {
-    //         male: $('#maleCheckbox').is(':checked'),
-    //         female: $('#femaleCheckbox').is(':checked')
-    //     },
-    //     ageRange: {
-    //         min: $('#minAge').val(),
-    //         max: $('#maxAge').val()
-    //     }
-    // };
-    let taskInfo = req.body;
-    let businessList = await businessData.getBusinessRankingList(taskInfo);
-    return res.json({bList: businessList});
-}
-);
+// .route("/getBusinessRanking")
+// .post(async (req, res) => {
+//     // const taskInfo = {
+//     //     category: $('#categorySelect').val(),
+//     //     gender: {
+//     //         male: $('#maleCheckbox').is(':checked'),
+//     //         female: $('#femaleCheckbox').is(':checked')
+//     //     },
+//     //     ageRange: {
+//     //         min: $('#minAge').val(),
+//     //         max: $('#maxAge').val()
+//     //     }
+//     // };
+//     let taskInfo = req.body;
+//     let businessList = await businessData.getBusinessRankingList(taskInfo);
+//     return res.json({bList: businessList});
+// }
+// );
 // businessRouter
 // .route("/getRateAllBusiness")
 // .get(async (req, res) => {
@@ -215,13 +215,48 @@ businessRouter
 businessRouter
 .route("/customSearch")
 .post(async (req, res) => {
-    let searchInfo=req.body;
-    // let categorySelect= await routeHelper.routeValidationHelper(helper.checkString,searchInfo.categorySelectSearch,"Category",1,100);
+    
 
+    // let categorySelect= await routeHelper.routeValidationHelper(helper.checkString,searchInfo.categorySelectSearch,"Category",1,100);
+    try{
+      let searchInfo=req.body;
+      let categorySelect= await routeHelper.routeValidationHelper(helper.checkString,searchInfo.category);
+      let maxAge=undefined;
+      let minAge=undefined;
+    if (searchInfo.maxAge){
+      maxAge= await routeHelper.routeValidationHelper(helper.checkNaturalNumber,searchInfo.maxAge);
+    }
+    if (searchInfo.minAge){
+      minAge= await routeHelper.routeValidationHelper(helper.checkNaturalNumber,searchInfo.minAge);
+    }
+    if (minAge&&maxAge&&minAge>maxAge){
+      res.status(400).json({ errorMessage: "Min Age should be smaller than Max Age" });
+    }
+    
+    let male=false;
+    let female=false;
+    let friends=false;
+    if (searchInfo.male==="true"){
+      male=searchInfo.male
+    }
+    if (searchInfo.female==="true"){
+      female=searchInfo.female
+    }
+    if (searchInfo.friends==="true"){
+      friends=searchInfo.friends
+    }   
+    let username=await routeHelper.routeValidationHelper(helper.checkValidUsername,searchInfo.username);
     const businesses = await businessData.rateAllBusines();
-    const businessList = await businessData.getBusinessRankingList(searchInfo);
+    const businessList = await businessData.getBusinessRankingList(categorySelect[0],username,minAge,maxAge,male,female,friends);
 
     res.json({businessList:businessList});
+    }catch(error){
+      console.log(error)
+      res.status(400).json({ errorMessage: error });
+
+    }
+    
+    
 });
 
 

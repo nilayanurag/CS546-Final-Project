@@ -333,9 +333,10 @@ $(document).ready(function() {
             category: $('#categorySelectSearch').val(),
             male: $('#maleCheckbox').is(':checked'),
             female: $('#femaleCheckbox').is(':checked'),
-            min: $('#minAge').val(),
-            max: $('#maxAge').val(),
-            username: getUsernameFromCookie()
+            minAge: $('#minAge').val(),
+            maxAge: $('#maxAge').val(),
+            username: getUsernameFromCookie(),
+            friends: $('#friendsCheckbox').is(':checked')
         };
 
         $.ajax({
