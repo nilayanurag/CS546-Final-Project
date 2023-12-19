@@ -347,6 +347,9 @@ export const rateAllBusines = async () => {
         for(let eachReview of reviewList){
             let reviewInfo=await reviewCollection.findOne({_id: eachReview})
             let reviewerInfo=await userData.getUserById(reviewInfo.userId.toString())
+            if (reviewInfo){
+                continue;
+            }
             let valid=true
             if (friends){
                 if (userInfoFollowing.includes(reviewerInfo._id.toString())){
