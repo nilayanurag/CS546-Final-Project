@@ -17,8 +17,8 @@ You can check our functionalitites by either creading an account or login to exi
 
 One of the existing credentials you can use to test:
 ```
-email: nilayanurag@gmail.com
-password: Password@123
+email: 
+password: 
 ```
 
 ## Functionalities Implemented
